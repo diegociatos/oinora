@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora — Área do Empregado</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .filete{display:flex;align-items:center;gap:10px;font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--marinho-med);text-transform:uppercase}
+  .filete::before,.filete::after{content:"";flex:1;height:1px;background:var(--cinza-cl)}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc);transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,99,58,.25)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-verde{background:var(--verde);color:white}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+  .btn-lg{padding:14px 30px;font-size:16px}
+
+  /* SHELL DO EMPREGADO - DIFERENTE: visual mais leve, header em vez de sidebar */
+  .emp-shell{display:flex;flex-direction:column;min-height:100vh}
+  .emp-topnav{background:var(--branco);border-bottom:1px solid var(--cinza-cl);padding:0 44px;display:flex;align-items:center;gap:32px;height:72px;position:sticky;top:0;z-index:100}
+  .emp-topnav .logo{font-size:24px}
+  .emp-topnav .empresa-divisor{width:1px;height:32px;background:var(--cinza-cl)}
+  .emp-topnav .empresa{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1px;text-transform:uppercase}
+  .emp-topnav .empresa strong{color:var(--marinho);font-family:var(--serif);font-size:15px;letter-spacing:0;display:block;text-transform:none;margin-top:2px}
+  .emp-nav-itens{display:flex;gap:4px;flex:1;justify-content:center}
+  .emp-nav-item{padding:8px 14px;font-family:var(--ui);font-size:12px;color:var(--cinza);letter-spacing:.5px;text-transform:uppercase;font-weight:600;cursor:pointer;border-radius:2px;display:flex;align-items:center;gap:6px;border-bottom:2px solid transparent;transition:all .15s;position:relative}
+  .emp-nav-item:hover{color:var(--marinho)}
+  .emp-nav-item.ativo{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .emp-nav-item .badge{background:var(--laranja);color:white;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:2px}
+  .emp-perfil-trigger{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .emp-perfil-trigger .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:16px}
+  .emp-perfil-trigger .info{text-align:right}
+  .emp-perfil-trigger .nome{font-size:13px;color:var(--marinho);line-height:1.2}
+  .emp-perfil-trigger .cargo{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.5px}
+  .emp-notif{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--cinza-fundo);color:var(--marinho);cursor:pointer;position:relative}
+  .emp-notif .ponto{position:absolute;top:6px;right:8px;width:8px;height:8px;background:var(--laranja);border-radius:50%;border:2px solid var(--branco)}
+
+  .emp-main{padding:36px 44px 80px;background:var(--papel);flex:1;max-width:1400px;margin:0 auto;width:100%}
+
+  /* HERO DASHBOARD EMPREGADO */
+  .hero-emp{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);border-radius:2px;padding:36px 40px;margin-bottom:24px;position:relative;overflow:hidden}
+  .hero-emp::before{content:"";position:absolute;top:-50%;right:-10%;width:480px;height:480px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .hero-emp-conteudo{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center}
+  .hero-emp h1{font-size:36px;font-weight:400;letter-spacing:-.3px;line-height:1.1;margin-bottom:6px}
+  .hero-emp h1 em{color:var(--laranja);font-style:italic}
+  .hero-emp .sub{font-family:var(--ui);font-size:14px;opacity:.75;letter-spacing:.3px}
+
+  .ponto-quick{background:rgba(255,255,255,.06);backdrop-filter:blur(10px);padding:24px 32px;border-radius:4px;text-align:center;min-width:260px;border:1px solid rgba(255,255,255,.1)}
+  .ponto-quick .hora-atual{font-family:var(--serif);font-size:42px;color:var(--papel);line-height:1;letter-spacing:-1px;font-style:italic}
+  .ponto-quick .data-hoje{font-family:var(--ui);font-size:11px;opacity:.7;letter-spacing:2px;text-transform:uppercase;margin-top:8px;font-weight:600}
+  .btn-bater-ponto{background:var(--laranja);color:white;padding:14px 28px;border-radius:2px;font-family:var(--serif);font-size:15px;margin-top:18px;display:inline-flex;align-items:center;gap:10px;cursor:pointer;width:100%;justify-content:center;transition:all .2s}
+  .btn-bater-ponto:hover{background:var(--laranja-esc);transform:translateY(-1px)}
+  .btn-bater-ponto::before{content:"●";color:white;font-size:16px}
+  .ponto-status-rapido{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px;font-family:var(--ui);font-size:10px;letter-spacing:.5px}
+  .ponto-status-rapido > div{padding:6px 4px;background:rgba(255,255,255,.04);border-radius:2px}
+  .ponto-status-rapido .hr{font-family:var(--serif);font-size:13px;color:var(--papel);font-style:italic}
+  .ponto-status-rapido .hr.pend{color:var(--laranja);opacity:.5}
+  .ponto-status-rapido .lab{opacity:.5;text-transform:uppercase;margin-top:2px}
+
+  /* CARDS DASHBOARD */
+  .cards-emp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px}
+  .card-emp{background:var(--branco);border:1px solid var(--cinza-cl);padding:24px;border-radius:2px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+  .card-emp:hover{border-color:var(--laranja);transform:translateY(-2px);box-shadow:0 6px 24px rgba(31,42,68,.08)}
+  .card-emp-icone{width:42px;height:42px;background:var(--laranja-cl);color:var(--laranja);display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:50%;margin-bottom:14px}
+  .card-emp-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .card-emp-valor{font-size:32px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.3px}
+  .card-emp-valor em{color:var(--laranja);font-style:italic}
+  .card-emp-valor span{font-size:14px;color:var(--cinza)}
+  .card-emp-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:10px;letter-spacing:.3px}
+  .card-emp-cta{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--cinza-cl);font-family:var(--ui);font-size:11px;color:var(--laranja);font-weight:700;letter-spacing:.5px}
+
+  /* GRID 2x */
+  .grid-2{display:grid;grid-template-columns:2fr 1fr;gap:24px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:20px}
+  .painel h3{font-size:21px;font-weight:400;margin-bottom:4px}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:22px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px}
+
+  .tag{font-family:var(--ui);font-size:11px;padding:4px 10px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  /* COMUNICADOS / MURAL */
+  .mural-item{padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;margin-bottom:12px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:flex-start;cursor:pointer;transition:all .15s}
+  .mural-item:hover{border-color:var(--laranja);background:var(--cinza-fundo)}
+  .mural-icone{width:42px;height:42px;border-radius:50%;background:var(--marinho);color:var(--papel);display:flex;align-items:center;justify-content:center;font-size:18px}
+  .mural-icone.aniv{background:var(--laranja-cl);color:var(--laranja)}
+  .mural-icone.comunicado{background:var(--marinho)}
+  .mural-icone.evento{background:var(--verde)}
+  .mural-titulo{font-size:15px;font-weight:500;margin-bottom:3px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+  .mural-data{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;white-space:nowrap}
+  .mural-resumo{font-family:var(--ui);font-size:13px;color:var(--cinza);line-height:1.5}
+
+  /* PROGRESSO */
+  .barra-progresso{height:6px;background:var(--cinza-fundo);border-radius:3px;overflow:hidden}
+  .barra-progresso .preenchimento{height:100%;background:linear-gradient(90deg,var(--laranja),var(--laranja-esc));transition:width .6s}
+
+  /* PERFIL EMPREGADO HEADER */
+  .perfil-meu-header{background:var(--branco);border:1px solid var(--cinza-cl);padding:36px;border-radius:2px;margin-bottom:24px;display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center}
+  .perfil-meu-foto{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:46px;position:relative}
+  .perfil-meu-foto::after{content:"📷";position:absolute;bottom:0;right:0;width:34px;height:34px;background:var(--branco);border:2px solid var(--cinza-cl);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+  .perfil-meu-info h2{font-size:32px;font-weight:400;margin-bottom:4px}
+  .perfil-meu-info .cargo{font-family:var(--ui);font-size:13px;color:var(--cinza);letter-spacing:.5px;margin-bottom:14px}
+  .perfil-meu-tags{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* ABAS */
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;overflow-x:auto}
+  .aba{padding:12px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+
+  /* INFO LINHA */
+  .info-linha{display:grid;grid-template-columns:160px 1fr;gap:14px;padding:11px 0;border-bottom:1px solid var(--cinza-cl);font-size:14px}
+  .info-linha:last-child{border:none}
+  .info-linha .rotulo{color:var(--cinza);font-family:var(--ui);font-size:12px;letter-spacing:.3px}
+  .info-linha .valor{color:var(--marinho)}
+
+  /* DOCUMENTOS LISTA */
+  .doc-item{display:flex;align-items:center;gap:14px;padding:14px;background:var(--cinza-fundo);border-radius:2px;margin-bottom:8px;border:1px solid transparent;transition:all .15s;cursor:pointer}
+  .doc-item:hover{border-color:var(--laranja);background:var(--laranja-cl)}
+  .doc-icone{width:38px;height:38px;background:var(--marinho);color:var(--papel);display:flex;align-items:center;justify-content:center;font-family:var(--ui);font-size:10px;font-weight:700;border-radius:2px;flex-shrink:0}
+  .doc-icone.atencao{background:var(--amarelo);color:white}
+  .doc-icone.vencido{background:var(--vermelho);color:white}
+  .doc-icone.verde{background:var(--verde)}
+  .doc-info{flex:1}
+  .doc-nome{font-size:14px;font-weight:500}
+  .doc-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px}
+  .doc-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:var(--branco);color:var(--cinza);transition:all .15s}
+  .doc-btn:hover{color:var(--marinho);background:var(--cinza-cl)}
+
+  /* BATER PONTO - TELA GRANDE */
+  .bater-ponto-wrap{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:flex-start}
+  .bater-ponto-principal{background:var(--branco);border:1px solid var(--cinza-cl);padding:40px;border-radius:2px;text-align:center}
+  .relogio-grande{font-family:var(--serif);font-size:96px;color:var(--marinho);line-height:1;letter-spacing:-3px;font-style:italic;margin-bottom:8px}
+  .relogio-grande span{color:var(--laranja)}
+  .data-grande{font-family:var(--ui);font-size:14px;color:var(--cinza);letter-spacing:3px;text-transform:uppercase;font-weight:600;margin-bottom:32px}
+  .gps-status{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:var(--verde-cl);color:var(--verde);border-radius:20px;font-family:var(--ui);font-size:12px;font-weight:600;margin-bottom:24px;letter-spacing:.3px}
+  .gps-status::before{content:"●";animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .btn-bater-grande{background:var(--laranja);color:white;padding:24px 60px;border-radius:2px;font-family:var(--serif);font-size:20px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;border:none;box-shadow:0 10px 30px rgba(232,99,58,.3)}
+  .btn-bater-grande:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(232,99,58,.4);background:var(--laranja-esc)}
+  .btn-bater-grande::before{content:"";width:14px;height:14px;background:white;border-radius:50%;animation:pulse 1.5s infinite}
+  .bater-info{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:24px;letter-spacing:.5px;line-height:1.6}
+
+  .ponto-historico-hoje{background:var(--cinza-fundo);padding:18px;border-radius:2px;margin-top:24px;text-align:left}
+  .ponto-historico-hoje h5{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:14px}
+  .ponto-marcacao{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--cinza-cl)}
+  .ponto-marcacao:last-child{border:none}
+  .ponto-marcacao .lab{font-family:var(--ui);font-size:13px;display:flex;align-items:center;gap:8px}
+  .ponto-marcacao .lab::before{content:"";width:8px;height:8px;background:var(--verde);border-radius:50%}
+  .ponto-marcacao.pendente .lab{color:var(--cinza);opacity:.5}
+  .ponto-marcacao.pendente .lab::before{background:var(--cinza-cl)}
+  .ponto-marcacao .hr{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--marinho)}
+  .ponto-marcacao.pendente .hr{color:var(--cinza);opacity:.5}
+
+  /* CALENDARIO MES MEU */
+  .cal-mes{padding:0;margin-bottom:20px}
+  .cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-dia-head{padding:8px;text-align:center;font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+  .cal-dia{aspect-ratio:1;padding:6px;background:var(--cinza-fundo);border-radius:2px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;font-family:var(--ui);font-size:12px;cursor:pointer;transition:all .15s;position:relative}
+  .cal-dia:hover{background:var(--laranja-cl)}
+  .cal-dia.fim-semana{opacity:.4;cursor:default}
+  .cal-dia.fim-semana:hover{background:var(--cinza-fundo)}
+  .cal-dia.ok{background:var(--verde-cl);color:var(--verde)}
+  .cal-dia.atencao{background:var(--amarelo-cl);color:#876715}
+  .cal-dia.falta{background:var(--vermelho-cl);color:var(--vermelho)}
+  .cal-dia.ferias{background:var(--roxo-cl);color:var(--roxo)}
+  .cal-dia.hoje{border:2px solid var(--laranja);font-weight:700}
+  .cal-dia .data{font-weight:600;font-size:13px}
+  .cal-dia .info{font-size:9px;letter-spacing:.3px;opacity:.85}
+
+  /* SOLICITAÇÕES - cards seletor */
+  .solic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+  .solic-card{background:var(--branco);border:1px solid var(--cinza-cl);padding:24px;border-radius:2px;cursor:pointer;transition:all .15s;text-align:center}
+  .solic-card:hover{border-color:var(--laranja);transform:translateY(-2px);box-shadow:0 6px 20px rgba(31,42,68,.06)}
+  .solic-icone-grande{width:54px;height:54px;background:var(--laranja-cl);color:var(--laranja);display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:50%;margin:0 auto 14px}
+  .solic-card h5{font-size:15px;font-weight:500;margin-bottom:6px}
+  .solic-card p{font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5}
+
+  /* SOLICITAÇÃO ATIVA */
+  .solic-ativa{background:var(--branco);border:1px solid var(--cinza-cl);padding:14px 18px;border-radius:2px;display:grid;grid-template-columns:auto 1fr auto auto;gap:16px;align-items:center;margin-bottom:10px}
+  .solic-ativa-status{width:6px;align-self:stretch;border-radius:3px;background:var(--amarelo)}
+  .solic-ativa-status.verde{background:var(--verde)}
+  .solic-ativa-status.vermelho{background:var(--vermelho)}
+  .solic-ativa h6{font-size:14px;font-weight:500}
+  .solic-ativa .meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px}
+
+  /* HOLERITES */
+  .holerite-card{background:var(--branco);border:1px solid var(--cinza-cl);padding:20px;border-radius:2px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;transition:all .15s;cursor:pointer}
+  .holerite-card:hover{border-color:var(--laranja)}
+  .holerite-mes{font-family:var(--ui);font-size:11px;letter-spacing:2px;color:var(--cinza);text-transform:uppercase;font-weight:700}
+  .holerite-valor{font-family:var(--serif);font-size:24px;color:var(--marinho);margin-top:3px;font-style:italic}
+  .holerite-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px}
+
+  /* CHAT */
+  .chat-shell{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;height:720px;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+  .chat-header{padding:20px 28px;background:var(--marinho);color:var(--papel);display:flex;align-items:center;gap:14px}
+  .chat-header .av{width:44px;height:44px;border-radius:50%;background:var(--laranja-cl);color:var(--laranja);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:18px;font-weight:600}
+  .chat-header .av.bot{background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));color:white}
+  .chat-header h4{font-size:17px;font-weight:500}
+  .chat-header .status{font-family:var(--ui);font-size:11px;opacity:.7;display:flex;align-items:center;gap:6px;margin-top:2px;letter-spacing:.5px}
+  .chat-header .status::before{content:"";width:6px;height:6px;background:var(--verde);border-radius:50%}
+  .chat-body{padding:28px 32px;overflow-y:auto;background:var(--papel)}
+  .msg{margin-bottom:16px;display:flex;gap:10px;max-width:78%}
+  .msg.me{margin-left:auto;flex-direction:row-reverse}
+  .msg-bubble{padding:12px 18px;border-radius:6px;font-size:14px;line-height:1.55}
+  .msg.them .msg-bubble{background:var(--branco);border:1px solid var(--cinza-cl)}
+  .msg.bot .msg-bubble{background:linear-gradient(135deg,#FFFBF7,var(--branco));border:1px solid var(--laranja-cl);color:var(--marinho)}
+  .msg.me .msg-bubble{background:var(--laranja);color:white}
+  .msg-time{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .msg-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;color:white;font-weight:600}
+  .msg-av.bot{background:linear-gradient(135deg,var(--laranja),var(--laranja-esc))}
+  .msg-av.rh{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .chat-input{padding:16px 24px;background:var(--branco);border-top:1px solid var(--cinza-cl);display:flex;gap:10px;align-items:center}
+  .chat-input input{flex:1;padding:12px 16px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:14px;border-radius:2px}
+  .chat-acoes-rapidas{padding:14px 24px;background:var(--cinza-fundo);border-top:1px solid var(--cinza-cl);display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:var(--ui);font-size:11px}
+  .quick-action{padding:6px 14px;border:1px solid var(--cinza-cl);background:var(--branco);border-radius:14px;font-size:12px;cursor:pointer;font-family:var(--serif);transition:all .15s}
+  .quick-action:hover{border-color:var(--laranja);color:var(--laranja)}
+
+  /* TREINAMENTO CARD */
+  .treina-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden;cursor:pointer;transition:all .15s}
+  .treina-card:hover{border-color:var(--laranja);transform:translateY(-2px)}
+  .treina-thumb{height:120px;background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));position:relative;display:flex;align-items:center;justify-content:center;color:var(--papel)}
+  .treina-thumb.obrig{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .treina-thumb.lider{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .treina-thumb.idioma{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .treina-thumb-icone{font-size:40px;opacity:.7}
+  .treina-tag-flag{position:absolute;top:10px;right:10px;font-family:var(--ui);font-size:9px;letter-spacing:1px;padding:3px 8px;background:rgba(255,255,255,.2);border-radius:2px;font-weight:700}
+  .treina-body{padding:16px}
+  .treina-titulo{font-size:14px;font-weight:500;margin-bottom:6px}
+  .treina-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:10px}
+  .treina-progresso{font-family:var(--ui);font-size:10px;color:var(--cinza);display:flex;justify-content:space-between;margin-bottom:4px;letter-spacing:.3px}
+
+  /* MEUS PAGAMENTOS - resumo */
+  .pag-resumo{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);padding:36px;border-radius:2px;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px}
+  .pag-resumo-item{text-align:center;padding:0 18px;border-right:1px solid rgba(255,255,255,.1)}
+  .pag-resumo-item:last-child{border-right:none}
+  .pag-resumo-item .lab{font-family:var(--ui);font-size:10px;letter-spacing:2px;opacity:.6;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+  .pag-resumo-item .val{font-family:var(--serif);font-size:28px;font-style:italic;color:var(--papel)}
+  .pag-resumo-item .val em{color:var(--laranja)}
+  .pag-resumo-item .descr{font-family:var(--ui);font-size:11px;opacity:.5;margin-top:6px}
+
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(19,27,46,.85);z-index:1000;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+  .modal-overlay.aberto{display:flex}
+  .modal{background:var(--papel);max-width:680px;width:100%;border-radius:4px;position:relative;overflow:hidden}
+  .modal-fechar{position:absolute;top:14px;right:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--cinza);cursor:pointer;z-index:10;background:rgba(255,255,255,.9);border-radius:50%}
+  .modal-body{padding:40px}
+
+  /* CAMPOS */
+  .campo{margin-bottom:18px}
+  .campo label{display:block;font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--marinho-med);margin-bottom:8px;font-weight:600}
+  .campo input,.campo select,.campo textarea{width:100%;padding:11px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;color:var(--marinho);border-radius:2px}
+  .campo input:focus,.campo textarea:focus{outline:none;border-color:var(--laranja)}
+  .campos-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  /* PDI PROGRESS */
+  .pdi-item{padding:18px;background:var(--cinza-fundo);border-left:3px solid var(--laranja);border-radius:2px;margin-bottom:12px}
+  .pdi-meta{display:flex;justify-content:space-between;margin-bottom:10px;font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1100px){
+    .cards-emp-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2{grid-template-columns:1fr}
+    .bater-ponto-wrap{grid-template-columns:1fr}
+    .emp-nav-itens{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: DASHBOARD DO EMPREGADO -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-dash">
+  <div class="emp-shell">
+    <nav class="emp-topnav">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-divisor"></div>
+      <div class="empresa"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+      <div class="emp-nav-itens">
+        <div class="emp-nav-item ativo" onclick="irPara('t-dash')">🏠 Início</div>
+        <div class="emp-nav-item" onclick="irPara('t-bater-ponto')">⏱ Ponto</div>
+        <div class="emp-nav-item" onclick="irPara('t-meu-perfil')">👤 Meu Perfil</div>
+        <div class="emp-nav-item" onclick="irPara('t-solicitacoes')">📝 Solicitações</div>
+        <div class="emp-nav-item" onclick="irPara('t-pagamentos')">💰 Pagamentos</div>
+        <div class="emp-nav-item" onclick="irPara('t-treinamentos')">🎓 Aprender</div>
+        <div class="emp-nav-item" onclick="irPara('t-desempenho')">⭐ Desempenho</div>
+        <div class="emp-nav-item" onclick="irPara('t-chat-rh')">💬 Falar com RH <span class="badge">1</span></div>
+      </div>
+      <div class="emp-notif">🔔<span class="ponto"></span></div>
+      <div class="emp-perfil-trigger">
+        <div class="info">
+          <div class="nome">Fernando Lacerda</div>
+          <div class="cargo">Engenheiro Civil Sr</div>
+        </div>
+        <div class="av">F</div>
+      </div>
+    </nav>
+
+    <main class="emp-main">
+      <div class="hero-emp">
+        <div class="hero-emp-conteudo">
+          <div>
+            <h1>Olá, <em>Fernando</em>.</h1>
+            <p class="sub">Segunda-feira, 25 de maio de 2026 · Bom começo de semana 👋</p>
+            <div style="margin-top:24px;display:flex;gap:24px;flex-wrap:wrap;font-family:var(--ui);font-size:13px;opacity:.9">
+              <span>📅 22 dias de férias disponíveis</span>
+              <span>⚠ 1 documento expirando</span>
+              <span>🎓 2 treinamentos pendentes</span>
+            </div>
+          </div>
+          <div class="ponto-quick">
+            <div class="hora-atual">14:23</div>
+            <div class="data-hoje">25 · MAI · SEG</div>
+            <button class="btn-bater-ponto" onclick="irPara('t-bater-ponto')">Bater Ponto · Saída</button>
+            <div class="ponto-status-rapido">
+              <div><div class="hr">08:00</div><div class="lab">Entrada</div></div>
+              <div><div class="hr">12:00</div><div class="lab">Almoço</div></div>
+              <div><div class="hr">13:02</div><div class="lab">Volta</div></div>
+              <div><div class="hr pend">--:--</div><div class="lab">Saída</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards-emp-grid">
+        <div class="card-emp" onclick="irPara('t-solicitacoes')">
+          <div class="card-emp-icone" style="background:var(--roxo-cl);color:var(--roxo)">🌴</div>
+          <div class="card-emp-titulo">Saldo de Férias</div>
+          <div class="card-emp-valor"><em>22</em><span>dias</span></div>
+          <div class="card-emp-meta">Período aquisitivo 09/2024-09/2025</div>
+          <div class="card-emp-cta"><span>SOLICITAR FÉRIAS</span><span>→</span></div>
+        </div>
+
+        <div class="card-emp" onclick="irPara('t-pagamentos')">
+          <div class="card-emp-icone" style="background:var(--verde-cl);color:var(--verde)">💰</div>
+          <div class="card-emp-titulo">Último Holerite</div>
+          <div class="card-emp-valor"><em>R$ 9.847</em></div>
+          <div class="card-emp-meta">Abril 2026 · Líquido</div>
+          <div class="card-emp-cta"><span>VER HOLERITES</span><span>→</span></div>
+        </div>
+
+        <div class="card-emp" onclick="irPara('t-treinamentos')">
+          <div class="card-emp-icone" style="background:var(--amarelo-cl);color:#876715">🎓</div>
+          <div class="card-emp-titulo">Treinamentos</div>
+          <div class="card-emp-valor"><em>2</em><span>pendentes</span></div>
+          <div class="card-emp-meta">NR-35 (renovação) · LGPD</div>
+          <div class="card-emp-cta"><span>FAZER AGORA</span><span>→</span></div>
+        </div>
+
+        <div class="card-emp" onclick="irPara('t-meu-perfil')">
+          <div class="card-emp-icone" style="background:var(--vermelho-cl);color:var(--vermelho)">⚠</div>
+          <div class="card-emp-titulo">ASO Vencendo</div>
+          <div class="card-emp-valor"><em>8</em><span>dias</span></div>
+          <div class="card-emp-meta">Exame periódico até 02/06</div>
+          <div class="card-emp-cta" style="color:var(--vermelho)"><span>VER DETALHES</span><span>→</span></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div>
+                <h3>Mural &amp; Comunicados</h3>
+                <div class="sub-titulo">Da empresa para você</div>
+              </div>
+              <button class="btn btn-fantasma btn-sm">Ver todos</button>
+            </div>
+
+            <div class="mural-item">
+              <div class="mural-icone aniv">🎂</div>
+              <div>
+                <div class="mural-titulo">
+                  <span>Aniversariantes da semana</span>
+                  <span class="mural-data">3 pessoas</span>
+                </div>
+                <div class="mural-resumo">Camila Reis · 27/05 · Auxiliar Administrativa · &nbsp;|&nbsp; Marcos V. · 28/05 · &nbsp;|&nbsp; Tatiana M. · 30/05</div>
+              </div>
+            </div>
+
+            <div class="mural-item">
+              <div class="mural-icone comunicado">📢</div>
+              <div>
+                <div class="mural-titulo">
+                  <span>Reajuste salarial setembro/2026</span>
+                  <span class="mural-data">há 2 dias</span>
+                </div>
+                <div class="mural-resumo">Comunicado da Diretoria sobre a campanha de reajuste e cronograma de revisões. Lido por 89 pessoas.</div>
+              </div>
+            </div>
+
+            <div class="mural-item">
+              <div class="mural-icone evento">🎉</div>
+              <div>
+                <div class="mural-titulo">
+                  <span>Festa Junina Aurora · 21/06</span>
+                  <span class="mural-data">há 4 dias</span>
+                </div>
+                <div class="mural-resumo">Confirme presença até 10/06. Confirmações até agora: 62 colaboradores + 38 dependentes 🎊</div>
+              </div>
+            </div>
+
+            <div class="mural-item">
+              <div class="mural-icone comunicado">📋</div>
+              <div>
+                <div class="mural-titulo">
+                  <span>Política de Home Office atualizada</span>
+                  <span class="mural-data">15/05</span>
+                </div>
+                <div class="mural-resumo">Novas diretrizes em vigor a partir de junho. Leitura e aceite obrigatórios. <strong style="color:var(--laranja)">Você ainda não leu</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Suas próximas avaliações</h3><div class="sub-titulo">Ciclo 2026-S1</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div style="padding:18px;background:var(--cinza-fundo);border-radius:2px;border-left:3px solid var(--laranja)">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700;margin-bottom:6px">EM 15 DIAS</div>
+                <h5 style="font-size:15px;font-weight:500;margin-bottom:4px">Autoavaliação</h5>
+                <p style="font-family:var(--ui);font-size:11px;color:var(--cinza)">09/06 a 23/06</p>
+              </div>
+              <div style="padding:18px;background:var(--cinza-fundo);border-radius:2px;border-left:3px solid var(--marinho)">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700;margin-bottom:6px">EM 29 DIAS</div>
+                <h5 style="font-size:15px;font-weight:500;margin-bottom:4px">Feedback 1:1</h5>
+                <p style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Com Luísa Mendonça · 14/07</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Atalhos rápidos</h3>
+            <div class="sub-titulo">O que você faz mais</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <button class="btn btn-fantasma btn-sm" style="justify-content:center;padding:14px 8px;flex-direction:column;height:auto;gap:6px" onclick="irPara('t-bater-ponto')">
+                <span style="font-size:22px">⏱</span>
+                <span style="font-size:11px">Bater Ponto</span>
+              </button>
+              <button class="btn btn-fantasma btn-sm" style="justify-content:center;padding:14px 8px;flex-direction:column;height:auto;gap:6px" onclick="abrirModal('m-solic-ferias')">
+                <span style="font-size:22px">🌴</span>
+                <span style="font-size:11px">Solicitar Férias</span>
+              </button>
+              <button class="btn btn-fantasma btn-sm" style="justify-content:center;padding:14px 8px;flex-direction:column;height:auto;gap:6px" onclick="irPara('t-solicitacoes')">
+                <span style="font-size:22px">📄</span>
+                <span style="font-size:11px">Declarações</span>
+              </button>
+              <button class="btn btn-fantasma btn-sm" style="justify-content:center;padding:14px 8px;flex-direction:column;height:auto;gap:6px" onclick="irPara('t-solicitacoes')">
+                <span style="font-size:22px">💊</span>
+                <span style="font-size:11px">Reembolso</span>
+              </button>
+              <button class="btn btn-fantasma btn-sm" style="justify-content:center;padding:14px 8px;flex-direction:column;height:auto;gap:6px" onclick="irPara('t-pagamentos')">
+                <span style="font-size:22px">🧾</span>
+                <span style="font-size:11px">Imposto Renda</span>
+              </button>
+              <button class="btn btn-fantasma btn-sm" style="justify-content:center;padding:14px 8px;flex-direction:column;height:auto;gap:6px" onclick="irPara('t-chat-rh')">
+                <span style="font-size:22px">💬</span>
+                <span style="font-size:11px">Falar com RH</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Sua equipe</h3>
+            <div class="sub-titulo">Time da Eng. Civil</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:2px;background:var(--cinza-fundo)">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px">L</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Luísa Mendonça</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Diretora · sua gestora</div>
+                </div>
+                <button class="doc-btn">💬</button>
+              </div>
+              <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:2px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7E5BCC,#5B3FA0);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px">A</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Ana Carolina Souza</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Engenheira Pl · sua par</div>
+                </div>
+                <span class="tag amarelo" style="font-size:9px">Licença</span>
+              </div>
+              <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:2px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#D4A02C,#A37614);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px">P</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Pedro Aurélio Lima</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Estagiário · seu liderado</div>
+                </div>
+                <button class="doc-btn">💬</button>
+              </div>
+              <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:2px">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2D7D5A,#1F5740);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px">D</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Daniel Pinheiro</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Eng. Jr · seu liderado</div>
+                </div>
+                <button class="doc-btn">💬</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: BATER PONTO -->
+<!-- ============================================== -->
+<div class="tela" id="t-bater-ponto">
+  <div class="emp-shell">
+    <nav class="emp-topnav">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-divisor"></div>
+      <div class="empresa"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+      <div class="emp-nav-itens">
+        <div class="emp-nav-item" onclick="irPara('t-dash')">🏠 Início</div>
+        <div class="emp-nav-item ativo">⏱ Ponto</div>
+        <div class="emp-nav-item" onclick="irPara('t-meu-perfil')">👤 Meu Perfil</div>
+        <div class="emp-nav-item" onclick="irPara('t-solicitacoes')">📝 Solicitações</div>
+        <div class="emp-nav-item" onclick="irPara('t-pagamentos')">💰 Pagamentos</div>
+        <div class="emp-nav-item" onclick="irPara('t-treinamentos')">🎓 Aprender</div>
+        <div class="emp-nav-item" onclick="irPara('t-desempenho')">⭐ Desempenho</div>
+        <div class="emp-nav-item" onclick="irPara('t-chat-rh')">💬 Falar com RH</div>
+      </div>
+      <div class="emp-notif">🔔<span class="ponto"></span></div>
+      <div class="emp-perfil-trigger">
+        <div class="info"><div class="nome">Fernando Lacerda</div><div class="cargo">Engenheiro Civil Sr</div></div>
+        <div class="av">F</div>
+      </div>
+    </nav>
+
+    <main class="emp-main">
+      <div style="margin-bottom:24px">
+        <h1 style="font-size:34px;font-weight:400">Ponto <em style="color:var(--laranja);font-style:italic">eletrônico</em></h1>
+        <p style="font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px">Bata seu ponto · veja seu histórico · justifique inconsistências</p>
+      </div>
+
+      <div class="bater-ponto-wrap">
+        <div class="bater-ponto-principal">
+          <div class="data-grande">SEGUNDA · 25 DE MAIO · 2026</div>
+          <div class="relogio-grande">14:23<span>:</span>47</div>
+
+          <div class="gps-status">GPS confirmado · Sítio I, Vespasiano/MG</div>
+          <br>
+
+          <button class="btn-bater-grande">Bater Ponto · Saída</button>
+
+          <div class="bater-info">
+            Sua marcação será registrada com<br>
+            geolocalização e identificação biométrica facial<br>
+            <strong style="color:var(--marinho)">Modelo: REP-A (Portaria 671/2021)</strong>
+          </div>
+
+          <div class="ponto-historico-hoje">
+            <h5>Marcações de hoje</h5>
+            <div class="ponto-marcacao">
+              <div class="lab">Entrada</div>
+              <div class="hr">08:00</div>
+            </div>
+            <div class="ponto-marcacao">
+              <div class="lab">Saída almoço</div>
+              <div class="hr">12:00</div>
+            </div>
+            <div class="ponto-marcacao">
+              <div class="lab">Retorno almoço</div>
+              <div class="hr">13:02</div>
+            </div>
+            <div class="ponto-marcacao pendente">
+              <div class="lab">Saída</div>
+              <div class="hr">--:--</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--cinza-cl);font-family:var(--ui);font-size:12px">
+              <span style="color:var(--cinza)">Trabalhadas até agora</span>
+              <strong style="font-family:var(--serif);font-size:18px;color:var(--marinho);font-style:italic">5h 21min</strong>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Espelho de ponto · Maio 2026</h3>
+            <div class="sub-titulo">Calendário do mês</div>
+            <div class="cal-grid">
+              <div class="cal-dia-head">Dom</div>
+              <div class="cal-dia-head">Seg</div>
+              <div class="cal-dia-head">Ter</div>
+              <div class="cal-dia-head">Qua</div>
+              <div class="cal-dia-head">Qui</div>
+              <div class="cal-dia-head">Sex</div>
+              <div class="cal-dia-head">Sáb</div>
+
+              <div class="cal-dia fim-semana"><div class="data">26</div></div>
+              <div class="cal-dia fim-semana"><div class="data">27</div></div>
+              <div class="cal-dia fim-semana"><div class="data">28</div></div>
+              <div class="cal-dia fim-semana"><div class="data">29</div></div>
+              <div class="cal-dia fim-semana"><div class="data">30</div></div>
+              <div class="cal-dia ok"><div class="data">01</div><div class="info">Feriado</div></div>
+              <div class="cal-dia fim-semana"><div class="data">02</div></div>
+
+              <div class="cal-dia fim-semana"><div class="data">03</div></div>
+              <div class="cal-dia ok"><div class="data">04</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia ok"><div class="data">05</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia ok"><div class="data">06</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia atencao"><div class="data">07</div><div class="info">+22'</div></div>
+              <div class="cal-dia ok"><div class="data">08</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia fim-semana"><div class="data">09</div></div>
+
+              <div class="cal-dia fim-semana"><div class="data">10</div></div>
+              <div class="cal-dia ok"><div class="data">11</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia ok"><div class="data">12</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia ok"><div class="data">13</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia falta"><div class="data">14</div><div class="info">atest.</div></div>
+              <div class="cal-dia ok"><div class="data">15</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia fim-semana"><div class="data">16</div></div>
+
+              <div class="cal-dia fim-semana"><div class="data">17</div></div>
+              <div class="cal-dia ok"><div class="data">18</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia ok"><div class="data">19</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia ok"><div class="data">20</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia ok"><div class="data">21</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia ok"><div class="data">22</div><div class="info">8h ✓</div></div>
+              <div class="cal-dia fim-semana"><div class="data">23</div></div>
+
+              <div class="cal-dia fim-semana"><div class="data">24</div></div>
+              <div class="cal-dia hoje"><div class="data">25</div><div class="info">hoje</div></div>
+              <div class="cal-dia"><div class="data">26</div></div>
+              <div class="cal-dia"><div class="data">27</div></div>
+              <div class="cal-dia"><div class="data">28</div></div>
+              <div class="cal-dia"><div class="data">29</div></div>
+              <div class="cal-dia fim-semana"><div class="data">30</div></div>
+
+              <div class="cal-dia fim-semana"><div class="data">31</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:18px;border-top:1px solid var(--cinza-cl);font-family:var(--ui);font-size:12px">
+              <div>
+                <div style="color:var(--cinza)">Banco de horas atual</div>
+                <div style="font-family:var(--serif);font-size:22px;color:var(--verde);font-style:italic;margin-top:2px">+12h</div>
+              </div>
+              <button class="btn btn-fantasma btn-sm">⤓ Exportar espelho</button>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Justificar marcação</h3>
+            <div class="sub-titulo">Se algo não saiu como esperado</div>
+            <div style="padding:14px;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px;margin-bottom:14px">
+              <div style="font-family:var(--ui);font-size:10px;color:#876715;font-weight:700;letter-spacing:1px">⚠ INCONSISTÊNCIA DETECTADA</div>
+              <div style="font-size:14px;font-weight:500;margin-top:6px">Quarta, 07/05 · atraso de 22 minutos</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px">Entrada registrada: 08:22 · Esperado: 08:00</div>
+              <button class="btn btn-primario btn-sm" style="margin-top:10px">Enviar justificativa</button>
+            </div>
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center">+ Nova solicitação de ajuste</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: MEU PERFIL -->
+<!-- ============================================== -->
+<div class="tela" id="t-meu-perfil">
+  <div class="emp-shell">
+    <nav class="emp-topnav">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-divisor"></div>
+      <div class="empresa"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+      <div class="emp-nav-itens">
+        <div class="emp-nav-item" onclick="irPara('t-dash')">🏠 Início</div>
+        <div class="emp-nav-item" onclick="irPara('t-bater-ponto')">⏱ Ponto</div>
+        <div class="emp-nav-item ativo">👤 Meu Perfil</div>
+        <div class="emp-nav-item" onclick="irPara('t-solicitacoes')">📝 Solicitações</div>
+        <div class="emp-nav-item" onclick="irPara('t-pagamentos')">💰 Pagamentos</div>
+        <div class="emp-nav-item" onclick="irPara('t-treinamentos')">🎓 Aprender</div>
+        <div class="emp-nav-item" onclick="irPara('t-desempenho')">⭐ Desempenho</div>
+        <div class="emp-nav-item" onclick="irPara('t-chat-rh')">💬 Falar com RH</div>
+      </div>
+      <div class="emp-notif">🔔<span class="ponto"></span></div>
+      <div class="emp-perfil-trigger">
+        <div class="info"><div class="nome">Fernando Lacerda</div><div class="cargo">Engenheiro Civil Sr</div></div>
+        <div class="av">F</div>
+      </div>
+    </nav>
+
+    <main class="emp-main">
+      <div class="perfil-meu-header">
+        <div class="perfil-meu-foto">F</div>
+        <div class="perfil-meu-info">
+          <h2>Fernando Lacerda Costa</h2>
+          <div class="cargo">ENGENHEIRO CIVIL SÊNIOR · MATRÍCULA 0112 · CLT</div>
+          <div class="perfil-meu-tags">
+            <span class="tag verde">Ativo</span>
+            <span class="tag marinho">4 anos de casa</span>
+            <span class="tag">Construtora Aurora desde 09/2021</span>
+            <span class="tag amarelo">⚠ ASO vence 02/06</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">Dados pessoais</div>
+        <div class="aba">Contrato &amp; benefícios</div>
+        <div class="aba">Meus documentos</div>
+        <div class="aba">Dependentes</div>
+        <div class="aba">Bancário</div>
+        <div class="aba">Preferências</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Informações pessoais</h3><div class="sub-titulo">Esses dados são privados &amp; LGPD</div></div>
+              <button class="btn btn-fantasma btn-sm">✏ Editar</button>
+            </div>
+            <div class="info-linha"><span class="rotulo">Nome completo</span><span class="valor">Fernando Lacerda Costa</span></div>
+            <div class="info-linha"><span class="rotulo">Nome social</span><span class="valor">—</span></div>
+            <div class="info-linha"><span class="rotulo">Data de nascimento</span><span class="valor">22 de agosto de 1988 · 36 anos</span></div>
+            <div class="info-linha"><span class="rotulo">CPF</span><span class="valor">***.234.567-** &nbsp;<a style="font-family:var(--ui);font-size:11px;color:var(--laranja);cursor:pointer">👁 Ver completo</a></span></div>
+            <div class="info-linha"><span class="rotulo">RG</span><span class="valor">MG-12.***.789</span></div>
+            <div class="info-linha"><span class="rotulo">CTPS</span><span class="valor">3456789 / 0023-MG</span></div>
+            <div class="info-linha"><span class="rotulo">PIS / NIS</span><span class="valor">123.45678.90-1</span></div>
+            <div class="info-linha"><span class="rotulo">Estado civil</span><span class="valor">Casado</span></div>
+            <div class="info-linha"><span class="rotulo">Gênero</span><span class="valor">Masculino</span></div>
+            <div class="info-linha"><span class="rotulo">Raça/cor (autodeclarada)</span><span class="valor">Branca</span></div>
+          </div>
+
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Contato &amp; endereço</h3><div class="sub-titulo">Como te encontramos</div></div>
+              <button class="btn btn-fantasma btn-sm">✏ Editar</button>
+            </div>
+            <div class="info-linha"><span class="rotulo">E-mail corporativo</span><span class="valor">flacerda@aurora.com.br</span></div>
+            <div class="info-linha"><span class="rotulo">E-mail pessoal</span><span class="valor">fernando.lacerda@email.com</span></div>
+            <div class="info-linha"><span class="rotulo">Celular</span><span class="valor">(31) 99654-3210</span></div>
+            <div class="info-linha"><span class="rotulo">Endereço</span><span class="valor">Rua das Acácias, 245 — Bairro Anchieta<br>Belo Horizonte/MG · CEP 30310-110</span></div>
+            <div class="info-linha"><span class="rotulo">Contato de emergência</span><span class="valor">Camila Lacerda (esposa)<br>(31) 99876-5432</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Resumo contratual</h3>
+            <div class="sub-titulo">Seu vínculo atual</div>
+            <div class="info-linha"><span class="rotulo">Admissão</span><span class="valor">05/09/2021</span></div>
+            <div class="info-linha"><span class="rotulo">Tempo de casa</span><span class="valor">4 anos, 8 meses</span></div>
+            <div class="info-linha"><span class="rotulo">Cargo</span><span class="valor">Eng. Civil Sênior</span></div>
+            <div class="info-linha"><span class="rotulo">Centro de custo</span><span class="valor">CC-203 · Obras BH</span></div>
+            <div class="info-linha"><span class="rotulo">Gestora direta</span><span class="valor">Luísa Mendonça</span></div>
+            <div class="info-linha"><span class="rotulo">Jornada</span><span class="valor">44h · 8h às 17h48</span></div>
+            <div class="info-linha"><span class="rotulo">Próxima revisão</span><span class="valor">Setembro/2026</span></div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Meus documentos</h3>
+            <div class="sub-titulo">Sua pasta digital</div>
+            <div class="doc-item">
+              <div class="doc-icone verde">CT</div>
+              <div class="doc-info"><div class="doc-nome">Contrato de Trabalho</div><div class="doc-meta">05/09/2021 · assinado</div></div>
+              <button class="doc-btn">↓</button>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icone atencao">ASO</div>
+              <div class="doc-info"><div class="doc-nome">Atestado de Saúde Ocupacional</div><div class="doc-meta">⚠ Vence em 8 dias</div></div>
+              <button class="doc-btn">↓</button>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icone verde">PDF</div>
+              <div class="doc-info"><div class="doc-nome">Diploma · UFMG</div><div class="doc-meta">Enviado 05/09/2021</div></div>
+              <button class="doc-btn">↓</button>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icone verde">PDF</div>
+              <div class="doc-info"><div class="doc-nome">CREA-MG ativo</div><div class="doc-meta">Valid. 2027</div></div>
+              <button class="doc-btn">↓</button>
+            </div>
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:10px">+ Enviar novo documento</button>
+          </div>
+
+          <div class="painel" style="background:var(--marinho);color:var(--papel);border:none">
+            <h3 style="color:var(--papel);font-size:17px">🔒 Seus dados &amp; LGPD</h3>
+            <p style="font-family:var(--ui);font-size:12px;opacity:.8;line-height:1.6;margin-top:8px">Você tem direito de ver, corrigir, exportar ou pedir a exclusão dos seus dados a qualquer momento.</p>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+              <button class="btn btn-fantasma btn-sm" style="color:var(--papel);border-color:rgba(255,255,255,.2);justify-content:flex-start">⤓ Baixar meus dados</button>
+              <button class="btn btn-fantasma btn-sm" style="color:var(--papel);border-color:rgba(255,255,255,.2);justify-content:flex-start">✉ Falar com o DPO</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: SOLICITAÇÕES -->
+<!-- ============================================== -->
+<div class="tela" id="t-solicitacoes">
+  <div class="emp-shell">
+    <nav class="emp-topnav">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-divisor"></div>
+      <div class="empresa"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+      <div class="emp-nav-itens">
+        <div class="emp-nav-item" onclick="irPara('t-dash')">🏠 Início</div>
+        <div class="emp-nav-item" onclick="irPara('t-bater-ponto')">⏱ Ponto</div>
+        <div class="emp-nav-item" onclick="irPara('t-meu-perfil')">👤 Meu Perfil</div>
+        <div class="emp-nav-item ativo">📝 Solicitações</div>
+        <div class="emp-nav-item" onclick="irPara('t-pagamentos')">💰 Pagamentos</div>
+        <div class="emp-nav-item" onclick="irPara('t-treinamentos')">🎓 Aprender</div>
+        <div class="emp-nav-item" onclick="irPara('t-desempenho')">⭐ Desempenho</div>
+        <div class="emp-nav-item" onclick="irPara('t-chat-rh')">💬 Falar com RH</div>
+      </div>
+      <div class="emp-notif">🔔<span class="ponto"></span></div>
+      <div class="emp-perfil-trigger">
+        <div class="info"><div class="nome">Fernando Lacerda</div><div class="cargo">Engenheiro Civil Sr</div></div>
+        <div class="av">F</div>
+      </div>
+    </nav>
+
+    <main class="emp-main">
+      <div style="margin-bottom:24px">
+        <h1 style="font-size:34px;font-weight:400">Minhas <em style="color:var(--laranja);font-style:italic">Solicitações</em></h1>
+        <p style="font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px">Tudo o que você pode pedir ao RH em um só lugar</p>
+      </div>
+
+      <div class="painel">
+        <h3 style="font-size:19px;margin-bottom:18px">O que você precisa hoje?</h3>
+        <div class="solic-grid">
+          <div class="solic-card" onclick="abrirModal('m-solic-ferias')">
+            <div class="solic-icone-grande">🌴</div>
+            <h5>Férias</h5>
+            <p>Solicite, divida em períodos, antecipe 13º</p>
+          </div>
+          <div class="solic-card">
+            <div class="solic-icone-grande">🤒</div>
+            <h5>Atestado Médico</h5>
+            <p>Envie atestado direto pelo app</p>
+          </div>
+          <div class="solic-card">
+            <div class="solic-icone-grande">📄</div>
+            <h5>Declarações</h5>
+            <p>Vínculo, salário, IR, banco</p>
+          </div>
+          <div class="solic-card">
+            <div class="solic-icone-grande">💊</div>
+            <h5>Reembolso</h5>
+            <p>Saúde, educação, viagem</p>
+          </div>
+          <div class="solic-card">
+            <div class="solic-icone-grande">📚</div>
+            <h5>Curso/Treinamento</h5>
+            <p>Solicite cursos externos</p>
+          </div>
+          <div class="solic-card">
+            <div class="solic-icone-grande">👶</div>
+            <h5>Dependentes</h5>
+            <p>Incluir filho, cônjuge, plano</p>
+          </div>
+          <div class="solic-card">
+            <div class="solic-icone-grande">✋</div>
+            <h5>Ajuste de Ponto</h5>
+            <p>Justifique uma marcação</p>
+          </div>
+          <div class="solic-card">
+            <div class="solic-icone-grande">🚪</div>
+            <h5>Desligamento</h5>
+            <p>Pedido voluntário · processo</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>Suas solicitações em andamento</h3><div class="sub-titulo">3 ativas · 12 concluídas</div></div>
+          <button class="btn btn-fantasma btn-sm">Ver histórico completo</button>
+        </div>
+
+        <div class="solic-ativa">
+          <div class="solic-ativa-status"></div>
+          <div>
+            <h6>Solicitação de Férias</h6>
+            <div class="meta">Período: 01/09 a 20/09/2026 · 20 dias · Enviada em 21/05</div>
+          </div>
+          <span class="tag amarelo">Aguardando aprovação</span>
+          <button class="btn btn-fantasma btn-xs">Ver</button>
+        </div>
+
+        <div class="solic-ativa">
+          <div class="solic-ativa-status verde"></div>
+          <div>
+            <h6>Declaração de Vínculo Empregatício</h6>
+            <div class="meta">Para: financiamento imobiliário CEF · Enviada em 18/05</div>
+          </div>
+          <span class="tag verde">Pronta para baixar</span>
+          <button class="btn btn-fantasma btn-xs">↓ Baixar</button>
+        </div>
+
+        <div class="solic-ativa">
+          <div class="solic-ativa-status"></div>
+          <div>
+            <h6>Reembolso · Consulta médica</h6>
+            <div class="meta">Valor: R$ 380,00 · Dr. Lima (cardio) · 12/05 · Enviada em 14/05</div>
+          </div>
+          <span class="tag amarelo">Em análise · Financeiro</span>
+          <button class="btn btn-fantasma btn-xs">Ver</button>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>Recentes (concluídas)</h3>
+        <div class="sub-titulo">Últimos 30 dias</div>
+
+        <div class="solic-ativa">
+          <div class="solic-ativa-status verde"></div>
+          <div>
+            <h6>Inclusão de dependente · plano de saúde</h6>
+            <div class="meta">Pedro Lacerda (filho · 5 anos) · concluída em 12/05</div>
+          </div>
+          <span class="tag verde">Concluída</span>
+          <button class="btn btn-fantasma btn-xs">Ver</button>
+        </div>
+
+        <div class="solic-ativa">
+          <div class="solic-ativa-status verde"></div>
+          <div>
+            <h6>Atestado médico · 1 dia</h6>
+            <div class="meta">14/05 · CID J11 (gripe) · aceito em 15/05</div>
+          </div>
+          <span class="tag verde">Aceito</span>
+          <button class="btn btn-fantasma btn-xs">Ver</button>
+        </div>
+
+        <div class="solic-ativa">
+          <div class="solic-ativa-status vermelho"></div>
+          <div>
+            <h6>Reembolso · Curso de Inglês</h6>
+            <div class="meta">R$ 850 · Cultura Inglesa · enviada em 02/05</div>
+          </div>
+          <span class="tag vermelho">Reprovada</span>
+          <button class="btn btn-fantasma btn-xs">Ver motivo</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: PAGAMENTOS (Holerites, IR, etc) -->
+<!-- ============================================== -->
+<div class="tela" id="t-pagamentos">
+  <div class="emp-shell">
+    <nav class="emp-topnav">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-divisor"></div>
+      <div class="empresa"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+      <div class="emp-nav-itens">
+        <div class="emp-nav-item" onclick="irPara('t-dash')">🏠 Início</div>
+        <div class="emp-nav-item" onclick="irPara('t-bater-ponto')">⏱ Ponto</div>
+        <div class="emp-nav-item" onclick="irPara('t-meu-perfil')">👤 Meu Perfil</div>
+        <div class="emp-nav-item" onclick="irPara('t-solicitacoes')">📝 Solicitações</div>
+        <div class="emp-nav-item ativo">💰 Pagamentos</div>
+        <div class="emp-nav-item" onclick="irPara('t-treinamentos')">🎓 Aprender</div>
+        <div class="emp-nav-item" onclick="irPara('t-desempenho')">⭐ Desempenho</div>
+        <div class="emp-nav-item" onclick="irPara('t-chat-rh')">💬 Falar com RH</div>
+      </div>
+      <div class="emp-notif">🔔<span class="ponto"></span></div>
+      <div class="emp-perfil-trigger">
+        <div class="info"><div class="nome">Fernando Lacerda</div><div class="cargo">Engenheiro Civil Sr</div></div>
+        <div class="av">F</div>
+      </div>
+    </nav>
+
+    <main class="emp-main">
+      <div style="margin-bottom:24px">
+        <h1 style="font-size:34px;font-weight:400">Meus <em style="color:var(--laranja);font-style:italic">Pagamentos</em></h1>
+        <p style="font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px">Holerites · 13º · férias · IR · Comprovantes</p>
+      </div>
+
+      <div class="pag-resumo">
+        <div class="pag-resumo-item">
+          <div class="lab">Salário Bruto</div>
+          <div class="val">R$ 12.500</div>
+          <div class="descr">Maio/2026</div>
+        </div>
+        <div class="pag-resumo-item">
+          <div class="lab">Descontos</div>
+          <div class="val">R$ 2.853</div>
+          <div class="descr">INSS · IRRF · VR · Saúde</div>
+        </div>
+        <div class="pag-resumo-item">
+          <div class="lab">Líquido (próximo dia 5)</div>
+          <div class="val"><em>R$ 9.647</em></div>
+          <div class="descr">Cai na conta Itaú</div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">Holerites</div>
+        <div class="aba">13º Salário</div>
+        <div class="aba">Recibos de Férias</div>
+        <div class="aba">Informe IR</div>
+        <div class="aba">Histórico salarial</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <h3>Holerites recentes</h3>
+            <div class="sub-titulo">Últimos 12 meses</div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+              <div class="holerite-card" style="border-color:var(--laranja);background:var(--laranja-cl)">
+                <div>
+                  <div class="holerite-mes">MAIO 2026 · ATUAL</div>
+                  <div class="holerite-valor">R$ 9.647</div>
+                  <div class="holerite-meta">Fechamento em 30/05 · pagamento 05/06</div>
+                </div>
+                <div style="display:flex;gap:8px"><span class="tag amarelo">Em fechamento</span></div>
+              </div>
+
+              <div class="holerite-card">
+                <div>
+                  <div class="holerite-mes">ABRIL 2026</div>
+                  <div class="holerite-valor">R$ 9.847</div>
+                  <div class="holerite-meta">Pago em 05/05 · inclui 8h extras</div>
+                </div>
+                <div style="display:flex;gap:8px"><button class="btn btn-fantasma btn-sm">↓ PDF</button></div>
+              </div>
+
+              <div class="holerite-card">
+                <div>
+                  <div class="holerite-mes">MARÇO 2026</div>
+                  <div class="holerite-valor">R$ 9.647</div>
+                  <div class="holerite-meta">Pago em 05/04</div>
+                </div>
+                <div style="display:flex;gap:8px"><button class="btn btn-fantasma btn-sm">↓ PDF</button></div>
+              </div>
+
+              <div class="holerite-card">
+                <div>
+                  <div class="holerite-mes">FEVEREIRO 2026</div>
+                  <div class="holerite-valor">R$ 9.647</div>
+                  <div class="holerite-meta">Pago em 05/03</div>
+                </div>
+                <div style="display:flex;gap:8px"><button class="btn btn-fantasma btn-sm">↓ PDF</button></div>
+              </div>
+
+              <div class="holerite-card">
+                <div>
+                  <div class="holerite-mes">JANEIRO 2026</div>
+                  <div class="holerite-valor">R$ 9.847</div>
+                  <div class="holerite-meta">Pago em 05/02 · inclui 5h extras</div>
+                </div>
+                <div style="display:flex;gap:8px"><button class="btn btn-fantasma btn-sm">↓ PDF</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Composição do mês</h3>
+            <div class="sub-titulo">Maio 2026 (prévia)</div>
+
+            <div style="font-family:var(--ui);font-size:11px;color:var(--verde);font-weight:700;letter-spacing:1.5px;margin-bottom:8px">+ PROVENTOS</div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cinza-cl);font-size:13px"><span>Salário base</span><strong style="font-family:var(--serif)">R$ 12.500,00</strong></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cinza-cl);font-size:13px"><span>Horas extras 50%</span><strong style="font-family:var(--serif)">R$ 380,00</strong></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cinza-cl);font-size:13px"><span>Adicional periculosidade 30%</span><strong style="font-family:var(--serif)">R$ 3.750,00</strong></div>
+
+            <div style="font-family:var(--ui);font-size:11px;color:var(--vermelho);font-weight:700;letter-spacing:1.5px;margin:14px 0 8px">− DESCONTOS</div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cinza-cl);font-size:13px"><span>INSS (14%)</span><strong style="font-family:var(--serif);color:var(--vermelho)">- R$ 1.108,00</strong></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cinza-cl);font-size:13px"><span>IRRF</span><strong style="font-family:var(--serif);color:var(--vermelho)">- R$ 1.245,00</strong></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cinza-cl);font-size:13px"><span>Plano de Saúde (titular + 2)</span><strong style="font-family:var(--serif);color:var(--vermelho)">- R$ 320,00</strong></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cinza-cl);font-size:13px"><span>VR (cota empregado)</span><strong style="font-family:var(--serif);color:var(--vermelho)">- R$ 180,00</strong></div>
+
+            <div style="background:var(--laranja-cl);padding:14px;border-radius:2px;margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-family:var(--ui);font-size:11px;color:var(--laranja);letter-spacing:1.5px;font-weight:700">LÍQUIDO</span>
+              <strong style="font-family:var(--serif);font-size:24px;color:var(--marinho);font-style:italic">R$ 9.647</strong>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Próximos pagamentos</h3>
+            <div class="sub-titulo">Eventos programados</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between;font-size:13px">
+                <div>
+                  <div>Holerite Maio</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">05/06/2026</div>
+                </div>
+                <strong style="font-family:var(--serif);font-style:italic">R$ 9.647</strong>
+              </div>
+              <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between;font-size:13px">
+                <div>
+                  <div>13º · 1ª parcela</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">30/11/2026</div>
+                </div>
+                <strong style="font-family:var(--serif);font-style:italic">~ R$ 6.250</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 6: APRENDER / TREINAMENTOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-treinamentos">
+  <div class="emp-shell">
+    <nav class="emp-topnav">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-divisor"></div>
+      <div class="empresa"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+      <div class="emp-nav-itens">
+        <div class="emp-nav-item" onclick="irPara('t-dash')">🏠 Início</div>
+        <div class="emp-nav-item" onclick="irPara('t-bater-ponto')">⏱ Ponto</div>
+        <div class="emp-nav-item" onclick="irPara('t-meu-perfil')">👤 Meu Perfil</div>
+        <div class="emp-nav-item" onclick="irPara('t-solicitacoes')">📝 Solicitações</div>
+        <div class="emp-nav-item" onclick="irPara('t-pagamentos')">💰 Pagamentos</div>
+        <div class="emp-nav-item ativo">🎓 Aprender</div>
+        <div class="emp-nav-item" onclick="irPara('t-desempenho')">⭐ Desempenho</div>
+        <div class="emp-nav-item" onclick="irPara('t-chat-rh')">💬 Falar com RH</div>
+      </div>
+      <div class="emp-notif">🔔<span class="ponto"></span></div>
+      <div class="emp-perfil-trigger">
+        <div class="info"><div class="nome">Fernando Lacerda</div><div class="cargo">Engenheiro Civil Sr</div></div>
+        <div class="av">F</div>
+      </div>
+    </nav>
+
+    <main class="emp-main">
+      <div style="margin-bottom:24px">
+        <h1 style="font-size:34px;font-weight:400">Trilhas de <em style="color:var(--laranja);font-style:italic">Aprendizado</em></h1>
+        <p style="font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px">Cursos atribuídos e biblioteca aberta · 12 horas concluídas em 2026</p>
+      </div>
+
+      <div class="cards-emp-grid">
+        <div class="card-emp">
+          <div class="card-emp-icone" style="background:var(--vermelho-cl);color:var(--vermelho)">⚠</div>
+          <div class="card-emp-titulo">Pendentes</div>
+          <div class="card-emp-valor"><em>2</em></div>
+          <div class="card-emp-meta">Prazo: 30 de junho</div>
+        </div>
+        <div class="card-emp">
+          <div class="card-emp-icone" style="background:var(--verde-cl);color:var(--verde)">✓</div>
+          <div class="card-emp-titulo">Concluídas</div>
+          <div class="card-emp-valor"><em>8</em></div>
+          <div class="card-emp-meta">Em 2026</div>
+        </div>
+        <div class="card-emp">
+          <div class="card-emp-icone" style="background:var(--amarelo-cl);color:#876715">⏱</div>
+          <div class="card-emp-titulo">Horas</div>
+          <div class="card-emp-valor"><em>12</em><span>h</span></div>
+          <div class="card-emp-meta">Meta anual: 32h</div>
+        </div>
+        <div class="card-emp">
+          <div class="card-emp-icone" style="background:var(--roxo-cl);color:var(--roxo)">🏆</div>
+          <div class="card-emp-titulo">Certificados</div>
+          <div class="card-emp-valor"><em>14</em></div>
+          <div class="card-emp-meta">Carreira inteira</div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>⚠ Obrigatórios pendentes</h3><div class="sub-titulo">Atribuídos pelo RH · faça até 30/06</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+          <div class="treina-card">
+            <div class="treina-thumb obrig">
+              <div class="treina-thumb-icone">⚡</div>
+              <div class="treina-tag-flag">OBRIGATÓRIO</div>
+            </div>
+            <div class="treina-body">
+              <div class="treina-titulo">NR-35 · Trabalho em Altura</div>
+              <div class="treina-meta">Renovação anual · 8h · vídeo + prova</div>
+              <div class="treina-progresso"><span>Não iniciado</span><span>0%</span></div>
+              <div class="barra-progresso"><div class="preenchimento" style="width:0%"></div></div>
+              <button class="btn btn-primario btn-sm" style="margin-top:14px;width:100%;justify-content:center">▶ Começar agora</button>
+            </div>
+          </div>
+
+          <div class="treina-card">
+            <div class="treina-thumb obrig">
+              <div class="treina-thumb-icone">🔒</div>
+              <div class="treina-tag-flag">OBRIGATÓRIO</div>
+            </div>
+            <div class="treina-body">
+              <div class="treina-titulo">LGPD para todos</div>
+              <div class="treina-meta">Anual · 2h · vídeo + quiz</div>
+              <div class="treina-progresso"><span>Em andamento · módulo 2/4</span><span>45%</span></div>
+              <div class="barra-progresso"><div class="preenchimento" style="width:45%"></div></div>
+              <button class="btn btn-primario btn-sm" style="margin-top:14px;width:100%;justify-content:center">Continuar →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>Trilhas de desenvolvimento</h3><div class="sub-titulo">Voluntárias · escolha a sua</div></div>
+          <button class="btn btn-fantasma btn-sm">Ver biblioteca completa</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+          <div class="treina-card">
+            <div class="treina-thumb lider">
+              <div class="treina-thumb-icone">👑</div>
+              <div class="treina-tag-flag">RECOMENDADO</div>
+            </div>
+            <div class="treina-body">
+              <div class="treina-titulo">Liderança Servidora</div>
+              <div class="treina-meta">FDC · 16h · certificado</div>
+              <div class="treina-progresso" style="margin-top:6px"><span>Inscrito · módulo 4/8</span><span>50%</span></div>
+              <div class="barra-progresso"><div class="preenchimento" style="width:50%"></div></div>
+            </div>
+          </div>
+
+          <div class="treina-card">
+            <div class="treina-thumb">
+              <div class="treina-thumb-icone">📊</div>
+            </div>
+            <div class="treina-body">
+              <div class="treina-titulo">Power BI Avançado</div>
+              <div class="treina-meta">12 aulas · 24h</div>
+              <div class="treina-progresso" style="margin-top:6px"><span>Não inscrito</span></div>
+            </div>
+          </div>
+
+          <div class="treina-card">
+            <div class="treina-thumb idioma">
+              <div class="treina-thumb-icone">🇬🇧</div>
+              <div class="treina-tag-flag">ATIVO</div>
+            </div>
+            <div class="treina-body">
+              <div class="treina-titulo">Inglês Corporativo</div>
+              <div class="treina-meta">Cultura Inglesa · em curso</div>
+              <div class="treina-progresso" style="margin-top:6px"><span>Nível B1 · 78%</span></div>
+              <div class="barra-progresso"><div class="preenchimento" style="width:78%"></div></div>
+            </div>
+          </div>
+
+          <div class="treina-card">
+            <div class="treina-thumb">
+              <div class="treina-thumb-icone">💬</div>
+            </div>
+            <div class="treina-body">
+              <div class="treina-titulo">Comunicação Não-Violenta</div>
+              <div class="treina-meta">4 módulos · 8h</div>
+              <div class="treina-progresso" style="margin-top:6px"><span>Não inscrito</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 7: MEU DESEMPENHO -->
+<!-- ============================================== -->
+<div class="tela" id="t-desempenho">
+  <div class="emp-shell">
+    <nav class="emp-topnav">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-divisor"></div>
+      <div class="empresa"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+      <div class="emp-nav-itens">
+        <div class="emp-nav-item" onclick="irPara('t-dash')">🏠 Início</div>
+        <div class="emp-nav-item" onclick="irPara('t-bater-ponto')">⏱ Ponto</div>
+        <div class="emp-nav-item" onclick="irPara('t-meu-perfil')">👤 Meu Perfil</div>
+        <div class="emp-nav-item" onclick="irPara('t-solicitacoes')">📝 Solicitações</div>
+        <div class="emp-nav-item" onclick="irPara('t-pagamentos')">💰 Pagamentos</div>
+        <div class="emp-nav-item" onclick="irPara('t-treinamentos')">🎓 Aprender</div>
+        <div class="emp-nav-item ativo">⭐ Desempenho</div>
+        <div class="emp-nav-item" onclick="irPara('t-chat-rh')">💬 Falar com RH</div>
+      </div>
+      <div class="emp-notif">🔔<span class="ponto"></span></div>
+      <div class="emp-perfil-trigger">
+        <div class="info"><div class="nome">Fernando Lacerda</div><div class="cargo">Engenheiro Civil Sr</div></div>
+        <div class="av">F</div>
+      </div>
+    </nav>
+
+    <main class="emp-main">
+      <div style="margin-bottom:24px">
+        <h1 style="font-size:34px;font-weight:400">Meu <em style="color:var(--laranja);font-style:italic">Desempenho</em></h1>
+        <p style="font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px">Avaliações, metas, PDI e feedbacks recebidos</p>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Avaliação 2025-S2 · Resultado</h3><div class="sub-titulo">Finalizada em 28/04/2026</div></div>
+              <span class="tag verde">Concluída</span>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px">
+              <div style="text-align:center;padding:20px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700">AUTOAVAL.</div>
+                <div style="font-size:36px;color:var(--marinho);font-style:italic;line-height:1;margin-top:8px">8,2</div>
+              </div>
+              <div style="text-align:center;padding:20px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700">GESTORA</div>
+                <div style="font-size:36px;color:var(--marinho);font-style:italic;line-height:1;margin-top:8px">8,5</div>
+              </div>
+              <div style="text-align:center;padding:20px;background:var(--laranja-cl);border-radius:2px;border:2px solid var(--laranja)">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1.5px;font-weight:700">FINAL</div>
+                <div style="font-size:36px;color:var(--laranja);font-style:italic;line-height:1;margin-top:8px">8,4</div>
+              </div>
+            </div>
+
+            <div style="background:var(--verde-cl);padding:18px;border-radius:2px;border-left:3px solid var(--verde);margin-bottom:18px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--verde);letter-spacing:1.5px;font-weight:700;margin-bottom:6px">⭐ MATRIZ 9-BOX</div>
+              <div style="font-size:18px;font-weight:500">Alto Desempenho</div>
+              <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5;margin-top:6px">Performance acima da média + potencial em desenvolvimento. Caminho natural para liderança técnica.</p>
+            </div>
+
+            <h5 style="font-size:14px;font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;font-family:var(--ui)">Notas por dimensão</h5>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:grid;grid-template-columns:140px 1fr 50px;gap:12px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Resultados</span>
+                <div style="height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden"><div style="width:88%;height:100%;background:var(--laranja)"></div></div>
+                <span style="text-align:right;font-weight:600">8,8</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr 50px;gap:12px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Conhec. técnico</span>
+                <div style="height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden"><div style="width:92%;height:100%;background:var(--laranja)"></div></div>
+                <span style="text-align:right;font-weight:600">9,2</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr 50px;gap:12px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Trabalho em equipe</span>
+                <div style="height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden"><div style="width:80%;height:100%;background:var(--marinho)"></div></div>
+                <span style="text-align:right;font-weight:600">8,0</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr 50px;gap:12px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Liderança</span>
+                <div style="height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden"><div style="width:72%;height:100%;background:var(--marinho)"></div></div>
+                <span style="text-align:right;font-weight:600">7,2</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr 50px;gap:12px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Inovação</span>
+                <div style="height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden"><div style="width:85%;height:100%;background:var(--marinho)"></div></div>
+                <span style="text-align:right;font-weight:600">8,5</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>Meu PDI · Plano de Desenvolvimento</h3>
+            <div class="sub-titulo">Acordado com Luísa em 14/05</div>
+
+            <div class="pdi-item">
+              <div class="pdi-meta">
+                <span style="text-transform:uppercase;font-weight:700">META 1 · LIDERANÇA</span>
+                <span>Prazo: dez/2026</span>
+              </div>
+              <h5 style="font-size:14px;font-weight:500;margin-bottom:6px">Concluir trilha "Liderança Servidora" da FDC</h5>
+              <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5">Desenvolver competências de liderança para preparação à promoção a Eng. Especialista.</p>
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:10px;letter-spacing:.5px"><span>Progresso</span><strong>50%</strong></div>
+              <div class="barra-progresso" style="margin-top:4px"><div class="preenchimento" style="width:50%"></div></div>
+            </div>
+
+            <div class="pdi-item">
+              <div class="pdi-meta">
+                <span style="text-transform:uppercase;font-weight:700">META 2 · TÉCNICA</span>
+                <span>Prazo: ago/2026</span>
+              </div>
+              <h5 style="font-size:14px;font-weight:500;margin-bottom:6px">Certificação BIM (Building Information Modeling)</h5>
+              <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5">Buildings Smart Brazil · 80h · curso patrocinado pela empresa.</p>
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:10px;letter-spacing:.5px"><span>Progresso</span><strong>20%</strong></div>
+              <div class="barra-progresso" style="margin-top:4px"><div class="preenchimento" style="width:20%"></div></div>
+            </div>
+
+            <div class="pdi-item">
+              <div class="pdi-meta">
+                <span style="text-transform:uppercase;font-weight:700">META 3 · LINGUAGEM</span>
+                <span>Prazo: dez/2026</span>
+              </div>
+              <h5 style="font-size:14px;font-weight:500;margin-bottom:6px">Atingir nível B2 de Inglês</h5>
+              <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5">Curso na Cultura Inglesa (em andamento) · prep. para projetos com investidores estrangeiros.</p>
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:10px;letter-spacing:.5px"><span>Progresso</span><strong>78%</strong></div>
+              <div class="barra-progresso" style="margin-top:4px"><div class="preenchimento" style="width:78%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Feedbacks recentes</h3>
+            <div class="sub-titulo">De pares e gestora</div>
+
+            <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px;border-left:3px solid var(--marinho);margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700;letter-spacing:.5px;margin-bottom:8px">
+                <span>LUÍSA MENDONÇA · GESTORA</span><span>20/05</span>
+              </div>
+              <p style="font-family:var(--serif);font-size:13px;line-height:1.55;color:var(--marinho);font-style:italic">"Fernando, sua atuação na obra do Sítio I foi exemplar. A forma como conduziu a entrega na semana passada com a equipe enxuta demonstrou maturidade técnica e de liderança."</p>
+            </div>
+
+            <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px;border-left:3px solid var(--laranja);margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700;letter-spacing:.5px;margin-bottom:8px">
+                <span>DANIEL PINHEIRO · PAR</span><span>15/05</span>
+              </div>
+              <p style="font-family:var(--serif);font-size:13px;line-height:1.55;color:var(--marinho);font-style:italic">"Aprendo muito com você no dia a dia. Suas explicações são sempre didáticas. Sugiro só que documentemos melhor as decisões em projeto para os juniores."</p>
+            </div>
+
+            <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px;border-left:3px solid var(--verde)">
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700;letter-spacing:.5px;margin-bottom:8px">
+                <span>EDUARDO SANTOS · DIR. FIN.</span><span>02/05</span>
+              </div>
+              <p style="font-family:var(--serif);font-size:13px;line-height:1.55;color:var(--marinho);font-style:italic">"Excelente colaboração na revisão do orçamento da obra residencial. Cuidado e precisão fizeram a diferença."</p>
+            </div>
+
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px">+ Pedir feedback a alguém</button>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Ciclo 2026-S1</h3>
+            <div class="sub-titulo">Inicia em 09/06</div>
+
+            <div style="padding:16px;background:var(--laranja-cl);border-left:3px solid var(--laranja);border-radius:2px;margin-bottom:14px">
+              <div style="font-family:var(--ui);font-size:11px;color:var(--laranja);letter-spacing:1px;font-weight:700">EM 15 DIAS</div>
+              <div style="font-size:15px;font-weight:500;margin-top:4px">Sua autoavaliação abre dia 09/06</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12px">
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px"><span style="color:var(--cinza)">09/06</span><span>Autoavaliação aberta</span></div>
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px"><span style="color:var(--cinza)">23/06</span><span>Avaliação da Luísa</span></div>
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px"><span style="color:var(--cinza)">14/07</span><span>Feedback 1:1 com Luísa</span></div>
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px"><span style="color:var(--cinza)">28/07</span><span>Novo PDI definido</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 8: CHAT COM RH (IA + ESCALADA HUMANA) -->
+<!-- ============================================== -->
+<div class="tela" id="t-chat-rh">
+  <div class="emp-shell">
+    <nav class="emp-topnav">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-divisor"></div>
+      <div class="empresa"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+      <div class="emp-nav-itens">
+        <div class="emp-nav-item" onclick="irPara('t-dash')">🏠 Início</div>
+        <div class="emp-nav-item" onclick="irPara('t-bater-ponto')">⏱ Ponto</div>
+        <div class="emp-nav-item" onclick="irPara('t-meu-perfil')">👤 Meu Perfil</div>
+        <div class="emp-nav-item" onclick="irPara('t-solicitacoes')">📝 Solicitações</div>
+        <div class="emp-nav-item" onclick="irPara('t-pagamentos')">💰 Pagamentos</div>
+        <div class="emp-nav-item" onclick="irPara('t-treinamentos')">🎓 Aprender</div>
+        <div class="emp-nav-item" onclick="irPara('t-desempenho')">⭐ Desempenho</div>
+        <div class="emp-nav-item ativo">💬 Falar com RH <span class="badge">1</span></div>
+      </div>
+      <div class="emp-notif">🔔<span class="ponto"></span></div>
+      <div class="emp-perfil-trigger">
+        <div class="info"><div class="nome">Fernando Lacerda</div><div class="cargo">Engenheiro Civil Sr</div></div>
+        <div class="av">F</div>
+      </div>
+    </nav>
+
+    <main class="emp-main">
+      <div style="margin-bottom:24px">
+        <h1 style="font-size:34px;font-weight:400">Falar com o <em style="color:var(--laranja);font-style:italic">RH</em></h1>
+        <p style="font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px">Tire dúvidas com a Nora (IA) · escale para um humano quando precisar · suas conversas são privadas</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:flex-start">
+        <div style="background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--cinza-cl);font-family:var(--ui);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;display:flex;justify-content:space-between;align-items:center">
+            <span>Conversas</span>
+            <button class="btn btn-fantasma btn-xs">+ Nova</button>
+          </div>
+
+          <div style="padding:14px 16px;background:var(--laranja-cl);border-left:3px solid var(--laranja);cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:4px">
+              <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:9px">N</div>
+              <span style="font-weight:700">NORA · IA + RH</span><span style="margin-left:auto">14:48</span>
+            </div>
+            <div style="font-size:14px;font-weight:500">Dúvida sobre adiantamento de férias</div>
+            <div style="font-size:12px;color:var(--cinza);margin-top:4px;line-height:1.4">A Renata do RH vai te responder em alguns minutos. Posso adiantar enquanto isso...</div>
+            <div style="margin-top:6px"><span class="tag laranja" style="font-size:10px;padding:2px 6px">1 não lida</span></div>
+          </div>
+
+          <div style="padding:14px 16px;border-bottom:1px solid var(--cinza-cl);cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:4px">
+              <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:9px">N</div>
+              <span style="font-weight:700">NORA · IA</span><span style="margin-left:auto">Ontem</span>
+            </div>
+            <div style="font-size:14px;font-weight:500">Como funciona o reembolso?</div>
+            <div style="font-size:12px;color:var(--cinza);margin-top:4px;line-height:1.4">Pronto, te expliquei como funciona o reembolso. Algo mais?</div>
+          </div>
+
+          <div style="padding:14px 16px;border-bottom:1px solid var(--cinza-cl);cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:4px">
+              <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:9px">R</div>
+              <span style="font-weight:700">RENATA · RH</span><span style="margin-left:auto">15/05</span>
+            </div>
+            <div style="font-size:14px;font-weight:500">Inclusão de filho no plano</div>
+            <div style="font-size:12px;color:var(--cinza);margin-top:4px;line-height:1.4">Tudo certo, Fernando! Pedro já está incluído no plano da Unimed.</div>
+          </div>
+
+          <div style="padding:14px 16px;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:4px">
+              <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:9px">N</div>
+              <span style="font-weight:700">NORA · IA</span><span style="margin-left:auto">02/05</span>
+            </div>
+            <div style="font-size:14px;font-weight:500">Quando cai meu salário?</div>
+            <div style="font-size:12px;color:var(--cinza);margin-top:4px;line-height:1.4">No dia 5 de cada mês. Se cair em fim de semana...</div>
+          </div>
+        </div>
+
+        <div class="chat-shell">
+          <div class="chat-header">
+            <div class="av bot">N</div>
+            <div style="flex:1">
+              <h4>Nora · IA</h4>
+              <div class="status">Online · pode escalar pra Renata (RH) a qualquer momento</div>
+            </div>
+            <button class="btn btn-fantasma btn-sm" style="color:var(--papel);border:1px solid rgba(255,255,255,.3)">👤 Falar com humano</button>
+          </div>
+
+          <div class="chat-body">
+            <div style="text-align:center;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:18px;letter-spacing:1px">HOJE · 14:32</div>
+
+            <div class="msg me">
+              <div>
+                <div class="msg-bubble">Oi! Tenho uma viagem com a família em julho e queria saber se consigo antecipar parte das minhas férias junto com o 13º. Como funciona?</div>
+                <div class="msg-time">14:32</div>
+              </div>
+            </div>
+
+            <div class="msg bot">
+              <div class="msg-av bot">N</div>
+              <div>
+                <div class="msg-bubble">Oi, Fernando! 😊 Sou a Nora, a assistente de RH da Aurora. Vou te ajudar com as férias.<br><br>Olhando seu cadastro, você tem <strong>22 dias disponíveis</strong> do período aquisitivo 09/2024–09/2025. Pode usar até <strong>20 dias contínuos em um único período</strong>, conforme a CLT.<br><br>Sobre adiantar 13º: sim, é possível! Você pode pedir o <strong>abono pecuniário</strong> (vender até 1/3 dos dias = 7 dias) e também <strong>antecipar a 1ª parcela do 13º</strong> nas férias. Quer que eu prepare uma simulação?</div>
+                <div class="msg-time">Nora · 14:33</div>
+              </div>
+            </div>
+
+            <div class="msg me">
+              <div>
+                <div class="msg-bubble">Sim, por favor! Vou tirar de 15/07 a 03/08.</div>
+                <div class="msg-time">14:34</div>
+              </div>
+            </div>
+
+            <div class="msg bot">
+              <div class="msg-av bot">N</div>
+              <div>
+                <div class="msg-bubble" style="background:var(--cinza-fundo);border:1px solid var(--cinza-cl)">
+                  <strong style="display:block;margin-bottom:8px">📋 Simulação · Férias 15/07 a 03/08</strong>
+                  <div style="font-family:var(--ui);font-size:12px;line-height:1.7">
+                    20 dias de férias · R$ 8.333<br>
+                    + 1/3 constitucional · R$ 2.778<br>
+                    + Abono pecuniário (7 dias) · R$ 2.917<br>
+                    + Antecipação 1ª parcela 13º · ~R$ 6.250<br>
+                    <hr style="margin:8px 0;border:none;border-top:1px solid var(--cinza-cl)">
+                    <strong style="color:var(--laranja);font-family:var(--serif);font-size:14px;font-style:italic">Total bruto previsto: R$ 20.278</strong><br>
+                    <span style="color:var(--cinza);font-size:11px">(Líquido após INSS/IR a calcular pela folha)</span>
+                  </div>
+                </div>
+                <div class="msg-time">Nora · 14:35</div>
+              </div>
+            </div>
+
+            <div class="msg bot">
+              <div class="msg-av bot">N</div>
+              <div>
+                <div class="msg-bubble">Esse pedido precisa do <strong>aval da Luísa Mendonça</strong> (sua gestora) e da Renata do RH. Quer que eu já registre a solicitação?</div>
+                <div class="msg-time">Nora · 14:35</div>
+              </div>
+            </div>
+
+            <div class="msg me">
+              <div>
+                <div class="msg-bubble">Sim, registre por favor. Mas tenho uma dúvida específica de contrato. Posso falar com alguém do RH direto?</div>
+                <div class="msg-time">14:42</div>
+              </div>
+            </div>
+
+            <div class="msg bot">
+              <div class="msg-av bot">N</div>
+              <div>
+                <div class="msg-bubble" style="background:var(--verde-cl);border-color:var(--verde)">✓ <strong>Solicitação registrada</strong> · Protocolo #2026-0871<br><br>Já passei a conversa para a <strong>Renata Macedo</strong> (RH). Ela vai te responder pessoalmente em alguns minutos.</div>
+                <div class="msg-time">Nora · 14:43</div>
+              </div>
+            </div>
+
+            <div class="msg them">
+              <div class="msg-av rh">R</div>
+              <div>
+                <div class="msg-bubble">Oi, Fernando! Renata aqui do RH. 😊 Recebi sua solicitação e tudo está dentro das regras. Conta o que você queria conversar?</div>
+                <div class="msg-time">Renata · 14:48</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-acoes-rapidas">
+            <span style="color:var(--cinza)">Atalhos:</span>
+            <button class="quick-action">📅 Marcar 1:1</button>
+            <button class="quick-action">📎 Anexar documento</button>
+            <button class="quick-action">🌴 Status da minha férias</button>
+            <button class="quick-action">⚙ Configurar privacidade</button>
+          </div>
+
+          <div class="chat-input">
+            <button class="btn btn-fantasma btn-sm" style="padding:8px 12px">📎</button>
+            <input placeholder="Escreva para a Renata..." style="flex:1"/>
+            <button class="btn btn-primario btn-sm">Enviar →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel" style="margin-top:24px;background:var(--marinho);color:var(--papel);border:none">
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center">
+          <div style="font-size:32px">🔒</div>
+          <div>
+            <h4 style="color:var(--papel);font-size:16px;margin-bottom:4px">Suas conversas com o RH são confidenciais</h4>
+            <p style="font-family:var(--ui);font-size:12px;opacity:.75;line-height:1.5">A Nora (IA) tem acesso aos seus dados de RH para te ajudar melhor. Sua gestora <strong>NÃO</strong> vê o que você fala aqui. Em casos sensíveis (assédio, problemas pessoais, saúde mental), use o canal anônimo.</p>
+          </div>
+          <button class="btn btn-fantasma btn-sm" style="color:var(--papel);border:1px solid rgba(255,255,255,.3)">📢 Canal Anônimo</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- MODAL: SOLICITAR FÉRIAS -->
+<!-- ============================================== -->
+<div class="modal-overlay" id="m-solic-ferias">
+  <div class="modal">
+    <button class="modal-fechar" onclick="fecharModal()">✕</button>
+    <div class="modal-body">
+      <h2 style="font-size:26px;font-weight:400;margin-bottom:6px">Solicitar <em style="color:var(--laranja);font-style:italic">Férias</em></h2>
+      <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:24px">Saldo disponível: <strong style="color:var(--laranja)">22 dias</strong> · Período aquisitivo 09/2024–09/2025</p>
+
+      <div class="campos-grid">
+        <div class="campo">
+          <label>Data de início</label>
+          <input type="date" value="2026-07-15"/>
+        </div>
+        <div class="campo">
+          <label>Data de retorno</label>
+          <input type="date" value="2026-08-04"/>
+        </div>
+      </div>
+
+      <div class="campos-grid">
+        <div class="campo">
+          <label>Quantos dias?</label>
+          <select><option>20 dias (integral)</option><option>15 dias</option><option>10 dias</option><option>5 dias</option></select>
+        </div>
+        <div class="campo">
+          <label>Dividir em períodos?</label>
+          <select><option>Não, período único</option><option>Sim, em 2 períodos</option><option>Sim, em 3 períodos</option></select>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label>Vender 1/3 das férias (abono pecuniário)?</label>
+        <select><option>Não</option><option selected>Sim — vender 7 dias</option></select>
+      </div>
+
+      <div class="campo">
+        <label>Antecipar a 1ª parcela do 13º junto?</label>
+        <select><option>Não</option><option selected>Sim, antecipar</option></select>
+      </div>
+
+      <div class="campo">
+        <label>Justificativa / observações (opcional)</label>
+        <textarea rows="3" placeholder="Ex: viagem em família já programada com passagens compradas..."></textarea>
+      </div>
+
+      <div style="background:var(--laranja-cl);padding:18px;border-radius:2px;margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--laranja);letter-spacing:1.5px;font-weight:700">VALOR LÍQUIDO PREVISTO</div>
+          <div style="font-family:var(--serif);font-size:28px;color:var(--marinho);font-style:italic;margin-top:4px">~ R$ 15.840</div>
+        </div>
+        <div style="text-align:right;font-family:var(--ui);font-size:11px;color:var(--cinza)">
+          Após INSS &amp; IRRF<br>
+          Crédito antes do 1º dia
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px">
+        <button class="btn btn-fantasma" onclick="fecharModal()">Cancelar</button>
+        <button class="btn btn-primario">Enviar pedido →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Fase 4 — Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-dash">🏠 Dashboard Empregado</option>
+    <option value="t-bater-ponto">⏱ Bater Ponto</option>
+    <option value="t-meu-perfil">👤 Meu Perfil</option>
+    <option value="t-solicitacoes">📝 Solicitações</option>
+    <option value="t-pagamentos">💰 Holerites & Pagamentos</option>
+    <option value="t-treinamentos">🎓 Trilhas de Aprendizado</option>
+    <option value="t-desempenho">⭐ Meu Desempenho</option>
+    <option value="t-chat-rh">💬 Chat com RH (Nora IA)</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+function abrirModal(id){document.getElementById(id).classList.add('aberto');}
+function fecharModal(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('aberto'));}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)fecharModal();});
+});
+
+// Relógio ao vivo
+setInterval(()=>{
+  const agora=new Date();
+  const h=String(agora.getHours()).padStart(2,'0');
+  const m=String(agora.getMinutes()).padStart(2,'0');
+  const s=String(agora.getSeconds()).padStart(2,'0');
+  document.querySelectorAll('.relogio-grande').forEach(el=>{
+    el.innerHTML=`${h}:${m}<span>:</span>${s}`;
+  });
+  document.querySelectorAll('.hora-atual').forEach(el=>{
+    el.textContent=`${h}:${m}`;
+  });
+},1000);
+</script>
+</body>
+</html>

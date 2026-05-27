@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Headcount &amp; Quadro de Posições</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  .header-bar{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:24px 28px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+  .header-bar h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .header-bar h1 em{color:var(--laranja);font-style:italic}
+  .header-bar .meta{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px}
+  .header-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:0 6px}
+  .aba{padding:14px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .aba .cnt{background:var(--cinza-fundo);font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700;color:var(--cinza)}
+  .aba.ativa .cnt{background:var(--laranja);color:white}
+
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px}
+  .painel h3 em{color:var(--laranja);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+
+  .kpis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .kpi.destaque{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border-color:var(--laranja)}
+  .kpi.verde{background:linear-gradient(135deg,var(--branco) 50%,var(--verde-cl));border-color:var(--verde)}
+  .kpi.amarelo{background:linear-gradient(135deg,var(--branco) 50%,var(--amarelo-cl));border-color:var(--amarelo)}
+  .kpi-titulo{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .kpi-valor{font-size:28px;color:var(--marinho);line-height:1;font-family:var(--serif);font-style:italic}
+  .kpi-valor em{color:var(--laranja)}
+  .kpi-valor span{font-size:13px;color:var(--cinza);font-style:normal}
+  .kpi-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px}
+  .kpi-delta{font-family:var(--ui);font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px}
+  .kpi-delta.up{color:var(--verde)}
+  .kpi-delta.down{color:var(--vermelho)}
+  .kpi-delta.neutro{color:var(--cinza)}
+
+  /* BARRA DE CAPACIDADE · autorizado vs preenchido */
+  .cap-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;margin-bottom:14px}
+  .cap-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:14px;flex-wrap:wrap}
+  .cap-titulo{font-size:15px;font-weight:500;color:var(--marinho);display:flex;align-items:center;gap:8px;font-family:var(--serif)}
+  .cap-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .cap-stats{display:flex;gap:18px;font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:right;flex-wrap:wrap}
+  .cap-stats div strong{display:block;font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:18px;line-height:1}
+  .cap-barra{position:relative;height:34px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden;display:flex}
+  .cap-seg{height:100%;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.3px;transition:all .2s}
+  .cap-seg.preench{background:var(--verde)}
+  .cap-seg.recrutamento{background:var(--laranja);background-image:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(255,255,255,.12) 6px,rgba(255,255,255,.12) 12px)}
+  .cap-seg.vaga{background:var(--amarelo);color:#876715;background-image:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.06) 4px,rgba(0,0,0,.06) 8px)}
+  .cap-legenda{display:flex;gap:18px;margin-top:10px;font-family:var(--ui);font-size:11px;color:var(--cinza);flex-wrap:wrap}
+  .cap-legenda-item{display:flex;align-items:center;gap:6px}
+  .cap-leg-cor{width:12px;height:12px;border-radius:2px;border:1px solid rgba(0,0,0,.05)}
+  .cap-leg-cor.preench{background:var(--verde)}
+  .cap-leg-cor.recrutamento{background:var(--laranja)}
+  .cap-leg-cor.vaga{background:var(--amarelo)}
+  .cap-leg-cor.excedente{background:var(--vermelho)}
+
+  /* ALERTAS */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden}
+  .alert-marinho::before{content:"";position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .alert-marinho > *{position:relative}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert-verde{background:var(--verde-cl);border-left:3px solid var(--verde);color:var(--marinho)}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* GRID 2-1 */
+  .grid-2-1{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  /* PROJEÇÃO 12 MESES · gráfico de barras horizontal */
+  .grafico-12m{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:20px;margin-bottom:18px;overflow-x:auto}
+  .grafico-eixo{display:grid;grid-template-columns:60px repeat(12,1fr);gap:6px;margin-bottom:14px}
+  .grafico-mes-h{font-family:var(--ui);font-size:10px;color:var(--cinza);text-align:center;font-weight:700;letter-spacing:.5px;padding-bottom:6px;border-bottom:1px solid var(--cinza-cl)}
+  .grafico-mes-h.atual{color:var(--laranja);font-weight:800}
+  .grafico-mes-h.previsao{color:var(--cinza);font-style:italic}
+
+  .grafico-barras{display:grid;grid-template-columns:60px repeat(12,1fr);gap:6px;align-items:flex-end;height:240px;border-bottom:1px solid var(--cinza-cl);padding-bottom:8px;position:relative}
+  .grafico-y-label{font-family:var(--ui);font-size:9px;color:var(--cinza);text-align:right;padding-right:6px;align-self:flex-start;writing-mode:horizontal-tb}
+  .barra-coluna{display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:2px;position:relative;align-items:center}
+  .barra-seg-v{width:100%;max-width:38px;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--ui);font-size:9px;font-weight:600;border-radius:1px;min-height:2px}
+  .barra-seg-v.preench{background:var(--verde)}
+  .barra-seg-v.recrut{background:var(--laranja);background-image:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,.15) 3px,rgba(255,255,255,.15) 6px)}
+  .barra-seg-v.previsao{background:var(--cinza);opacity:.4;background-image:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,.2) 3px,rgba(255,255,255,.2) 6px)}
+  .barra-num{font-family:var(--serif);font-style:italic;font-size:11px;color:var(--marinho);font-weight:600;margin-top:4px;text-align:center}
+  .barra-num.previsao{color:var(--cinza)}
+
+  .grafico-linhas-h{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
+  .grafico-linha-meta{position:absolute;left:0;right:0;border-top:2px dashed var(--laranja);font-family:var(--ui);font-size:9px;color:var(--laranja);font-weight:700;letter-spacing:.5px}
+  .grafico-linha-meta::after{content:attr(data-label);position:absolute;right:0;top:-14px;background:var(--branco);padding:0 6px}
+
+  /* CENÁRIOS · cards de comparação */
+  .cenarios-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+  .cenario-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:20px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column}
+  .cenario-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(31,42,68,.06)}
+  .cenario-card.atual{border:2px solid var(--laranja);background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl))}
+  .cenario-card.otimista{border-left:3px solid var(--verde)}
+  .cenario-card.pessimista{border-left:3px solid var(--vermelho)}
+  .cenario-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .cenario-ic{width:36px;height:36px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--cinza-fundo);border:1px solid var(--cinza-cl)}
+  .cenario-card.atual .cenario-ic{background:var(--laranja-cl);border-color:var(--laranja)}
+  .cenario-card.otimista .cenario-ic{background:var(--verde-cl);border-color:var(--verde)}
+  .cenario-card.pessimista .cenario-ic{background:var(--vermelho-cl);border-color:var(--vermelho)}
+  .cenario-titulo{font-size:14px;font-weight:500;color:var(--marinho)}
+  .cenario-sub{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-top:2px}
+  .cenario-num-grande{font-family:var(--serif);font-style:italic;font-size:32px;color:var(--marinho);line-height:1;margin:10px 0 4px}
+  .cenario-card.atual .cenario-num-grande{color:var(--laranja)}
+  .cenario-card.otimista .cenario-num-grande{color:var(--verde)}
+  .cenario-card.pessimista .cenario-num-grande{color:var(--vermelho)}
+  .cenario-num-meta{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px;margin-bottom:14px}
+  .cenario-linhas{flex:1;display:flex;flex-direction:column;gap:6px;padding-top:14px;border-top:1px dashed var(--cinza-cl);font-family:var(--ui);font-size:11px}
+  .cenario-linhas div{display:flex;justify-content:space-between}
+  .cenario-linhas strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-weight:400}
+
+  /* MARCOS · timeline futura */
+  .marcos-timeline{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:20px;position:relative}
+  .marco-linha{display:grid;grid-template-columns:90px 1fr;gap:18px;padding:14px 0;border-bottom:1px dashed var(--cinza-cl);align-items:flex-start}
+  .marco-linha:last-child{border-bottom:none}
+  .marco-data{font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:15px;text-align:right;font-weight:500}
+  .marco-data span{display:block;font-family:var(--ui);font-size:10px;color:var(--cinza);font-style:normal;letter-spacing:.5px;font-weight:600;margin-top:2px}
+  .marco-conteudo{padding-left:18px;border-left:3px solid var(--cinza-cl);position:relative}
+  .marco-conteudo::before{content:"";position:absolute;left:-9px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--branco);border:3px solid var(--cinza-cl)}
+  .marco-conteudo.laranja{border-left-color:var(--laranja)}
+  .marco-conteudo.laranja::before{border-color:var(--laranja);background:var(--laranja)}
+  .marco-conteudo.verde{border-left-color:var(--verde)}
+  .marco-conteudo.verde::before{border-color:var(--verde);background:var(--verde)}
+  .marco-conteudo.amarelo{border-left-color:var(--amarelo)}
+  .marco-conteudo.amarelo::before{border-color:var(--amarelo);background:var(--amarelo)}
+  .marco-titulo-tl{font-size:14px;font-weight:500;color:var(--marinho);margin-bottom:3px}
+  .marco-desc{font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.55;letter-spacing:.3px}
+  .marco-desc strong{color:var(--marinho);font-weight:600}
+
+  /* MOVIMENTAÇÕES · cards horizontais */
+  .mov-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .mov-chip{font-family:var(--ui);font-size:11px;padding:8px 14px;border:1px solid var(--cinza-cl);background:var(--branco);color:var(--cinza);border-radius:16px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+  .mov-chip:hover{border-color:var(--marinho);color:var(--marinho)}
+  .mov-chip.ativo{background:var(--laranja);border-color:var(--laranja);color:white}
+  .mov-chip .num{background:rgba(255,255,255,.3);padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700}
+  .mov-chip:not(.ativo) .num{background:var(--cinza-fundo);color:var(--cinza)}
+
+  .mov-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto auto;gap:18px;align-items:center;transition:all .15s;border-left:3px solid var(--cinza)}
+  .mov-card:hover{transform:translateX(2px);box-shadow:0 4px 12px rgba(31,42,68,.05)}
+  .mov-card.admissao{border-left-color:var(--verde);background:linear-gradient(90deg,var(--verde-cl) 0%,var(--branco) 30%)}
+  .mov-card.desligamento{border-left-color:var(--vermelho);background:linear-gradient(90deg,var(--vermelho-cl) 0%,var(--branco) 30%)}
+  .mov-card.promocao{border-left-color:var(--laranja);background:linear-gradient(90deg,var(--laranja-cl) 0%,var(--branco) 30%)}
+  .mov-card.transferencia{border-left-color:var(--roxo);background:linear-gradient(90deg,var(--roxo-cl) 0%,var(--branco) 30%)}
+  .mov-card.reajuste{border-left-color:var(--amarelo);background:linear-gradient(90deg,var(--amarelo-cl) 0%,var(--branco) 30%)}
+  .mov-card.futura{opacity:.85;border-style:dashed}
+
+  .mov-ic-tipo{width:48px;height:48px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--cinza-fundo);border:1px solid var(--cinza-cl)}
+  .mov-card.admissao .mov-ic-tipo{background:var(--verde-cl);border-color:var(--verde);color:var(--verde)}
+  .mov-card.desligamento .mov-ic-tipo{background:var(--vermelho-cl);border-color:var(--vermelho);color:var(--vermelho)}
+  .mov-card.promocao .mov-ic-tipo{background:var(--laranja-cl);border-color:var(--laranja);color:var(--laranja)}
+  .mov-card.transferencia .mov-ic-tipo{background:var(--roxo-cl);border-color:var(--roxo);color:var(--roxo)}
+  .mov-card.reajuste .mov-ic-tipo{background:var(--amarelo-cl);border-color:var(--amarelo);color:#876715}
+
+  .mov-info{min-width:0}
+  .mov-tipo-label{font-family:var(--ui);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:3px}
+  .mov-card.admissao .mov-tipo-label{color:var(--verde)}
+  .mov-card.desligamento .mov-tipo-label{color:var(--vermelho)}
+  .mov-card.promocao .mov-tipo-label{color:var(--laranja)}
+  .mov-card.transferencia .mov-tipo-label{color:var(--roxo)}
+  .mov-card.reajuste .mov-tipo-label{color:#876715}
+  .mov-titulo-card{font-size:15px;font-weight:500;color:var(--marinho);line-height:1.2;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--serif)}
+  .mov-detalhe{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px;letter-spacing:.3px;line-height:1.55}
+  .mov-detalhe strong{color:var(--marinho);font-weight:600}
+  .mov-impacto{font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:right;min-width:140px}
+  .mov-impacto strong{display:block;font-family:var(--serif);font-style:italic;font-size:16px;color:var(--marinho);font-weight:400;line-height:1.1;margin-bottom:2px}
+  .mov-impacto.positivo strong{color:var(--verde)}
+  .mov-impacto.negativo strong{color:var(--vermelho)}
+
+  .mov-acoes-card{display:flex;flex-direction:column;gap:4px}
+
+  /* RESUMO DE MOVIMENTAÇÕES */
+  .resumo-mov{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px;display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+  .resumo-mov-item{text-align:center;padding:0 8px;position:relative}
+  .resumo-mov-item:not(:last-child)::after{content:"";position:absolute;right:0;top:14px;bottom:14px;width:1px;background:var(--cinza-cl)}
+  .resumo-mov-num{font-family:var(--serif);font-style:italic;font-size:32px;color:var(--marinho);line-height:1}
+  .resumo-mov-num.verde{color:var(--verde)}
+  .resumo-mov-num.vermelho{color:var(--vermelho)}
+  .resumo-mov-num.laranja{color:var(--laranja)}
+  .resumo-mov-num.roxo{color:var(--roxo)}
+  .resumo-mov-num.amarelo{color:var(--amarelo)}
+  .resumo-mov-label{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-top:6px}
+  .resumo-mov-sub{font-family:var(--ui);font-size:10.5px;color:var(--cinza);margin-top:3px}
+
+  /* AVATAR COMPARTILHADO COM OUTRAS TELAS */
+  .av-mov{width:34px;height:34px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;flex-shrink:0;font-weight:600}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+
+  /* SEÇÃO HEAD */
+  .secao-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--cinza-cl);gap:14px;flex-wrap:wrap}
+  .secao-titulo{font-size:16px;font-weight:500;color:var(--marinho);display:flex;align-items:center;gap:8px}
+  .secao-titulo em{color:var(--laranja);font-style:italic}
+  .secao-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px}
+
+  @media (max-width:1050px){
+    .kpis-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2-1{grid-template-columns:1fr}
+    .header-bar{grid-template-columns:1fr;text-align:center}
+    .cap-head{flex-direction:column}
+    .cenarios-grid{grid-template-columns:1fr}
+    .grafico-eixo,.grafico-barras{grid-template-columns:50px repeat(12,minmax(40px,1fr));font-size:9px}
+    .mov-card{grid-template-columns:auto 1fr;gap:10px}
+    .mov-impacto,.mov-acoes-card{grid-column:2;text-align:left}
+    .resumo-mov{grid-template-columns:repeat(2,1fr);gap:18px}
+    .resumo-mov-item:not(:last-child)::after{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- TELA 1: DASHBOARD HEADCOUNT -->
+<div class="tela ativa" id="t-dash-hc">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">📊</span> Headcount</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">🎓</span> Onboarding</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">📚</span> Treinamentos</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner · Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Gestão de Pessoas</a> &gt; <span style="color:var(--laranja)">Headcount &amp; Quadro de Posições</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Headcount &amp; <em>Quadro de Posições</em></h1>
+          <div class="meta">Gestão orçamentária de pessoas · 2026 · planejado vs realizado · ciclo aprovado pelo CFO em jan/2026</div>
+          <div class="header-tags">
+            <span class="tag verde">128 ativos / 135 autorizados</span>
+            <span class="tag laranja">5 em recrutamento</span>
+            <span class="tag amarelo">2 vagas em aberto</span>
+            <span class="tag marinho">R$ 2.789K / R$ 2.940K orçado</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar Excel</button>
+          <button class="btn btn-fantasma btn-sm">📊 Comparar cenários</button>
+          <button class="btn btn-primario btn-sm">+ Solicitar vaga</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa"><span>📊</span> Visão geral</div>
+        <div class="aba"><span>🏢</span> Por departamento <span class="cnt">6</span></div>
+        <div class="aba"><span>📅</span> Projeção 12m</div>
+        <div class="aba"><span>↔</span> Movimentações <span class="cnt">14</span></div>
+      </div>
+
+      <!-- KPIs PRINCIPAIS -->
+      <div class="kpis-grid">
+        <div class="kpi destaque">
+          <div class="kpi-titulo">Headcount autorizado</div>
+          <div class="kpi-valor"><em>135</em></div>
+          <div class="kpi-delta neutro">aprovado CFO · jan/2026</div>
+        </div>
+        <div class="kpi verde">
+          <div class="kpi-titulo">Empregados ativos</div>
+          <div class="kpi-valor"><em>128</em><span>/135</span></div>
+          <div class="kpi-delta up">▲ 95% de preenchimento</div>
+        </div>
+        <div class="kpi amarelo">
+          <div class="kpi-titulo">Posições em aberto</div>
+          <div class="kpi-valor" style="color:#876715"><em>7</em></div>
+          <div class="kpi-delta neutro">5 em recrutamento · 2 vagas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Custo · maio/2026</div>
+          <div class="kpi-valor"><em>R$ 2.789K</em></div>
+          <div class="kpi-delta up">▼ R$ 151K vs orçado (R$ 2.940K)</div>
+        </div>
+      </div>
+
+      <!-- ALERTA IA -->
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🤖</span>
+        <div>
+          <strong>Nora · IA · análise do quadro</strong>
+          Você está <strong style="color:var(--laranja)">95% preenchido</strong> com 5% de slack orçamentário disponível (R$ 151K/mês). 5 vagas em recrutamento devem fechar até julho. Recomendo focar na <strong>Eng. Civil Pleno (afirmativa)</strong> — vaga #2026-0042 em fase de seleção.
+        </div>
+      </div>
+
+      <!-- BARRA GLOBAL DE CAPACIDADE -->
+      <div class="cap-card">
+        <div class="cap-head">
+          <div>
+            <div class="cap-titulo">📊 <em style="color:var(--laranja);font-style:italic">Aurora · Total</em></div>
+            <div class="cap-meta">Distribuição do quadro autorizado · 135 posições aprovadas pelo CFO</div>
+          </div>
+          <div class="cap-stats">
+            <div><strong style="color:var(--verde)">128</strong><span>preenchidas</span></div>
+            <div><strong style="color:var(--laranja)">5</strong><span>recrutamento</span></div>
+            <div><strong style="color:#876715">2</strong><span>vagas</span></div>
+            <div><strong>135</strong><span>total</span></div>
+          </div>
+        </div>
+        <div class="cap-barra">
+          <div class="cap-seg preench" style="flex:128">128 preenchidas (95%)</div>
+          <div class="cap-seg recrutamento" style="flex:5">5</div>
+          <div class="cap-seg vaga" style="flex:2">2</div>
+        </div>
+        <div class="cap-legenda">
+          <div class="cap-legenda-item"><div class="cap-leg-cor preench"></div>Preenchidas · com pessoa</div>
+          <div class="cap-legenda-item"><div class="cap-leg-cor recrutamento"></div>Em recrutamento · pipeline ATS</div>
+          <div class="cap-legenda-item"><div class="cap-leg-cor vaga"></div>Vaga em aberto · não publicada</div>
+          <div class="cap-legenda-item"><div class="cap-leg-cor excedente"></div>Excedente · acima do autorizado</div>
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div>
+          <!-- BARRAS POR DEPARTAMENTO -->
+          <div class="painel">
+            <h3>Distribuição por <em>departamento</em></h3>
+            <p class="sub-titulo">Quadro autorizado vs realizado por área</p>
+
+            <div class="cap-card" style="border-color:var(--marinho);border-left:3px solid var(--marinho)">
+              <div class="cap-head">
+                <div>
+                  <div class="cap-titulo">🏗 Operações &amp; Obra</div>
+                  <div class="cap-meta">Carlos Aurora · sigla OPS · obras Sítio II + Vila Aurora</div>
+                </div>
+                <div class="cap-stats">
+                  <div><strong style="color:var(--verde)">78</strong><span>ativos</span></div>
+                  <div><strong style="color:var(--laranja)">3</strong><span>recrut.</span></div>
+                  <div><strong style="color:#876715">1</strong><span>vaga</span></div>
+                  <div><strong>82</strong><span>autoriz.</span></div>
+                </div>
+              </div>
+              <div class="cap-barra">
+                <div class="cap-seg preench" style="flex:78">78</div>
+                <div class="cap-seg recrutamento" style="flex:3">3</div>
+                <div class="cap-seg vaga" style="flex:1">1</div>
+              </div>
+              <div style="margin-top:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);display:flex;justify-content:space-between">
+                <span>Custo: <strong style="color:var(--marinho)">R$ 1.184K/mês</strong> · 42% da folha</span>
+                <span style="color:var(--verde)">▲ 95% preenchido</span>
+              </div>
+            </div>
+
+            <div class="cap-card" style="border-left:3px solid var(--roxo)">
+              <div class="cap-head">
+                <div>
+                  <div class="cap-titulo">📐 Engenharia</div>
+                  <div class="cap-meta">Luísa Mendonça · sigla ENG · sede BH + obras</div>
+                </div>
+                <div class="cap-stats">
+                  <div><strong style="color:var(--verde)">22</strong><span>ativos</span></div>
+                  <div><strong style="color:var(--laranja)">2</strong><span>recrut.</span></div>
+                  <div><strong style="color:#876715">1</strong><span>vaga</span></div>
+                  <div><strong>25</strong><span>autoriz.</span></div>
+                </div>
+              </div>
+              <div class="cap-barra">
+                <div class="cap-seg preench" style="flex:22">22</div>
+                <div class="cap-seg recrutamento" style="flex:2">2</div>
+                <div class="cap-seg vaga" style="flex:1">1</div>
+              </div>
+              <div style="margin-top:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);display:flex;justify-content:space-between">
+                <span>Custo: <strong style="color:var(--marinho)">R$ 498K/mês</strong> · inclui vaga afirmativa <strong style="color:var(--laranja)">#2026-0042</strong></span>
+                <span style="color:var(--amarelo)">⏰ 88% preenchido</span>
+              </div>
+            </div>
+
+            <div class="cap-card" style="border-left:3px solid var(--verde)">
+              <div class="cap-head">
+                <div>
+                  <div class="cap-titulo">💰 Financeiro &amp; Adm</div>
+                  <div class="cap-meta">Eduardo Santos · sigla FIN</div>
+                </div>
+                <div class="cap-stats">
+                  <div><strong style="color:var(--verde)">12</strong><span>ativos</span></div>
+                  <div><strong style="color:var(--cinza)">—</strong><span>recrut.</span></div>
+                  <div><strong style="color:var(--cinza)">—</strong><span>vaga</span></div>
+                  <div><strong>12</strong><span>autoriz.</span></div>
+                </div>
+              </div>
+              <div class="cap-barra">
+                <div class="cap-seg preench" style="flex:12">12 · 100% preenchido</div>
+              </div>
+              <div style="margin-top:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);display:flex;justify-content:space-between">
+                <span>Custo: <strong style="color:var(--marinho)">R$ 248K/mês</strong></span>
+                <span style="color:var(--verde)">✓ 100% preenchido</span>
+              </div>
+            </div>
+
+            <div class="cap-card" style="border-left:3px solid var(--laranja)">
+              <div class="cap-head">
+                <div>
+                  <div class="cap-titulo">📊 Comercial</div>
+                  <div class="cap-meta">Carlos Aurora · sigla COM</div>
+                </div>
+                <div class="cap-stats">
+                  <div><strong style="color:var(--verde)">8</strong><span>ativos</span></div>
+                  <div><strong style="color:var(--cinza)">—</strong><span>recrut.</span></div>
+                  <div><strong style="color:var(--cinza)">—</strong><span>vaga</span></div>
+                  <div><strong>8</strong><span>autoriz.</span></div>
+                </div>
+              </div>
+              <div class="cap-barra">
+                <div class="cap-seg preench" style="flex:8">8 · 100% preenchido</div>
+              </div>
+              <div style="margin-top:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);display:flex;justify-content:space-between">
+                <span>Custo: <strong style="color:var(--marinho)">R$ 167K/mês</strong></span>
+                <span style="color:var(--verde)">✓ 100% preenchido</span>
+              </div>
+            </div>
+
+            <div class="cap-card" style="border-left:3px solid var(--amarelo)">
+              <div class="cap-head">
+                <div>
+                  <div class="cap-titulo">📦 Suprimentos</div>
+                  <div class="cap-meta">Gabriela Tavares · sigla SUP</div>
+                </div>
+                <div class="cap-stats">
+                  <div><strong style="color:var(--verde)">5</strong><span>ativos</span></div>
+                  <div><strong style="color:var(--cinza)">—</strong><span>recrut.</span></div>
+                  <div><strong style="color:var(--cinza)">—</strong><span>vaga</span></div>
+                  <div><strong>5</strong><span>autoriz.</span></div>
+                </div>
+              </div>
+              <div class="cap-barra">
+                <div class="cap-seg preench" style="flex:5">5 · 100% preenchido</div>
+              </div>
+              <div style="margin-top:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);display:flex;justify-content:space-between">
+                <span>Custo: <strong style="color:var(--marinho)">R$ 92K/mês</strong></span>
+                <span style="color:var(--verde)">✓ 100% preenchido</span>
+              </div>
+            </div>
+
+            <div class="cap-card" style="border-left:3px solid var(--cinza)">
+              <div class="cap-head">
+                <div>
+                  <div class="cap-titulo">👥 Recursos Humanos</div>
+                  <div class="cap-meta">Roberto Aurora · sigla RH · Paula admitida ontem</div>
+                </div>
+                <div class="cap-stats">
+                  <div><strong style="color:var(--verde)">3</strong><span>ativos</span></div>
+                  <div><strong style="color:var(--cinza)">—</strong><span>recrut.</span></div>
+                  <div><strong style="color:var(--cinza)">—</strong><span>vaga</span></div>
+                  <div><strong>3</strong><span>autoriz.</span></div>
+                </div>
+              </div>
+              <div class="cap-barra">
+                <div class="cap-seg preench" style="flex:3">3 · 100% preenchido</div>
+              </div>
+              <div style="margin-top:8px;font-family:var(--ui);font-size:11px;color:var(--cinza);display:flex;justify-content:space-between">
+                <span>Custo: <strong style="color:var(--marinho)">R$ 50K/mês</strong></span>
+                <span style="color:var(--verde)">✓ Paula completou o quadro</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- ORÇAMENTO REALIZADO VS PLANEJADO -->
+          <div class="painel">
+            <h3 style="font-size:16px">Orçamento <em>2026</em></h3>
+            <div class="sub-titulo">Realizado vs planejado · acumulado YTD</div>
+
+            <div style="margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:6px">
+                <span>Realizado (jan-mai)</span>
+                <strong style="font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:14px">R$ 13.5M</strong>
+              </div>
+              <div style="height:10px;background:var(--cinza-fundo);border-radius:5px;overflow:hidden">
+                <div style="height:100%;width:42%;background:linear-gradient(90deg,var(--verde),#1F5740);border-radius:5px"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">
+                <span>de R$ 31.8M anual</span>
+                <span style="color:var(--verde);font-weight:600">42% executado</span>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--cinza-cl);padding-top:14px;margin-top:14px">
+              <div style="display:flex;justify-content:space-between;padding:8px 0;font-family:var(--ui);font-size:12px;color:var(--cinza)">
+                <span>Mês de maior custo</span>
+                <strong style="color:var(--marinho)">março · R$ 2.812K</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;font-family:var(--ui);font-size:12px;color:var(--cinza);border-top:1px solid var(--cinza-cl)">
+                <span>Mês atual (maio)</span>
+                <strong style="color:var(--verde)">R$ 2.789K · ▼ R$ 23K</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;font-family:var(--ui);font-size:12px;color:var(--cinza);border-top:1px solid var(--cinza-cl)">
+                <span>Reserva técnica</span>
+                <strong style="color:var(--laranja)">R$ 151K/mês</strong>
+              </div>
+            </div>
+
+            <div class="alert alert-verde" style="margin-top:14px;margin-bottom:0">
+              <span class="ic-grande">✓</span>
+              <div>
+                <strong>Dentro do orçamento</strong>
+                Folga de R$ 151K/mês pode absorver os 5 admissões em curso.
+              </div>
+            </div>
+          </div>
+
+          <!-- INDICADORES RH -->
+          <div class="painel">
+            <h3 style="font-size:16px">Indicadores <em>RH</em></h3>
+            <div class="sub-titulo">Saúde do quadro</div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;font-family:var(--ui);font-size:12px">
+              <div style="display:flex;justify-content:space-between;padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <span>Turnover 12m</span>
+                <strong style="color:var(--verde);font-family:var(--serif);font-style:italic;font-size:14px">8,2%</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <span>Tempo médio de casa</span>
+                <strong style="color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:14px">3,8 anos</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <span>Idade média</span>
+                <strong style="color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:14px">36 anos</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <span>Mulheres no quadro</span>
+                <strong style="color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:14px">26%</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px;background:var(--laranja-cl);border-radius:2px;border:1px solid var(--laranja)">
+                <span>Meta diversidade 2026</span>
+                <strong style="color:var(--laranja);font-family:var(--serif);font-style:italic;font-size:14px">+ 3pp</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRÓXIMOS EVENTOS -->
+          <div class="painel" style="background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none"></div>
+            <h3 style="font-size:16px;color:var(--papel);position:relative">📅 Próximas <em style="color:var(--laranja)">decisões</em></h3>
+            <div style="font-family:var(--ui);font-size:11px;opacity:.5;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;position:relative">próximos 30 dias</div>
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12px;position:relative">
+              <div style="padding:10px;background:rgba(255,255,255,.06);border-radius:2px;border-left:3px solid var(--laranja)">
+                <strong style="color:var(--laranja)">02/06</strong> · revisão semestral do quadro com CFO Eduardo
+              </div>
+              <div style="padding:10px;background:rgba(255,255,255,.06);border-radius:2px;border-left:3px solid var(--amarelo)">
+                <strong style="color:var(--amarelo)">15/06</strong> · projeção 2º semestre · alocação para Vila Aurora
+              </div>
+              <div style="padding:10px;background:rgba(255,255,255,.06);border-radius:2px;border-left:3px solid var(--verde)">
+                <strong style="color:var(--verde)">20/06</strong> · fechamento vaga #2026-0042 (afirmativa Eng. Pleno)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- TELA 2: PROJEÇÃO 12 MESES -->
+<div class="tela" id="t-projecao">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">📊</span> Headcount</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">🎓</span> Onboarding</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">📚</span> Treinamentos</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner · Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dash-hc')">Headcount</a> &gt; <span style="color:var(--laranja)">Projeção 12 meses</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Projeção · <em>12 meses</em></h1>
+          <div class="meta">Junho/2026 a Maio/2027 · 3 cenários · alinhamento com plano financeiro Aurora · revisão semestral 02/06</div>
+          <div class="header-tags">
+            <span class="tag laranja">📊 Cenário Realista</span>
+            <span class="tag verde">+ 15 contratações previstas</span>
+            <span class="tag amarelo">- 8 desligamentos previstos</span>
+            <span class="tag marinho">Pico em out/2026 (obra Vila Aurora)</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm">📤 Compartilhar com CFO</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar planilha</button>
+          <button class="btn btn-primario btn-sm">✎ Ajustar projeção</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-dash-hc')"><span>📊</span> Visão geral</div>
+        <div class="aba"><span>🏢</span> Por departamento <span class="cnt">6</span></div>
+        <div class="aba ativa"><span>📅</span> Projeção 12m</div>
+        <div class="aba" onclick="irPara('t-movimentacoes')"><span>↔</span> Movimentações <span class="cnt">14</span></div>
+      </div>
+
+      <!-- 3 CENÁRIOS -->
+      <div class="cenarios-grid">
+        <div class="cenario-card pessimista">
+          <div class="cenario-head">
+            <div class="cenario-ic">📉</div>
+            <div>
+              <div class="cenario-titulo">Conservador</div>
+              <div class="cenario-sub">crise econômica</div>
+            </div>
+          </div>
+          <div class="cenario-num-grande">124</div>
+          <div class="cenario-num-meta">empregados em mai/2027</div>
+          <div class="cenario-linhas">
+            <div><span>Vs hoje</span><strong style="color:var(--vermelho)">– 4 pessoas</strong></div>
+            <div><span>Custo mensal projetado</span><strong>R$ 2.7M</strong></div>
+            <div><span>Obra Vila Aurora</span><strong>adiada</strong></div>
+            <div><span>Contratações</span><strong>+ 4</strong></div>
+            <div><span>Desligamentos</span><strong>– 8</strong></div>
+          </div>
+        </div>
+
+        <div class="cenario-card atual">
+          <div class="cenario-head">
+            <div class="cenario-ic">🎯</div>
+            <div>
+              <div class="cenario-titulo">Realista <span class="tag laranja" style="font-size:9px">ATUAL</span></div>
+              <div class="cenario-sub">cenário base</div>
+            </div>
+          </div>
+          <div class="cenario-num-grande">135</div>
+          <div class="cenario-num-meta">empregados em mai/2027</div>
+          <div class="cenario-linhas">
+            <div><span>Vs hoje</span><strong style="color:var(--laranja)">+ 7 pessoas</strong></div>
+            <div><span>Custo mensal projetado</span><strong>R$ 3.1M</strong></div>
+            <div><span>Obra Vila Aurora</span><strong>em curso</strong></div>
+            <div><span>Contratações</span><strong>+ 15</strong></div>
+            <div><span>Desligamentos</span><strong>– 8</strong></div>
+          </div>
+        </div>
+
+        <div class="cenario-card otimista">
+          <div class="cenario-head">
+            <div class="cenario-ic">📈</div>
+            <div>
+              <div class="cenario-titulo">Otimista</div>
+              <div class="cenario-sub">2 novas obras</div>
+            </div>
+          </div>
+          <div class="cenario-num-grande">158</div>
+          <div class="cenario-num-meta">empregados em mai/2027</div>
+          <div class="cenario-linhas">
+            <div><span>Vs hoje</span><strong style="color:var(--verde)">+ 30 pessoas</strong></div>
+            <div><span>Custo mensal projetado</span><strong>R$ 3.6M</strong></div>
+            <div><span>Obra Vila Aurora</span><strong>+ obra Lagoa</strong></div>
+            <div><span>Contratações</span><strong>+ 38</strong></div>
+            <div><span>Desligamentos</span><strong>– 8</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRÁFICO 12 MESES · BARRAS VERTICAIS -->
+      <div class="painel">
+        <h3>Projeção <em>mês a mês</em></h3>
+        <p class="sub-titulo">Cenário realista · ativos (verde) + em recrutamento (laranja) + previsão futura (cinza)</p>
+
+        <div class="grafico-12m">
+          <div class="grafico-eixo">
+            <div></div>
+            <div class="grafico-mes-h atual">MAI<br><span style="font-size:8px">atual</span></div>
+            <div class="grafico-mes-h previsao">JUN</div>
+            <div class="grafico-mes-h previsao">JUL</div>
+            <div class="grafico-mes-h previsao">AGO</div>
+            <div class="grafico-mes-h previsao">SET</div>
+            <div class="grafico-mes-h previsao">OUT<br><span style="font-size:8px">pico</span></div>
+            <div class="grafico-mes-h previsao">NOV</div>
+            <div class="grafico-mes-h previsao">DEZ</div>
+            <div class="grafico-mes-h previsao">JAN<br><span style="font-size:8px">2027</span></div>
+            <div class="grafico-mes-h previsao">FEV</div>
+            <div class="grafico-mes-h previsao">MAR</div>
+            <div class="grafico-mes-h previsao">ABR</div>
+          </div>
+
+          <div class="grafico-barras">
+            <div style="display:flex;flex-direction:column;justify-content:space-between;height:100%;font-family:var(--ui);font-size:9px;color:var(--cinza);text-align:right;padding-right:6px">
+              <span>160</span>
+              <span>120</span>
+              <span>80</span>
+              <span>40</span>
+              <span>0</span>
+            </div>
+
+            <!-- MAI · atual -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v recrut" style="height:18px">5</div>
+              <div class="barra-seg-v preench" style="height:178px">128</div>
+              <div class="barra-num">133</div>
+            </div>
+
+            <!-- JUN -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v recrut" style="height:14px">4</div>
+              <div class="barra-seg-v previsao" style="height:182px">131</div>
+              <div class="barra-num previsao">135</div>
+            </div>
+
+            <!-- JUL -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:192px">137</div>
+              <div class="barra-num previsao">137</div>
+            </div>
+
+            <!-- AGO -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:195px">139</div>
+              <div class="barra-num previsao">139</div>
+            </div>
+
+            <!-- SET -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:204px">146</div>
+              <div class="barra-num previsao">146</div>
+            </div>
+
+            <!-- OUT · pico -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:215px;background:var(--laranja);opacity:.55">154</div>
+              <div class="barra-num previsao" style="color:var(--laranja);font-weight:700">154 ⬆</div>
+            </div>
+
+            <!-- NOV -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:208px">148</div>
+              <div class="barra-num previsao">148</div>
+            </div>
+
+            <!-- DEZ -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:201px">144</div>
+              <div class="barra-num previsao">144</div>
+            </div>
+
+            <!-- JAN 2027 -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:194px">139</div>
+              <div class="barra-num previsao">139</div>
+            </div>
+
+            <!-- FEV -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:192px">137</div>
+              <div class="barra-num previsao">137</div>
+            </div>
+
+            <!-- MAR -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:189px">135</div>
+              <div class="barra-num previsao">135</div>
+            </div>
+
+            <!-- ABR -->
+            <div class="barra-coluna">
+              <div class="barra-seg-v previsao" style="height:189px">135</div>
+              <div class="barra-num previsao">135</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:18px;margin-top:14px;font-family:var(--ui);font-size:11px;color:var(--cinza);flex-wrap:wrap;justify-content:center">
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--verde);border-radius:2px"></div>Atual</div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--laranja);border-radius:2px"></div>Em recrutamento</div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--cinza);border-radius:2px;opacity:.4"></div>Previsão</div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--laranja);border-radius:2px;opacity:.55"></div>Pico previsto</div>
+          </div>
+        </div>
+
+        <div class="alert alert-amarelo" style="margin-top:14px;margin-bottom:0">
+          <span class="ic-grande">⚠</span>
+          <div>
+            <strong>Atenção · Outubro/2026 com pico de 154 empregados</strong>
+            A obra Vila Aurora entra em fase de fundação em outubro · pico de 26 empregados extras (pedreiros, serventes, carpinteiros). <strong>Custo estimado adicional: R$ 540K/mês</strong>. Aprovação CFO necessária até 31/07.
+          </div>
+        </div>
+      </div>
+
+      <!-- MARCOS DA PROJEÇÃO -->
+      <div class="painel">
+        <h3>Marcos da <em>projeção</em></h3>
+        <p class="sub-titulo">Eventos esperados nos próximos 12 meses</p>
+
+        <div class="marcos-timeline">
+          <div class="marco-linha">
+            <div class="marco-data">02/06/26<span>SEG</span></div>
+            <div class="marco-conteudo laranja">
+              <div class="marco-titulo-tl">Revisão semestral com CFO Eduardo</div>
+              <div class="marco-desc">Roberto apresenta status do quadro · validar slack de <strong>R$ 151K/mês</strong> · ratificar plano contratações 2º semestre.</div>
+            </div>
+          </div>
+
+          <div class="marco-linha">
+            <div class="marco-data">20/06/26<span>SEX</span></div>
+            <div class="marco-conteudo verde">
+              <div class="marco-titulo-tl">Fechamento vaga afirmativa #2026-0042 · Eng. Civil Pleno</div>
+              <div class="marco-desc">Última etapa da seleção · Letícia Ferraz lidera funil · admissão prevista <strong>01/07</strong> · pertence ao quadro Engenharia (Luísa).</div>
+            </div>
+          </div>
+
+          <div class="marco-linha">
+            <div class="marco-data">15/07/26<span>QUA</span></div>
+            <div class="marco-conteudo amarelo">
+              <div class="marco-titulo-tl">Decisão sobre obra Vila Aurora · planejamento de pico</div>
+              <div class="marco-desc">Reunião com Carlos Aurora (Dir. Operações) para definir <strong>26 contratações temporárias</strong> entre ago-out · cronograma de NRs.</div>
+            </div>
+          </div>
+
+          <div class="marco-linha">
+            <div class="marco-data">10/2026<span>OUT</span></div>
+            <div class="marco-conteudo amarelo">
+              <div class="marco-titulo-tl">Pico operacional · 154 empregados</div>
+              <div class="marco-desc">Vila Aurora em fase de fundação · custo mensal estimado <strong>R$ 3.3M</strong> · 26 pessoas adicionais (predominantemente pedreiros e serventes em obra).</div>
+            </div>
+          </div>
+
+          <div class="marco-linha">
+            <div class="marco-data">12/2026<span>DEZ</span></div>
+            <div class="marco-conteudo">
+              <div class="marco-titulo-tl">13º salário · provisão acumulada</div>
+              <div class="marco-desc">Pagamento 13º estimado <strong>R$ 3.8M</strong> · provisão mensal em curso · impacto orçamentário planejado.</div>
+            </div>
+          </div>
+
+          <div class="marco-linha">
+            <div class="marco-data">01/04/27<span>QUI</span></div>
+            <div class="marco-conteudo">
+              <div class="marco-titulo-tl">Data-base SINTRAICCMG · reajuste salarial</div>
+              <div class="marco-desc">Negociação dissídio coletivo construção civil MG · estimativa <strong>+ 5% INPC</strong> · custo adicional R$ 140K/mês para folha.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- TELA 3: MOVIMENTAÇÕES -->
+<div class="tela" id="t-movimentacoes">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">📊</span> Headcount</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">🎓</span> Onboarding</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">📚</span> Treinamentos</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner · Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dash-hc')">Headcount</a> &gt; <span style="color:var(--laranja)">Movimentações</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Movimentações <em>de pessoal</em></h1>
+          <div class="meta">Últimos 30 dias + próximas previstas · admissões, desligamentos, promoções, transferências, reajustes</div>
+          <div class="header-tags">
+            <span class="tag verde">3 admissões · maio</span>
+            <span class="tag vermelho">2 desligamentos</span>
+            <span class="tag laranja">4 promoções</span>
+            <span class="tag roxo">2 transferências</span>
+            <span class="tag amarelo">3 reajustes</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar relatório</button>
+          <button class="btn btn-fantasma btn-sm">📤 Enviar CAGED</button>
+          <button class="btn btn-primario btn-sm">+ Nova movimentação</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-dash-hc')"><span>📊</span> Visão geral</div>
+        <div class="aba"><span>🏢</span> Por departamento <span class="cnt">6</span></div>
+        <div class="aba" onclick="irPara('t-projecao')"><span>📅</span> Projeção 12m</div>
+        <div class="aba ativa"><span>↔</span> Movimentações <span class="cnt">14</span></div>
+      </div>
+
+      <!-- RESUMO DE MOVIMENTAÇÕES · 5 KPIs em linha -->
+      <div class="resumo-mov">
+        <div class="resumo-mov-item">
+          <div class="resumo-mov-num verde">+ 3</div>
+          <div class="resumo-mov-label">Admissões</div>
+          <div class="resumo-mov-sub">maio · entrada</div>
+        </div>
+        <div class="resumo-mov-item">
+          <div class="resumo-mov-num vermelho">– 2</div>
+          <div class="resumo-mov-label">Desligamentos</div>
+          <div class="resumo-mov-sub">turnover 1,6%</div>
+        </div>
+        <div class="resumo-mov-item">
+          <div class="resumo-mov-num laranja">↑ 4</div>
+          <div class="resumo-mov-label">Promoções</div>
+          <div class="resumo-mov-sub">+ R$ 8.2k folha</div>
+        </div>
+        <div class="resumo-mov-item">
+          <div class="resumo-mov-num roxo">↔ 2</div>
+          <div class="resumo-mov-label">Transferências</div>
+          <div class="resumo-mov-sub">entre departamentos</div>
+        </div>
+        <div class="resumo-mov-item">
+          <div class="resumo-mov-num amarelo">$ 3</div>
+          <div class="resumo-mov-label">Reajustes</div>
+          <div class="resumo-mov-sub">mérito + dissídio</div>
+        </div>
+      </div>
+
+      <!-- FILTROS POR TIPO -->
+      <div class="mov-filtros">
+        <div class="mov-chip ativo">Todas <span class="num">14</span></div>
+        <div class="mov-chip">✓ Admissões <span class="num">3</span></div>
+        <div class="mov-chip">✕ Desligamentos <span class="num">2</span></div>
+        <div class="mov-chip">↑ Promoções <span class="num">4</span></div>
+        <div class="mov-chip">↔ Transferências <span class="num">2</span></div>
+        <div class="mov-chip">$ Reajustes <span class="num">3</span></div>
+      </div>
+
+      <!-- SEÇÃO: PRÓXIMAS PREVISTAS -->
+      <div class="painel">
+        <div class="secao-head">
+          <div class="secao-titulo">📅 Movimentações <em>previstas</em> · próximos 30 dias</div>
+          <div class="secao-meta">5 eventos pré-aprovados</div>
+        </div>
+
+        <!-- ADMISSÃO PREVISTA · LETÍCIA -->
+        <div class="mov-card admissao futura">
+          <div class="mov-ic-tipo">✓</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">▶ ADMISSÃO PREVISTA</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-f">LF</span>
+              Letícia Ferraz Almeida
+              <span class="tag laranja" style="font-size:10px">vaga afirmativa #2026-0042</span>
+            </div>
+            <div class="mov-detalhe">
+              Engenheira Civil Plena · vai para <strong>Engenharia</strong> (Luísa Mendonça) · contratação CLT · proposta enviada em 22/05 · admissão prevista <strong>01/07/2026</strong> · ASO agendado 27/06
+            </div>
+          </div>
+          <div class="mov-impacto positivo">
+            <strong>+ R$ 9.5k</strong>
+            <span>impacto folha</span>
+            <span style="color:var(--cinza)">CC ENG-002</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Ver vaga</button>
+            <button class="btn btn-fantasma btn-xs">📋 Status</button>
+          </div>
+        </div>
+
+        <!-- 2 ADMISSÕES PEDREIROS · OBRA -->
+        <div class="mov-card admissao futura">
+          <div class="mov-ic-tipo">✓</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">▶ ADMISSÃO PREVISTA · OBRA</div>
+            <div class="mov-titulo-card">
+              2 Pedreiros · Canteiro Sítio II
+            </div>
+            <div class="mov-detalhe">
+              Vagas autorizadas pelo Carlos Aurora · NR-18 obrigatória antes da entrada · candidatos em fase de triagem com a Mariana (Oi Nora) · admissão prevista entre <strong>03/06 e 10/06</strong>
+            </div>
+          </div>
+          <div class="mov-impacto positivo">
+            <strong>+ R$ 5.8k</strong>
+            <span>impacto folha</span>
+            <span style="color:var(--cinza)">CC OPS-001</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Vagas</button>
+          </div>
+        </div>
+
+        <!-- PROMOÇÃO PREVISTA · FERNANDO -->
+        <div class="mov-card promocao futura">
+          <div class="mov-ic-tipo">↑</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">▶ PROMOÇÃO PREVISTA</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-a">F</span>
+              Fernando Lacerda Costa
+              <span class="tag laranja" style="font-size:10px">★ Estrela 9-Box</span>
+            </div>
+            <div class="mov-detalhe">
+              Eng. Civil Sr → <strong>Eng. Civil Especialista</strong> · após conclusão da trilha BIM (previsto 02/08) · proposta da Luísa Mendonça · aguardando aprovação CFO Eduardo (acima R$ 1k) e ratificação CEO Alfredo
+            </div>
+          </div>
+          <div class="mov-impacto positivo">
+            <strong>+ R$ 4.0k</strong>
+            <span>aumento salarial</span>
+            <span style="color:var(--cinza)">R$ 12.5k → R$ 16.5k</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Ficha</button>
+            <button class="btn btn-fantasma btn-xs">📋 Aprovar</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SEÇÃO: REALIZADAS · ÚLTIMOS 30 DIAS -->
+      <div class="painel">
+        <div class="secao-head">
+          <div class="secao-titulo">✓ Movimentações <em>realizadas</em> · últimos 30 dias</div>
+          <div class="secao-meta">9 eventos concluídos</div>
+        </div>
+
+        <!-- PAULA · ADMISSÃO ONTEM -->
+        <div class="mov-card admissao">
+          <div class="mov-ic-tipo">✓</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">✓ ADMISSÃO · 26/05/2026</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-f">PM</span>
+              Paula Marques Souza
+              <span class="tag verde" style="font-size:10px">DIA 1 hoje</span>
+              <span class="tag" style="font-size:10px">MAT 0185</span>
+            </div>
+            <div class="mov-detalhe">
+              Coordenadora de RH · entrou em <strong>RH &amp; Pessoas</strong> (Roberto Aurora) · CLT efetivo · mentora Carla Aurora · em onboarding (Tela 6) · eSocial S-2200 enviado 23/05
+            </div>
+          </div>
+          <div class="mov-impacto positivo">
+            <strong>+ R$ 9.2k</strong>
+            <span>impacto folha jun</span>
+            <span style="color:var(--cinza)">CC RH-001</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Ficha</button>
+            <button class="btn btn-fantasma btn-xs">🎓 Onboarding</button>
+          </div>
+        </div>
+
+        <!-- FERNANDA · ADMISSÃO MARÇO -->
+        <div class="mov-card admissao">
+          <div class="mov-ic-tipo">✓</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">✓ ADMISSÃO · 02/03/2026</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-c">FT</span>
+              Fernanda Toledo
+              <span class="tag" style="font-size:10px">MAT 0148</span>
+            </div>
+            <div class="mov-detalhe">
+              Analista R&amp;S Júnior · entrou em <strong>Comercial</strong> · gestora Carla Aurora · onboarding 96% concluído (Tela 6) · término em 01/06
+            </div>
+          </div>
+          <div class="mov-impacto positivo">
+            <strong>+ R$ 6.4k</strong>
+            <span>folha já ativa</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Ficha</button>
+          </div>
+        </div>
+
+        <!-- DANIEL PEREIRA · ADMISSÃO MAIO -->
+        <div class="mov-card admissao">
+          <div class="mov-ic-tipo">✓</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">✓ ADMISSÃO · 04/05/2026</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-e">DP</span>
+              Daniel Pereira Lima
+              <span class="tag" style="font-size:10px">MAT 0182</span>
+            </div>
+            <div class="mov-detalhe">
+              Engenheiro Civil Pleno · entrou em <strong>Engenharia</strong> · gestora Luísa Mendonça · onboarding 74% concluído (Tela 6 · dia 22 de 30)
+            </div>
+          </div>
+          <div class="mov-impacto positivo">
+            <strong>+ R$ 9.5k</strong>
+            <span>folha jun</span>
+            <span style="color:var(--cinza)">CC ENG-002</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Ficha</button>
+          </div>
+        </div>
+
+        <!-- PROMOÇÃO · GABRIELA -->
+        <div class="mov-card promocao">
+          <div class="mov-ic-tipo">↑</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">↑ PROMOÇÃO · 01/05/2026</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-d">GT</span>
+              Gabriela Tavares
+            </div>
+            <div class="mov-detalhe">
+              Analista Sr → <strong>Coord. de Suprimentos</strong> · aumento de R$ 8.5k → R$ 11.5k (+35%) · ratificada por CEO Alfredo em 28/04 · 6 anos de casa
+            </div>
+          </div>
+          <div class="mov-impacto positivo">
+            <strong>+ R$ 3.0k</strong>
+            <span>aumento salarial</span>
+            <span style="color:var(--cinza)">SUP-001</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Ficha</button>
+          </div>
+        </div>
+
+        <!-- DESLIGAMENTO · JOÃO SAMPAIO -->
+        <div class="mov-card desligamento">
+          <div class="mov-ic-tipo">✕</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">✕ DESLIGAMENTO · 15/05/2026</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-b">JS</span>
+              João Sampaio
+              <span class="tag vermelho" style="font-size:10px">pedido demissão</span>
+            </div>
+            <div class="mov-detalhe">
+              Servente de Obra · saiu de <strong>Operações &amp; Obra</strong> (Sítio II) · pedido próprio · proposta concorrente · rescisão calculada · eSocial S-2299 enviado · 4 anos de casa
+            </div>
+          </div>
+          <div class="mov-impacto negativo">
+            <strong>– R$ 2.0k</strong>
+            <span>folha jun</span>
+            <span style="color:var(--cinza)">economia mensal</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Termo</button>
+          </div>
+        </div>
+
+        <!-- DESLIGAMENTO · MARCOS REIS -->
+        <div class="mov-card desligamento">
+          <div class="mov-ic-tipo">✕</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">✕ DESLIGAMENTO · 22/05/2026</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-c">MR</span>
+              Marcos Reis
+              <span class="tag vermelho" style="font-size:10px">acordo</span>
+            </div>
+            <div class="mov-detalhe">
+              Auxiliar Administrativo · saiu de <strong>Financeiro</strong> · acordo mútuo (Art. 484-A) · 50% multa FGTS · eSocial S-2299 enviado 22/05 · 2 anos casa
+            </div>
+          </div>
+          <div class="mov-impacto negativo">
+            <strong>– R$ 3.2k</strong>
+            <span>folha jun</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Termo</button>
+          </div>
+        </div>
+
+        <!-- TRANSFERÊNCIA · ROBERTA -->
+        <div class="mov-card transferencia">
+          <div class="mov-ic-tipo">↔</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">↔ TRANSFERÊNCIA · 10/05/2026</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-d">RP</span>
+              Roberta Pinheiro
+            </div>
+            <div class="mov-detalhe">
+              Coordenadora · saiu de <strong>Sítio II</strong> e foi para <strong>Vila Aurora</strong> (Carlos Aurora · Operações) · sem mudança salarial · transferência de centro de custo OPS-001 → OPS-002 · gestora mantém-se
+            </div>
+          </div>
+          <div class="mov-impacto">
+            <strong>R$ 0</strong>
+            <span>impacto folha</span>
+            <span style="color:var(--cinza)">CC realocado</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Ficha</button>
+          </div>
+        </div>
+
+        <!-- REAJUSTE · ANA CAROLINA -->
+        <div class="mov-card reajuste">
+          <div class="mov-ic-tipo">$</div>
+          <div class="mov-info">
+            <div class="mov-tipo-label">$ REAJUSTE · 01/05/2026</div>
+            <div class="mov-titulo-card">
+              <span class="av-mov av-f">AS</span>
+              Ana Carolina Souza
+              <span class="tag amarelo" style="font-size:10px">mérito</span>
+            </div>
+            <div class="mov-detalhe">
+              Eng. Civil Jr · aumento por mérito · R$ 6.2k → R$ 6.8k (+9.7%) · proposta de Luísa Mendonça aprovada por Eduardo (CFO) · ciclo de avaliação Q1
+            </div>
+          </div>
+          <div class="mov-impacto positivo">
+            <strong>+ R$ 600</strong>
+            <span>aumento</span>
+            <span style="color:var(--cinza)">CC ENG-002</span>
+          </div>
+          <div class="mov-acoes-card">
+            <button class="btn btn-fantasma btn-xs">👁 Ficha</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TOTAL DO PERÍODO · CARD FINAL -->
+      <div class="painel" style="background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border:1px solid var(--laranja)">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center">
+          <div>
+            <h3>Impacto <em>líquido</em> · maio/2026</h3>
+            <p class="sub-titulo" style="margin-bottom:0">Saldo de todas as movimentações</p>
+            <div style="display:flex;gap:18px;margin-top:14px;font-family:var(--ui);font-size:12px;color:var(--cinza);flex-wrap:wrap">
+              <div><strong style="color:var(--verde);font-family:var(--serif);font-style:italic;font-size:16px">+ R$ 31.1k</strong> · entradas</div>
+              <div><strong style="color:var(--vermelho);font-family:var(--serif);font-style:italic;font-size:16px">– R$ 5.2k</strong> · saídas</div>
+              <div><strong style="color:var(--laranja);font-family:var(--serif);font-style:italic;font-size:16px">+ R$ 8.6k</strong> · promoções &amp; reajustes</div>
+              <div><strong style="color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:16px">→</strong> · transferência neutra</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:var(--serif);font-style:italic;font-size:42px;color:var(--laranja);line-height:1">+ R$ 34.5k</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;letter-spacing:.5px">impacto na folha de junho · dentro do slack R$ 151K</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANNER CAGED -->
+      <div class="alert alert-marinho">
+        <span class="ic-grande">📤</span>
+        <div>
+          <strong>CAGED · pronto para envio</strong>
+          5 movimentações com obrigação CAGED em maio (3 admissões + 2 desligamentos). Arquivo gerado automaticamente · envio via eSocial S-2200/S-2299 já realizado · prazo de retificação até <strong style="color:var(--laranja)">07/06</strong>.
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Headcount · Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-dash-hc">📊 Dashboard Quadro</option>
+    <option value="t-projecao">📅 Projeção 12 meses</option>
+    <option value="t-movimentacoes">↔ Movimentações</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  const alvo = document.getElementById(idTela);
+  if(!alvo){
+    alert('Tela "' + idTela + '" ainda em construção. Aguarde as próximas partes.');
+    return;
+  }
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  alvo.classList.add('ativa');
+  window.scrollTo({top:0,behavior:'instant'});
+  const sel = document.getElementById('seletor-tela');
+  if(sel) sel.value = idTela;
+}
+</script>
+</body>
+</html>

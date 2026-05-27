@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Ponto Eletrônico (Visão RH)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-verde{background:var(--verde);color:white}
+  .btn-verde:hover{background:#1F5740}
+  .btn-perigo{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .btn-perigo:hover{background:var(--vermelho);color:white}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#D4A02C,#A37614);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  /* HEADER */
+  .header-bar{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:24px 28px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+  .header-bar h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .header-bar h1 em{color:var(--laranja);font-style:italic}
+  .header-bar .meta{font-family:var(--ui);font-size:12px;color:var(--cinza);letter-spacing:.5px;margin-top:6px}
+  .header-bar .meta strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:16px;font-weight:400}
+  .header-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .header-bar-acoes{display:flex;flex-direction:column;gap:8px}
+
+  /* RELÓGIO AO VIVO */
+  .relogio-vivo{background:var(--marinho);color:var(--papel);padding:14px 20px;border-radius:2px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden}
+  .relogio-vivo::before{content:"";position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .relogio-ic{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;position:relative}
+  .relogio-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--laranja);animation:pulse-ao-vivo 1.5s infinite}
+  @keyframes pulse-ao-vivo{0%,100%{opacity:1}50%{opacity:.3}}
+  .relogio-info{flex:1;position:relative}
+  .relogio-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:.6;font-weight:700}
+  .relogio-tempo{font-family:var(--serif);font-style:italic;font-size:22px;margin-top:2px;line-height:1}
+  .relogio-tempo em{color:var(--laranja);font-style:italic}
+
+  /* ABAS */
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;overflow-x:auto;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:0 6px}
+  .aba{padding:14px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .aba .ic{font-size:14px}
+  .aba .cnt{background:var(--cinza-fundo);font-size:10px;padding:1px 7px;border-radius:10px;letter-spacing:.3px;font-weight:700;color:var(--cinza)}
+  .aba.ativa .cnt{background:var(--laranja);color:white}
+  .aba .alerta{background:var(--vermelho);color:white;font-size:10px;padding:1px 7px;border-radius:10px;letter-spacing:.3px;font-weight:700}
+
+  /* KPIS */
+  .kpis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .kpi.destaque{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border-color:var(--laranja)}
+  .kpi.alerta{background:linear-gradient(135deg,var(--branco) 50%,var(--amarelo-cl));border-color:var(--amarelo)}
+  .kpi.erro{background:linear-gradient(135deg,var(--branco) 50%,var(--vermelho-cl));border-color:var(--vermelho)}
+  .kpi-titulo{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .kpi-valor{font-size:28px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.3px;font-family:var(--serif);font-style:italic}
+  .kpi-valor em{color:var(--laranja)}
+  .kpi-valor span{font-size:13px;color:var(--cinza);font-style:normal}
+  .kpi-delta{font-family:var(--ui);font-size:11px;margin-top:6px;letter-spacing:.3px;color:var(--cinza)}
+
+  /* PAINEL */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px;letter-spacing:-.2px}
+  .painel h3 em{color:var(--laranja);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+
+  /* TAGS */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  /* ALERT */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden}
+  .alert-marinho::before{content:"";position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .alert-marinho > *{position:relative}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert-verde{background:var(--verde-cl);border-left:3px solid var(--verde);color:var(--marinho)}
+  .alert-laranja{background:var(--laranja-cl);border-left:3px solid var(--laranja);color:var(--marinho)}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* MAPA AO VIVO · status do dia */
+  .grid-2-1{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+  .mapa-vivo-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+  .mapa-card{padding:14px;border:1px solid var(--cinza-cl);border-radius:2px;background:var(--branco);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+  .mapa-card:hover{border-color:var(--marinho)}
+  .mapa-card.bom{border-left:3px solid var(--verde)}
+  .mapa-card.alerta{border-left:3px solid var(--amarelo)}
+  .mapa-card.critico{border-left:3px solid var(--vermelho)}
+  .mapa-card-ic{width:42px;height:42px;border-radius:50%;background:var(--cinza-fundo);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--cinza-cl)}
+  .mapa-card.bom .mapa-card-ic{background:var(--verde-cl);border-color:var(--verde);color:var(--verde)}
+  .mapa-card.alerta .mapa-card-ic{background:var(--amarelo-cl);border-color:var(--amarelo);color:#876715}
+  .mapa-card.critico .mapa-card-ic{background:var(--vermelho-cl);border-color:var(--vermelho);color:var(--vermelho)}
+  .mapa-card-info{flex:1;min-width:0}
+  .mapa-card-titulo{font-size:13px;font-weight:500;color:var(--marinho)}
+  .mapa-card-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+  .mapa-card-num{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--marinho);min-width:42px;text-align:right}
+  .mapa-card.bom .mapa-card-num{color:var(--verde)}
+  .mapa-card.alerta .mapa-card-num{color:var(--amarelo)}
+  .mapa-card.critico .mapa-card-num{color:var(--vermelho)}
+
+  /* FEED DE BATIDAS · ao vivo */
+  .feed-batidas{max-height:420px;overflow-y:auto}
+  .feed-batidas::-webkit-scrollbar{width:6px}
+  .feed-batidas::-webkit-scrollbar-thumb{background:var(--cinza-cl);border-radius:3px}
+  .feed-batida{padding:12px;border-bottom:1px solid var(--cinza-cl);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+  .feed-batida:last-child{border-bottom:none}
+  .feed-batida.novo{background:linear-gradient(90deg,var(--laranja-cl) 0%,transparent 100%);border-left:3px solid var(--laranja)}
+  .feed-av{width:36px;height:36px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px;flex-shrink:0;font-weight:600}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .feed-info{font-size:13px;min-width:0}
+  .feed-nome{font-weight:500;color:var(--marinho);font-family:var(--serif)}
+  .feed-evento{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+  .feed-evento .tipo-evento{font-weight:600}
+  .feed-evento .tipo-evento.entrada{color:var(--verde)}
+  .feed-evento .tipo-evento.saida{color:var(--marinho)}
+  .feed-evento .tipo-evento.almoco{color:var(--amarelo)}
+  .feed-horario{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho);text-align:right}
+  .feed-acoes-min{font-family:var(--ui);font-size:9.5px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+
+  /* TABELA */
+  .tabela{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden}
+  .tab-linha{padding:14px 22px;border-bottom:1px solid var(--cinza-cl);display:grid;grid-template-columns:2fr 1.5fr 1.2fr 1.2fr 1fr 100px;gap:14px;align-items:center;transition:background .15s;font-family:var(--ui);font-size:12.5px}
+  .tab-linha:hover{background:var(--cinza-fundo)}
+  .tab-linha:last-child{border-bottom:none}
+  .tab-linha.head{background:var(--cinza-fundo);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700}
+  .tab-linha.head:hover{background:var(--cinza-fundo)}
+  .tab-pessoa{display:flex;align-items:center;gap:10px;min-width:0}
+  .tab-av{width:34px;height:34px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;flex-shrink:0;font-weight:600}
+  .tab-nome{font-size:13px;font-weight:500;line-height:1.2;color:var(--marinho);font-family:var(--serif)}
+  .tab-meta{font-size:10.5px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+
+  /* SOLICITAÇÕES · CARDS */
+  .solicita-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;margin-bottom:12px;border-left:3px solid var(--amarelo)}
+  .solicita-card.aprovado{border-left-color:var(--verde);background:linear-gradient(135deg,var(--branco) 90%,var(--verde-cl))}
+  .solicita-card.rejeitado{border-left-color:var(--vermelho);background:linear-gradient(135deg,var(--branco) 90%,var(--vermelho-cl));opacity:.85}
+  .solicita-head{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin-bottom:14px}
+  .solicita-titulo{font-size:14px;font-weight:500;color:var(--marinho);font-family:var(--serif)}
+  .solicita-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .solicita-status{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;padding:4px 10px;border-radius:2px}
+  .solicita-status.pendente{background:var(--amarelo-cl);color:#876715}
+  .solicita-status.aprovado{background:var(--verde-cl);color:var(--verde)}
+  .solicita-status.rejeitado{background:var(--vermelho-cl);color:var(--vermelho)}
+
+  .solicita-corpo{background:var(--cinza-fundo);padding:14px;border-radius:2px;display:grid;grid-template-columns:1fr 1fr;gap:14px;font-family:var(--ui);font-size:12px}
+  .solicita-corpo .col{display:flex;flex-direction:column;gap:6px}
+  .solicita-corpo .rotulo{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700}
+  .solicita-corpo .valor{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--marinho)}
+  .solicita-corpo .valor.dele{color:var(--cinza);font-size:13px;text-decoration:line-through}
+  .solicita-corpo .valor.novo{color:var(--laranja);font-size:15px}
+  .solicita-justificativa{margin-top:14px;padding:10px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;line-height:1.55;color:var(--marinho-med)}
+  .solicita-justificativa strong{display:block;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:6px}
+  .solicita-acoes{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+
+  /* BANCO DE HORAS */
+  .bh-resumo{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));padding:24px;border-radius:2px;border:1px solid var(--laranja);margin-bottom:14px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+  .bh-resumo h4{font-size:14px;font-weight:500;color:var(--marinho);font-family:var(--ui);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+  .bh-resumo h4 .ic-bh{margin-right:6px}
+  .bh-resumo p{font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.55}
+  .bh-saldo-grande{font-family:var(--serif);font-style:italic;font-size:48px;color:var(--laranja);line-height:1;letter-spacing:-1px}
+  .bh-saldo-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:right;margin-top:6px;letter-spacing:.5px}
+
+  /* DEPARTAMENTO BANCO HORAS */
+  .dept-grid{display:flex;flex-direction:column;gap:8px}
+  .dept-item{padding:14px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;display:grid;grid-template-columns:1.5fr 1fr 1fr auto;gap:14px;align-items:center;font-family:var(--ui);font-size:12px}
+  .dept-info{display:flex;flex-direction:column}
+  .dept-nome{font-weight:500;color:var(--marinho);font-size:12.5px}
+  .dept-meta{font-size:10px;color:var(--cinza);margin-top:2px}
+  .dept-barra-h{height:6px;background:var(--cinza-fundo);border-radius:3px;overflow:hidden;position:relative}
+  .dept-barra-pos{height:100%;background:var(--verde);position:absolute;left:50%}
+  .dept-barra-neg{height:100%;background:var(--amarelo);position:absolute;right:50%}
+  .dept-barra-meio{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--marinho)}
+  .dept-saldo{font-family:var(--serif);font-style:italic;font-size:14px;text-align:right;color:var(--marinho);min-width:75px}
+  .dept-saldo.positivo{color:var(--verde)}
+  .dept-saldo.negativo{color:var(--vermelho)}
+
+  /* ESPELHO DO EMPREGADO */
+  .espelho-cabeca{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px;display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center}
+  .espelho-av{width:64px;height:64px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:24px;font-weight:600;flex-shrink:0;background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .espelho-nome{font-size:24px;font-weight:400;letter-spacing:-.2px;font-family:var(--serif)}
+  .espelho-meta{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:4px;letter-spacing:.3px}
+  .espelho-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+  /* CALENDÁRIO DE PONTO */
+  .calendario-mes{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;background:var(--branco);padding:16px;border:1px solid var(--cinza-cl);border-radius:2px}
+  .cal-head{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;padding:8px;text-align:center}
+  .cal-dia{padding:8px 6px;border:1px solid var(--cinza-cl);border-radius:2px;min-height:78px;font-family:var(--ui);font-size:11px;background:var(--branco);position:relative;transition:all .15s;cursor:pointer}
+  .cal-dia:hover{border-color:var(--marinho);transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.04)}
+  .cal-dia.fora{opacity:.3;cursor:default}
+  .cal-dia.fora:hover{transform:none;box-shadow:none;border-color:var(--cinza-cl)}
+  .cal-dia.fimde{background:var(--cinza-fundo)}
+  .cal-dia.feriado{background:var(--roxo-cl);border-color:var(--roxo)}
+  .cal-dia.hoje{border:2px solid var(--laranja);background:var(--laranja-cl)}
+  .cal-dia.falta{background:var(--vermelho-cl);border-color:var(--vermelho)}
+  .cal-dia.atestado{background:var(--amarelo-cl);border-color:var(--amarelo)}
+  .cal-dia.ferias{background:var(--verde-cl);border-color:var(--verde)}
+  .cal-num{font-size:14px;font-weight:600;color:var(--marinho);margin-bottom:2px}
+  .cal-detalhe{font-size:9px;color:var(--cinza);line-height:1.3;letter-spacing:.2px}
+  .cal-detalhe strong{color:var(--marinho)}
+  .cal-tag{display:inline-block;font-size:8px;letter-spacing:.5px;font-weight:700;text-transform:uppercase;padding:1px 4px;border-radius:2px;margin-top:3px}
+  .cal-tag.he{background:var(--laranja);color:white}
+  .cal-tag.fer{background:var(--verde);color:white}
+  .cal-tag.atest{background:var(--amarelo);color:white}
+  .cal-tag.fal{background:var(--vermelho);color:white}
+
+  .legenda-cal{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:14px;padding:12px;background:var(--cinza-fundo);border-radius:2px}
+  .leg-item{display:flex;align-items:center;gap:6px}
+  .leg-cor{width:12px;height:12px;border-radius:2px;border:1px solid var(--cinza-cl)}
+  .leg-cor.verde{background:var(--verde-cl);border-color:var(--verde)}
+  .leg-cor.amarelo{background:var(--amarelo-cl);border-color:var(--amarelo)}
+  .leg-cor.vermelho{background:var(--vermelho-cl);border-color:var(--vermelho)}
+  .leg-cor.roxo{background:var(--roxo-cl);border-color:var(--roxo)}
+  .leg-cor.laranja{background:var(--laranja);border-color:var(--laranja)}
+
+  /* PORTARIA 671 */
+  .portaria-card{padding:14px 18px;background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));border:1px solid var(--laranja);border-radius:2px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+
+  /* RODAPÉ AÇÕES */
+  .acoes-rodape{position:sticky;bottom:0;background:var(--branco);border-top:1px solid var(--cinza-cl);padding:16px 36px;display:flex;justify-content:space-between;align-items:center;margin:24px -36px -60px;gap:14px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,.05);z-index:10}
+  .acoes-info{font-family:var(--ui);font-size:12px;color:var(--cinza)}
+  .acoes-info strong{color:var(--marinho)}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:88px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1050px){
+    .kpis-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2,.grid-2-1{grid-template-columns:1fr}
+    .mapa-vivo-cards{grid-template-columns:1fr}
+    .tab-linha{grid-template-columns:1fr;gap:8px;padding:12px 16px}
+    .solicita-corpo{grid-template-columns:1fr}
+    .header-bar{grid-template-columns:1fr;text-align:center}
+    .calendario-mes{grid-template-columns:repeat(7,minmax(0,1fr));font-size:9px}
+    .cal-dia{min-height:60px}
+    .bh-resumo{grid-template-columns:1fr;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: DASHBOARD AO VIVO -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-ponto-dashboard">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item ativo"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Gestão de Pessoas</a> &gt; <span style="color:var(--laranja)">Ponto Eletrônico</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Ponto <em>Eletrônico</em></h1>
+          <div class="meta">Visão de RH · 128 empregados · <strong>Terça, 26/05/2026</strong> · jornada-padrão 08h–18h</div>
+          <div class="header-tags">
+            <span class="tag amarelo">⚠ 12 pendências do dia</span>
+            <span class="tag verde">98% conformidade</span>
+            <span class="tag laranja">+312h banco</span>
+            <span class="tag">Portaria 671/2021 ✓</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar AFD (eSocial)</button>
+          <button class="btn btn-fantasma btn-sm">⚙ Configurar jornadas</button>
+        </div>
+      </div>
+
+      <!-- ABAS -->
+      <div class="abas">
+        <div class="aba ativa"><span class="ic">📡</span> Ao Vivo</div>
+        <div class="aba" onclick="irPara('t-solicitacoes')"><span class="ic">✎</span> Ajustes <span class="alerta">8</span></div>
+        <div class="aba" onclick="irPara('t-banco-horas')"><span class="ic">⚖</span> Banco de Horas</div>
+        <div class="aba" onclick="irPara('t-espelho')"><span class="ic">📄</span> Espelho Individual</div>
+      </div>
+
+      <!-- RELOGIO AO VIVO -->
+      <div class="relogio-vivo" style="margin-bottom:18px">
+        <div class="relogio-ic">⏱<div class="relogio-dot"></div></div>
+        <div class="relogio-info">
+          <div class="relogio-titulo">Agora · ao vivo</div>
+          <div class="relogio-tempo">26/05/2026 · <em>09:47:23</em></div>
+        </div>
+        <div style="font-family:var(--ui);font-size:11px;text-align:right;opacity:.6;letter-spacing:.3px;position:relative">
+          Última batida há 14 segundos<br>
+          Servidor NTP do Observatório Nacional · BR
+        </div>
+      </div>
+
+      <!-- KPIS DO DIA -->
+      <div class="kpis-grid">
+        <div class="kpi destaque">
+          <div class="kpi-titulo">Em jornada agora</div>
+          <div class="kpi-valor"><em>104</em><span>/128</span></div>
+          <div class="kpi-delta">81% · normal para este horário</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Bateram entrada</div>
+          <div class="kpi-valor">112</div>
+          <div class="kpi-delta">no horário previsto</div>
+        </div>
+        <div class="kpi alerta">
+          <div class="kpi-titulo">Atrasados (&gt;10min)</div>
+          <div class="kpi-valor">7</div>
+          <div class="kpi-delta">3 com justificativa enviada</div>
+        </div>
+        <div class="kpi erro">
+          <div class="kpi-titulo">Faltas / sem batida</div>
+          <div class="kpi-valor">5</div>
+          <div class="kpi-delta">aguardando atestado</div>
+        </div>
+      </div>
+
+      <!-- PORTARIA 671 -->
+      <div class="portaria-card">
+        <div style="font-size:32px">⚖</div>
+        <div>
+          <div style="font-size:14px;font-weight:500">Conformidade legal: <strong style="color:var(--laranja)">Portaria 671/2021 (MTE)</strong></div>
+          <div style="font-family:var(--ui);font-size:11.5px;color:var(--cinza);margin-top:4px;line-height:1.55">Todas as marcações são REP-A (próprio sistema · token único por batida) ou REP-P (app móvel com geolocalização + foto). AFD pronto para fiscalização.</div>
+        </div>
+        <button class="btn btn-fantasma btn-sm">📋 Ver AFD do mês</button>
+      </div>
+
+      <div class="grid-2-1">
+        <div>
+
+          <!-- STATUS POR DEPARTAMENTO -->
+          <div class="painel">
+            <h3>Status por <em>departamento</em></h3>
+            <p class="sub-titulo">Como cada área está hoje</p>
+
+            <div class="mapa-vivo-cards">
+              <div class="mapa-card bom">
+                <div class="mapa-card-ic">🏗</div>
+                <div class="mapa-card-info">
+                  <div class="mapa-card-titulo">Operações &amp; Obra</div>
+                  <div class="mapa-card-sub">78 emp · presencial no canteiro Sítio II</div>
+                </div>
+                <div class="mapa-card-num">76</div>
+              </div>
+
+              <div class="mapa-card bom">
+                <div class="mapa-card-ic">📐</div>
+                <div class="mapa-card-info">
+                  <div class="mapa-card-titulo">Engenharia</div>
+                  <div class="mapa-card-sub">22 emp · híbrido · home OK</div>
+                </div>
+                <div class="mapa-card-num">18</div>
+              </div>
+
+              <div class="mapa-card alerta">
+                <div class="mapa-card-ic">💰</div>
+                <div class="mapa-card-info">
+                  <div class="mapa-card-titulo">Financeiro &amp; Adm</div>
+                  <div class="mapa-card-sub">12 emp · 2 atrasados (Diego, Júlia)</div>
+                </div>
+                <div class="mapa-card-num">9</div>
+              </div>
+
+              <div class="mapa-card bom">
+                <div class="mapa-card-ic">📊</div>
+                <div class="mapa-card-info">
+                  <div class="mapa-card-titulo">Comercial</div>
+                  <div class="mapa-card-sub">8 emp · todos no escritório</div>
+                </div>
+                <div class="mapa-card-num">8</div>
+              </div>
+
+              <div class="mapa-card critico">
+                <div class="mapa-card-ic">📦</div>
+                <div class="mapa-card-info">
+                  <div class="mapa-card-titulo">Suprimentos</div>
+                  <div class="mapa-card-sub">5 emp · 2 sem batida (Pedro, Marcia)</div>
+                </div>
+                <div class="mapa-card-num">3</div>
+              </div>
+
+              <div class="mapa-card alerta">
+                <div class="mapa-card-ic">👥</div>
+                <div class="mapa-card-info">
+                  <div class="mapa-card-titulo">RH &amp; Pessoas</div>
+                  <div class="mapa-card-sub">3 emp · 1 em home não previsto</div>
+                </div>
+                <div class="mapa-card-num">2</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TABELA: ATRASADOS HOJE -->
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Atrasados <em>hoje</em></h3><p class="sub-titulo">7 empregados · 3 com justificativa enviada</p></div>
+              <button class="btn btn-fantasma btn-sm">📧 Notificar todos</button>
+            </div>
+
+            <div class="tabela">
+              <div class="tab-linha head">
+                <div>Empregado</div>
+                <div>Horário previsto</div>
+                <div>Bateu às</div>
+                <div>Atraso</div>
+                <div>Justificativa</div>
+                <div></div>
+              </div>
+
+              <div class="tab-linha">
+                <div class="tab-pessoa">
+                  <div class="tab-av av-c">DA</div>
+                  <div>
+                    <div class="tab-nome">Diego Almeida</div>
+                    <div class="tab-meta">MAT 0156 · Financeiro</div>
+                  </div>
+                </div>
+                <div>08:00</div>
+                <div>09:23</div>
+                <div style="color:var(--vermelho);font-weight:600">1h 23min</div>
+                <div><span class="tag amarelo" style="font-size:10px">📩 enviada</span></div>
+                <button class="btn btn-fantasma btn-xs">👁</button>
+              </div>
+
+              <div class="tab-linha">
+                <div class="tab-pessoa">
+                  <div class="tab-av av-d">JS</div>
+                  <div>
+                    <div class="tab-nome">Júlia Sampaio</div>
+                    <div class="tab-meta">MAT 0142 · Financeiro</div>
+                  </div>
+                </div>
+                <div>08:00</div>
+                <div>08:42</div>
+                <div style="color:var(--amarelo);font-weight:600">42min</div>
+                <div><span class="tag" style="font-size:10px">— sem justif.</span></div>
+                <button class="btn btn-fantasma btn-xs">📧</button>
+              </div>
+
+              <div class="tab-linha">
+                <div class="tab-pessoa">
+                  <div class="tab-av av-f">CR</div>
+                  <div>
+                    <div class="tab-nome">Carlos Ribeiro</div>
+                    <div class="tab-meta">MAT 0087 · Operações · obra</div>
+                  </div>
+                </div>
+                <div>07:00</div>
+                <div>07:28</div>
+                <div style="color:var(--amarelo);font-weight:600">28min</div>
+                <div><span class="tag amarelo" style="font-size:10px">📩 trânsito BR-040</span></div>
+                <button class="btn btn-fantasma btn-xs">👁</button>
+              </div>
+
+              <div class="tab-linha">
+                <div class="tab-pessoa">
+                  <div class="tab-av av-a">FB</div>
+                  <div>
+                    <div class="tab-nome">Felipe Barros</div>
+                    <div class="tab-meta">MAT 0119 · Engenharia</div>
+                  </div>
+                </div>
+                <div>08:00</div>
+                <div>08:18</div>
+                <div style="color:var(--amarelo);font-weight:600">18min</div>
+                <div><span class="tag" style="font-size:10px">— sem justif.</span></div>
+                <button class="btn btn-fantasma btn-xs">📧</button>
+              </div>
+
+              <div class="tab-linha">
+                <div class="tab-pessoa">
+                  <div class="tab-av av-e">LL</div>
+                  <div>
+                    <div class="tab-nome">Letícia Lacerda</div>
+                    <div class="tab-meta">MAT 0125 · Comercial</div>
+                  </div>
+                </div>
+                <div>08:30</div>
+                <div>08:47</div>
+                <div style="color:var(--amarelo);font-weight:600">17min</div>
+                <div><span class="tag amarelo" style="font-size:10px">📩 médico filho</span></div>
+                <button class="btn btn-fantasma btn-xs">👁</button>
+              </div>
+
+              <div class="tab-linha">
+                <div class="tab-pessoa">
+                  <div class="tab-av av-b">RT</div>
+                  <div>
+                    <div class="tab-nome">Rodrigo Teixeira</div>
+                    <div class="tab-meta">MAT 0098 · Operações</div>
+                  </div>
+                </div>
+                <div>07:00</div>
+                <div>07:13</div>
+                <div style="color:var(--amarelo);font-weight:600">13min</div>
+                <div><span class="tag" style="font-size:10px">— sem justif.</span></div>
+                <button class="btn btn-fantasma btn-xs">📧</button>
+              </div>
+
+              <div class="tab-linha">
+                <div class="tab-pessoa">
+                  <div class="tab-av av-c">VC</div>
+                  <div>
+                    <div class="tab-nome">Vanessa Castro</div>
+                    <div class="tab-meta">MAT 0134 · Suprimentos</div>
+                  </div>
+                </div>
+                <div>08:00</div>
+                <div>08:11</div>
+                <div style="color:var(--amarelo);font-weight:600">11min</div>
+                <div><span class="tag" style="font-size:10px">— sem justif.</span></div>
+                <button class="btn btn-fantasma btn-xs">📧</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- COLUNA DIREITA · FEED AO VIVO -->
+        <div>
+          <div class="painel" style="padding:0;overflow:hidden">
+            <div style="padding:18px 20px 14px;border-bottom:1px solid var(--cinza-cl);display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h3 style="font-size:16px">Feed <em>ao vivo</em></h3>
+                <p style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;font-weight:600">últimas batidas</p>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1px;font-weight:700"><span style="width:6px;height:6px;background:var(--laranja);border-radius:50%;animation:pulse-ao-vivo 1.5s infinite"></span>AO VIVO</div>
+            </div>
+
+            <div class="feed-batidas">
+              <div class="feed-batida novo">
+                <div class="feed-av av-a">F</div>
+                <div class="feed-info">
+                  <div class="feed-nome">Fernando Lacerda</div>
+                  <div class="feed-evento">
+                    <span class="tipo-evento entrada">▶ Retorno almoço</span> · canteiro Sítio II · foto OK
+                  </div>
+                  <div class="feed-acoes-min">app móvel · IP 200.x · -19.92, -43.93</div>
+                </div>
+                <div>
+                  <div class="feed-horario">13:00</div>
+                  <div class="feed-acoes-min" style="text-align:right">há 14s</div>
+                </div>
+              </div>
+
+              <div class="feed-batida">
+                <div class="feed-av av-d">RS</div>
+                <div class="feed-info">
+                  <div class="feed-nome">Roberta Salles</div>
+                  <div class="feed-evento">
+                    <span class="tipo-evento almoco">⏸ Início almoço</span> · sede BH
+                  </div>
+                  <div class="feed-acoes-min">REP-A · token único</div>
+                </div>
+                <div>
+                  <div class="feed-horario">12:58</div>
+                  <div class="feed-acoes-min" style="text-align:right">há 1min</div>
+                </div>
+              </div>
+
+              <div class="feed-batida">
+                <div class="feed-av av-b">MS</div>
+                <div class="feed-info">
+                  <div class="feed-nome">Marcelo Santos</div>
+                  <div class="feed-evento">
+                    <span class="tipo-evento almoco">⏸ Início almoço</span> · canteiro
+                  </div>
+                  <div class="feed-acoes-min">app móvel · geo OK</div>
+                </div>
+                <div>
+                  <div class="feed-horario">12:55</div>
+                  <div class="feed-acoes-min" style="text-align:right">há 4min</div>
+                </div>
+              </div>
+
+              <div class="feed-batida">
+                <div class="feed-av av-c">MA</div>
+                <div class="feed-info">
+                  <div class="feed-nome">Marcia Almeida</div>
+                  <div class="feed-evento">
+                    <span class="tipo-evento entrada">▶ Entrada</span> · home office · auth OK
+                  </div>
+                  <div class="feed-acoes-min">REP-P · MFA · home</div>
+                </div>
+                <div>
+                  <div class="feed-horario">12:42</div>
+                  <div class="feed-acoes-min" style="text-align:right">há 17min</div>
+                </div>
+              </div>
+
+              <div class="feed-batida">
+                <div class="feed-av av-f">HV</div>
+                <div class="feed-info">
+                  <div class="feed-nome">Henrique Viana</div>
+                  <div class="feed-evento">
+                    <span class="tipo-evento almoco">⏸ Início almoço</span> · sede
+                  </div>
+                  <div class="feed-acoes-min">REP-A</div>
+                </div>
+                <div>
+                  <div class="feed-horario">12:30</div>
+                  <div class="feed-acoes-min" style="text-align:right">há 29min</div>
+                </div>
+              </div>
+
+              <div class="feed-batida">
+                <div class="feed-av av-e">TS</div>
+                <div class="feed-info">
+                  <div class="feed-nome">Thiago Santos</div>
+                  <div class="feed-evento">
+                    <span class="tipo-evento entrada">▶ Entrada</span> · canteiro Sítio II
+                  </div>
+                  <div class="feed-acoes-min">app móvel · foto + geo</div>
+                </div>
+                <div>
+                  <div class="feed-horario">12:23</div>
+                  <div class="feed-acoes-min" style="text-align:right">há 36min</div>
+                </div>
+              </div>
+
+              <div class="feed-batida">
+                <div class="feed-av av-d">JP</div>
+                <div class="feed-info">
+                  <div class="feed-nome">João Paulo Costa</div>
+                  <div class="feed-evento">
+                    <span class="tipo-evento almoco">⏸ Início almoço</span> · obra Sítio II
+                  </div>
+                  <div class="feed-acoes-min">app móvel · foto OK</div>
+                </div>
+                <div>
+                  <div class="feed-horario">12:18</div>
+                  <div class="feed-acoes-min" style="text-align:right">há 41min</div>
+                </div>
+              </div>
+
+              <div class="feed-batida">
+                <div class="feed-av av-a">LM</div>
+                <div class="feed-info">
+                  <div class="feed-nome">Luísa Mendonça</div>
+                  <div class="feed-evento">
+                    <span class="tipo-evento entrada">▶ Entrada</span> · sede · cartão crachá
+                  </div>
+                  <div class="feed-acoes-min">REP-A · biometria</div>
+                </div>
+                <div>
+                  <div class="feed-horario">08:54</div>
+                  <div class="feed-acoes-min" style="text-align:right">há 5h</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="padding:12px 20px;background:var(--cinza-fundo);text-align:center;font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px">
+              <a style="color:var(--laranja);font-weight:600">Ver todas as 142 batidas de hoje →</a>
+            </div>
+          </div>
+
+          <!-- AÇÕES RÁPIDAS -->
+          <div class="painel">
+            <h3 style="font-size:16px">Ações rápidas</h3>
+            <p class="sub-titulo">Atalhos do dia</p>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">⚠ 8 solicitações de ajuste</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">📤 Enviar AFD do mês ao MTE</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">📧 Cobrar atrasados sem justificativa (4)</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">📊 Relatório de presença diário</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">🌴 Empregados em férias hoje (3)</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">⚖ Ver banco de horas consolidado</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: SOLICITAÇÕES DE AJUSTE -->
+<!-- ============================================== -->
+<div class="tela" id="t-solicitacoes">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item ativo"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-ponto-dashboard')">Ponto Eletrônico</a> &gt; <span style="color:var(--laranja)">Ajustes Pendentes</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Solicitações de <em>ajuste</em></h1>
+          <div class="meta">8 pendentes · 14 aprovadas este mês · gestores enviam, RH valida</div>
+          <div class="header-tags">
+            <span class="tag amarelo">8 pendentes</span>
+            <span class="tag verde">14 aprovadas</span>
+            <span class="tag vermelho">2 rejeitadas</span>
+            <span class="tag">SLA 24h</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">📋 Histórico do mês</button>
+          <button class="btn btn-marinho btn-sm">✓ Aprovar todas (auto-OK · 5)</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-ponto-dashboard')"><span class="ic">📡</span> Ao Vivo</div>
+        <div class="aba ativa"><span class="ic">✎</span> Ajustes <span class="alerta">8</span></div>
+        <div class="aba" onclick="irPara('t-banco-horas')"><span class="ic">⚖</span> Banco de Horas</div>
+        <div class="aba" onclick="irPara('t-espelho')"><span class="ic">📄</span> Espelho Individual</div>
+      </div>
+
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🤖</span>
+        <div>
+          <strong>Nora · IA analisou cada solicitação</strong>
+          5 batem com o histórico e padrão da pessoa · podem ser aprovadas em lote sem revisão. 3 precisam atenção (valor alto, padrão atípico ou ausência de justificativa robusta).
+        </div>
+      </div>
+
+      <!-- FILTROS -->
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+        <span class="tag laranja" style="cursor:pointer">Todas (8)</span>
+        <span class="tag" style="cursor:pointer">Esquecimento (4)</span>
+        <span class="tag" style="cursor:pointer">Compensação (2)</span>
+        <span class="tag" style="cursor:pointer">Justif. atraso (1)</span>
+        <span class="tag" style="cursor:pointer">Inclusão (1)</span>
+      </div>
+
+      <!-- SOLICITAÇÃO 1 · PEDRO AURÉLIO -->
+      <div class="solicita-card">
+        <div class="solicita-head">
+          <div class="feed-av av-d">PA</div>
+          <div>
+            <div class="solicita-titulo">Pedro Aurélio Castro · esquecimento de saída</div>
+            <div class="solicita-sub">MAT 0067 · Eng. Civil Pl · Engenharia · solicitado ontem 22:14</div>
+          </div>
+          <div class="solicita-status pendente">⏳ Pendente</div>
+        </div>
+
+        <div class="solicita-corpo">
+          <div class="col">
+            <div class="rotulo">📅 Data ajustada</div>
+            <div class="valor">25/05/2026 · segunda</div>
+            <div class="rotulo" style="margin-top:8px">⏱ Marcação anterior</div>
+            <div class="valor dele">— sem batida</div>
+          </div>
+          <div class="col">
+            <div class="rotulo">🆕 Marcação solicitada</div>
+            <div class="valor novo">Saída: <strong>19:42</strong></div>
+            <div class="rotulo" style="margin-top:8px">📍 Local</div>
+            <div class="valor" style="font-size:13px">Canteiro Sítio II · BR-040 km 538</div>
+          </div>
+        </div>
+
+        <div class="solicita-justificativa">
+          <strong>Justificativa do empregado</strong>
+          "Esqueci de bater saída ontem. Estava em reunião com a Luísa Mendonça e o engº fiscal da obra até 19:42. Telefonema da Luísa registrado nesse horário (em anexo)."
+          <div style="margin-top:6px"><a style="color:var(--laranja);font-weight:600;text-decoration:underline">📎 Captura de tela WhatsApp (1.2 MB)</a></div>
+        </div>
+
+        <div style="margin-top:14px;padding:10px;background:var(--verde-cl);border-radius:2px;font-family:var(--ui);font-size:12px;border-left:3px solid var(--verde)">
+          <strong style="color:var(--verde)">🤖 Análise IA:</strong> Última batida foi entrada às 07:48. Pedro fez 11h 54min de trabalho. Padrão histórico dele tem h.extras frequentes (+62h este mês). Reunião confirmada com Luísa. <strong>Recomendação: APROVAR.</strong>
+        </div>
+
+        <div class="solicita-acoes">
+          <button class="btn btn-fantasma btn-sm">💬 Conversar</button>
+          <button class="btn btn-perigo btn-sm">✕ Rejeitar</button>
+          <button class="btn btn-verde btn-sm">✓ Aprovar</button>
+        </div>
+      </div>
+
+      <!-- SOLICITAÇÃO 2 · DIEGO ALMEIDA -->
+      <div class="solicita-card" style="border-left-color:var(--vermelho)">
+        <div class="solicita-head">
+          <div class="feed-av av-c">DA</div>
+          <div>
+            <div class="solicita-titulo">Diego Almeida · justificativa de atraso</div>
+            <div class="solicita-sub">MAT 0156 · Analista Financeiro · solicitado hoje 09:51</div>
+          </div>
+          <div class="solicita-status pendente">⏳ Atenção</div>
+        </div>
+
+        <div class="solicita-corpo">
+          <div class="col">
+            <div class="rotulo">📅 Data</div>
+            <div class="valor">26/05/2026 · hoje</div>
+            <div class="rotulo" style="margin-top:8px">⏱ Horário previsto</div>
+            <div class="valor dele">08:00</div>
+          </div>
+          <div class="col">
+            <div class="rotulo">🆕 Batida real</div>
+            <div class="valor novo">09:23 · atraso 1h 23min</div>
+            <div class="rotulo" style="margin-top:8px">🎯 Pedido</div>
+            <div class="valor" style="font-size:13px">Justificar atraso como abono</div>
+          </div>
+        </div>
+
+        <div class="solicita-justificativa">
+          <strong>Justificativa do empregado</strong>
+          "Problema no metrô estação Calafate, BHTrans confirmou em <a style="color:var(--laranja);font-weight:600">@bhtrans 08:14</a> que linha 1 estava paralisada. Voltei pra casa e peguei carro depois."
+        </div>
+
+        <div style="margin-top:14px;padding:10px;background:var(--amarelo-cl);border-radius:2px;font-family:var(--ui);font-size:12px;border-left:3px solid var(--amarelo)">
+          <strong style="color:#876715">⚠ Análise IA:</strong> Tweet BHTrans confirma paralisação. Porém Diego teve 4 atrasos sem justif. nos últimos 60 dias. Padrão pode ser relevante para gestor.
+        </div>
+
+        <div class="solicita-acoes">
+          <button class="btn btn-fantasma btn-sm">💬 Conversar</button>
+          <button class="btn btn-fantasma btn-sm">📤 Escalar p/ gestor</button>
+          <button class="btn btn-perigo btn-sm">✕ Rejeitar</button>
+          <button class="btn btn-verde btn-sm">✓ Aprovar</button>
+        </div>
+      </div>
+
+      <!-- SOLICITAÇÃO 3 · ANA CAROLINA -->
+      <div class="solicita-card">
+        <div class="solicita-head">
+          <div class="feed-av av-f">AS</div>
+          <div>
+            <div class="solicita-titulo">Ana Carolina Souza · compensação (banco de horas)</div>
+            <div class="solicita-sub">MAT 0124 · Eng. Civil Jr · solicitado 24/05 15:30</div>
+          </div>
+          <div class="solicita-status pendente">⏳ Pendente</div>
+        </div>
+
+        <div class="solicita-corpo">
+          <div class="col">
+            <div class="rotulo">📅 Saída antecipada</div>
+            <div class="valor">29/05/2026 (sexta)</div>
+            <div class="rotulo" style="margin-top:8px">⏱ Sair às</div>
+            <div class="valor">15:00 (em vez de 18:00)</div>
+          </div>
+          <div class="col">
+            <div class="rotulo">⚖ Compensar com</div>
+            <div class="valor novo">3h do banco de horas</div>
+            <div class="rotulo" style="margin-top:8px">💰 Saldo após</div>
+            <div class="valor" style="font-size:13px">+ 8h (atual: +11h)</div>
+          </div>
+        </div>
+
+        <div class="solicita-justificativa">
+          <strong>Justificativa do empregado</strong>
+          "Consulta médica agendada na Unimed às 16h. Já avisei a Luísa Mendonça verbalmente."
+        </div>
+
+        <div style="margin-top:14px;padding:10px;background:var(--verde-cl);border-radius:2px;font-family:var(--ui);font-size:12px;border-left:3px solid var(--verde)">
+          <strong style="color:var(--verde)">🤖 Análise IA:</strong> Saldo positivo · compensação dentro do limite (max 8h/mês). Padrão normal de uso. <strong>Recomendação: APROVAR.</strong>
+        </div>
+
+        <div class="solicita-acoes">
+          <button class="btn btn-fantasma btn-sm">💬 Conversar</button>
+          <button class="btn btn-perigo btn-sm">✕ Rejeitar</button>
+          <button class="btn btn-verde btn-sm">✓ Aprovar</button>
+        </div>
+      </div>
+
+      <!-- SOLICITAÇÃO 4 · CARLOS RIBEIRO -->
+      <div class="solicita-card">
+        <div class="solicita-head">
+          <div class="feed-av av-b">CR</div>
+          <div>
+            <div class="solicita-titulo">Carlos Ribeiro · 3 dias seguidos esquecimento entrada</div>
+            <div class="solicita-sub">MAT 0087 · Mestre de Obras · enviado hoje 09:35</div>
+          </div>
+          <div class="solicita-status pendente">⚠ Atenção</div>
+        </div>
+
+        <div class="solicita-corpo" style="grid-template-columns:1fr">
+          <div class="col">
+            <div class="rotulo">📅 Datas e marcações faltantes</div>
+            <div style="font-family:var(--ui);font-size:12.5px;color:var(--marinho-med);line-height:1.7;margin-top:6px">
+              • <strong>22/05 quinta</strong> — entrada faltante · solicitado 06:42<br>
+              • <strong>23/05 sexta</strong> — entrada faltante · solicitado 06:38<br>
+              • <strong>26/05 segunda</strong> (hoje) — entrada faltante · solicitado 07:28
+            </div>
+          </div>
+        </div>
+
+        <div class="solicita-justificativa">
+          <strong>Justificativa</strong>
+          "Estou na obra Sítio II. App não carrega no canteiro porque o sinal está ruim depois da chuva derrubou a antena, pessoal do TI ainda não veio aqui."
+        </div>
+
+        <div style="margin-top:14px;padding:10px;background:var(--amarelo-cl);border-radius:2px;font-family:var(--ui);font-size:12px;border-left:3px solid var(--amarelo)">
+          <strong style="color:#876715">⚠ Análise IA:</strong> 3 esquecimentos em 5 dias úteis é atípico. Verificar se realmente há problema de sinal ou se é negligência. Outros empregados do mesmo canteiro estão batendo normalmente.
+        </div>
+
+        <div class="solicita-acoes">
+          <button class="btn btn-fantasma btn-sm">💬 Conversar</button>
+          <button class="btn btn-fantasma btn-sm">📤 Escalar p/ Luísa</button>
+          <button class="btn btn-perigo btn-sm">✕ Rejeitar</button>
+          <button class="btn btn-verde btn-sm">✓ Aprovar</button>
+        </div>
+      </div>
+
+      <!-- SOLICITAÇÃO 5 · HENRIQUE -->
+      <div class="solicita-card aprovado">
+        <div class="solicita-head">
+          <div class="feed-av av-d">HV</div>
+          <div>
+            <div class="solicita-titulo">Henrique Viana · inclusão de ponto (sábado)</div>
+            <div class="solicita-sub">MAT 0072 · Aprovado hoje 09:14 por Bruna · auto-OK pela IA</div>
+          </div>
+          <div class="solicita-status aprovado">✓ Aprovado</div>
+        </div>
+
+        <div class="solicita-corpo">
+          <div class="col">
+            <div class="rotulo">📅 Data</div>
+            <div class="valor">17/05/2026 (sábado)</div>
+            <div class="rotulo" style="margin-top:8px">⏱ Horário</div>
+            <div class="valor">08:00 – 12:00 (4h)</div>
+          </div>
+          <div class="col">
+            <div class="rotulo">⚖ Resultado</div>
+            <div class="valor novo">+ 4h banco de horas</div>
+            <div class="rotulo" style="margin-top:8px">🎯 Motivo</div>
+            <div class="valor" style="font-size:13px">Concretagem do Sítio II</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:14px;font-family:var(--ui);font-size:11px;color:var(--cinza)">
+        Mostrando 5 de 8 pendentes · <a style="color:var(--laranja);font-weight:600">Ver mais 3 →</a>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>3 ações em lote disponíveis</strong> · A IA sugere aprovar 5 solicitações automaticamente
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-ponto-dashboard')">← Dashboard</button>
+          <button class="btn btn-verde btn-sm">✓ Aprovar lote IA-OK (5)</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: BANCO DE HORAS -->
+<!-- ============================================== -->
+<div class="tela" id="t-banco-horas">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item ativo"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-ponto-dashboard')">Ponto Eletrônico</a> &gt; <span style="color:var(--laranja)">Banco de Horas</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Banco de <em>Horas</em></h1>
+          <div class="meta">128 empregados · saldo consolidado · ciclo CCT <strong>jul/2025 a jun/2026</strong></div>
+          <div class="header-tags">
+            <span class="tag laranja">+312h saldo geral</span>
+            <span class="tag amarelo">14 vencem em 30 dias</span>
+            <span class="tag">Limite indiv. 80h+</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar planilha</button>
+          <button class="btn btn-fantasma btn-sm">📋 Ver CCT</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-ponto-dashboard')"><span class="ic">📡</span> Ao Vivo</div>
+        <div class="aba" onclick="irPara('t-solicitacoes')"><span class="ic">✎</span> Ajustes <span class="alerta">8</span></div>
+        <div class="aba ativa"><span class="ic">⚖</span> Banco de Horas</div>
+        <div class="aba" onclick="irPara('t-espelho')"><span class="ic">📄</span> Espelho Individual</div>
+      </div>
+
+      <!-- RESUMO GERAL -->
+      <div class="bh-resumo">
+        <div>
+          <h4><span class="ic-bh">⚖</span> Saldo consolidado · Aurora</h4>
+          <p>Soma de todos os saldos individuais · 87 empregados positivo, 18 negativo, 23 zerados.</p>
+          <div style="margin-top:10px;display:flex;gap:14px;font-family:var(--ui);font-size:11px">
+            <div style="padding:6px 12px;background:var(--verde-cl);border-radius:2px;color:var(--verde);font-weight:700">+ 412h positivos</div>
+            <div style="padding:6px 12px;background:var(--vermelho-cl);border-radius:2px;color:var(--vermelho);font-weight:700">– 100h negativos</div>
+          </div>
+        </div>
+        <div>
+          <div class="bh-saldo-grande">+312h</div>
+          <div class="bh-saldo-meta">saldo líquido · ciclo atual</div>
+        </div>
+      </div>
+
+      <div class="alert alert-amarelo">
+        <span class="ic-grande">⚠</span>
+        <div>
+          <strong>14 empregados com h. extras vencendo em até 30 dias</strong>
+          CCT da construção exige compensação em até 12 meses. Casos não compensados viram h. extras pagas em folha. Considere campanha de compensação.
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- TOP POSITIVOS -->
+        <div class="painel">
+          <h3>Top <em>saldos positivos</em></h3>
+          <p class="sub-titulo">Quem mais acumulou horas</p>
+
+          <div class="dept-grid">
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Pedro Aurélio Castro</div>
+                <div class="dept-meta">Engenharia · este ciclo: +88h</div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-pos" style="width:60px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo positivo">+ 88h</div>
+              <button class="btn btn-fantasma btn-xs">📅 Compensar</button>
+            </div>
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Roberto Almeida</div>
+                <div class="dept-meta">Operações · este ciclo: +62h</div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-pos" style="width:46px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo positivo">+ 62h</div>
+              <button class="btn btn-fantasma btn-xs">📅 Compensar</button>
+            </div>
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Marcos Tavares</div>
+                <div class="dept-meta">Operações · vence em <strong style="color:var(--vermelho)">18 dias</strong></div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-pos" style="width:38px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo positivo">+ 48h</div>
+              <button class="btn btn-fantasma btn-xs">📅 Urgente</button>
+            </div>
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Henrique Lopes</div>
+                <div class="dept-meta">Comercial</div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-pos" style="width:34px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo positivo">+ 38h</div>
+              <button class="btn btn-fantasma btn-xs">📅 Compensar</button>
+            </div>
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Fernando Lacerda</div>
+                <div class="dept-meta">Engenharia · vence em <strong style="color:var(--amarelo)">33 dias</strong></div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-pos" style="width:14px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo positivo">+ 12h</div>
+              <button class="btn btn-fantasma btn-xs">📅 Compensar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP NEGATIVOS -->
+        <div class="painel">
+          <h3>Saldos <em>negativos</em></h3>
+          <p class="sub-titulo">Quem deve horas (atrasos, ausências)</p>
+
+          <div class="dept-grid">
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Diego Almeida</div>
+                <div class="dept-meta">Financeiro · 4 atrasos no mês</div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-neg" style="width:32px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo negativo">– 18h</div>
+              <button class="btn btn-fantasma btn-xs">💬 Falar</button>
+            </div>
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Vanessa Castro</div>
+                <div class="dept-meta">Suprimentos · 5 atrasos</div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-neg" style="width:22px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo negativo">– 12h</div>
+              <button class="btn btn-fantasma btn-xs">💬 Falar</button>
+            </div>
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Júlia Sampaio</div>
+                <div class="dept-meta">Financeiro · home não autorizado</div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-neg" style="width:18px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo negativo">– 9h</div>
+              <button class="btn btn-fantasma btn-xs">💬 Falar</button>
+            </div>
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Felipe Barros</div>
+                <div class="dept-meta">Engenharia · 3 atrasos</div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-neg" style="width:12px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo negativo">– 7h</div>
+              <button class="btn btn-fantasma btn-xs">💬 Falar</button>
+            </div>
+            <div class="dept-item">
+              <div class="dept-info">
+                <div class="dept-nome">Rodrigo Teixeira</div>
+                <div class="dept-meta">Operações · 2 atrasos</div>
+              </div>
+              <div class="dept-barra-h"><div class="dept-barra-neg" style="width:8px"></div><div class="dept-barra-meio"></div></div>
+              <div class="dept-saldo negativo">– 4h</div>
+              <button class="btn btn-fantasma btn-xs">💬 Falar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANCO POR DEPARTAMENTO -->
+      <div class="painel">
+        <h3>Banco por <em>departamento</em></h3>
+        <p class="sub-titulo">Distribuição consolidada</p>
+
+        <div class="dept-grid">
+          <div class="dept-item">
+            <div class="dept-info">
+              <div class="dept-nome">🏗 Operações &amp; Obra (78 emp)</div>
+              <div class="dept-meta">Alta variação · concretagens sábado, h. extras frequentes</div>
+            </div>
+            <div class="dept-barra-h"><div class="dept-barra-pos" style="width:80%"></div><div class="dept-barra-meio"></div></div>
+            <div class="dept-saldo positivo">+ 218h</div>
+            <span class="tag verde" style="font-size:10px">saudável</span>
+          </div>
+          <div class="dept-item">
+            <div class="dept-info">
+              <div class="dept-nome">📐 Engenharia (22 emp)</div>
+              <div class="dept-meta">Picos em fim de obras · padrão controlado</div>
+            </div>
+            <div class="dept-barra-h"><div class="dept-barra-pos" style="width:65%"></div><div class="dept-barra-meio"></div></div>
+            <div class="dept-saldo positivo">+ 116h</div>
+            <span class="tag verde" style="font-size:10px">saudável</span>
+          </div>
+          <div class="dept-item">
+            <div class="dept-info">
+              <div class="dept-nome">📊 Comercial (8 emp)</div>
+              <div class="dept-meta">Pouca extra · jornada regular</div>
+            </div>
+            <div class="dept-barra-h"><div class="dept-barra-pos" style="width:25%"></div><div class="dept-barra-meio"></div></div>
+            <div class="dept-saldo positivo">+ 32h</div>
+            <span class="tag verde" style="font-size:10px">saudável</span>
+          </div>
+          <div class="dept-item">
+            <div class="dept-info">
+              <div class="dept-nome">💰 Financeiro &amp; Adm (12 emp)</div>
+              <div class="dept-meta">Saldo negativo · vários atrasos no mês</div>
+            </div>
+            <div class="dept-barra-h"><div class="dept-barra-neg" style="width:32%"></div><div class="dept-barra-meio"></div></div>
+            <div class="dept-saldo negativo">– 38h</div>
+            <span class="tag amarelo" style="font-size:10px">atenção</span>
+          </div>
+          <div class="dept-item">
+            <div class="dept-info">
+              <div class="dept-nome">📦 Suprimentos (5 emp)</div>
+              <div class="dept-meta">Pequeno saldo negativo</div>
+            </div>
+            <div class="dept-barra-h"><div class="dept-barra-neg" style="width:8%"></div><div class="dept-barra-meio"></div></div>
+            <div class="dept-saldo negativo">– 12h</div>
+            <span class="tag" style="font-size:10px">acompanhar</span>
+          </div>
+          <div class="dept-item">
+            <div class="dept-info">
+              <div class="dept-nome">👥 RH &amp; Pessoas (3 emp)</div>
+              <div class="dept-meta">Bruna +4h, Roberto -1h</div>
+            </div>
+            <div class="dept-barra-h"><div class="dept-barra-pos" style="width:4%"></div><div class="dept-barra-meio"></div></div>
+            <div class="dept-saldo positivo">+ 3h</div>
+            <span class="tag verde" style="font-size:10px">ok</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: ESPELHO DO EMPREGADO -->
+<!-- ============================================== -->
+<div class="tela" id="t-espelho">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item ativo"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-ponto-dashboard')">Ponto Eletrônico</a> &gt; <span style="color:var(--laranja)">Espelho · Fernando Lacerda</span></div>
+
+      <div class="header-bar" style="background:var(--branco);border-color:var(--cinza-cl)">
+        <div>
+          <h1>Espelho de <em>ponto</em></h1>
+          <div class="meta">Marcações diárias · maio/2026 · pronto para anexar à folha</div>
+        </div>
+        <div class="header-bar-acoes">
+          <select style="padding:8px 12px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:13px;border-radius:2px;background:var(--branco)">
+            <option>Maio/2026</option>
+            <option>Abril/2026</option>
+            <option>Março/2026</option>
+          </select>
+          <button class="btn btn-fantasma btn-sm">⤓ Espelho PDF (assinado)</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-ponto-dashboard')"><span class="ic">📡</span> Ao Vivo</div>
+        <div class="aba" onclick="irPara('t-solicitacoes')"><span class="ic">✎</span> Ajustes <span class="alerta">8</span></div>
+        <div class="aba" onclick="irPara('t-banco-horas')"><span class="ic">⚖</span> Banco de Horas</div>
+        <div class="aba ativa"><span class="ic">📄</span> Espelho Individual</div>
+      </div>
+
+      <!-- HEADER PESSOA -->
+      <div class="espelho-cabeca">
+        <div class="espelho-av">F</div>
+        <div>
+          <div class="espelho-nome">Fernando Lacerda Costa</div>
+          <div class="espelho-meta">MAT 0112 · Eng. Civil Sr · Engenharia · jornada padrão 08:00–18:00 (44h/sem · 220h/mês)</div>
+          <div class="espelho-tags">
+            <span class="tag verde">✓ Conforme</span>
+            <span class="tag marinho">22 dias úteis</span>
+            <span class="tag laranja">+ 12h banco</span>
+            <span class="tag">213h trabalhadas</span>
+            <span class="tag">Híbrido · 3+2</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button class="btn btn-fantasma btn-sm">📧 Solicitar assinatura</button>
+          <button class="btn btn-fantasma btn-sm">👁 Ver na ficha</button>
+        </div>
+      </div>
+
+      <!-- RESUMO MENSAL -->
+      <div class="kpis-grid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="kpi">
+          <div class="kpi-titulo">Dias úteis</div>
+          <div class="kpi-valor">22</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Presença</div>
+          <div class="kpi-valor"><em>21</em><span>/22</span></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Horas trabalhadas</div>
+          <div class="kpi-valor"><em>213h</em></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">H. extras</div>
+          <div class="kpi-valor" style="color:var(--laranja)">4h</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Banco · saldo</div>
+          <div class="kpi-valor"><em>+12h</em></div>
+        </div>
+      </div>
+
+      <!-- CALENDÁRIO -->
+      <div class="painel">
+        <h3>Calendário · <em>Maio/2026</em></h3>
+        <p class="sub-titulo">Clique em qualquer dia para ver as 4 batidas</p>
+
+        <div class="calendario-mes">
+          <div class="cal-head">DOM</div>
+          <div class="cal-head">SEG</div>
+          <div class="cal-head">TER</div>
+          <div class="cal-head">QUA</div>
+          <div class="cal-head">QUI</div>
+          <div class="cal-head">SEX</div>
+          <div class="cal-head">SAB</div>
+
+          <!-- Semana 1: 26 abr a 02 mai -->
+          <div class="cal-dia fora"><div class="cal-num">26</div></div>
+          <div class="cal-dia fora"><div class="cal-num">27</div></div>
+          <div class="cal-dia fora"><div class="cal-num">28</div></div>
+          <div class="cal-dia fora"><div class="cal-num">29</div></div>
+          <div class="cal-dia fora"><div class="cal-num">30</div></div>
+          <div class="cal-dia">
+            <div class="cal-num">1</div>
+            <div class="cal-tag fer">FERIADO</div>
+            <div class="cal-detalhe">Dia do Trabalho</div>
+          </div>
+          <div class="cal-dia fimde"><div class="cal-num">2</div></div>
+
+          <!-- Semana 2 -->
+          <div class="cal-dia fimde"><div class="cal-num">3</div></div>
+          <div class="cal-dia">
+            <div class="cal-num">4</div>
+            <div class="cal-detalhe">08:02 · 12:00<br>13:00 · 18:04</div>
+            <div class="cal-detalhe"><strong>8h 02</strong></div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">5</div>
+            <div class="cal-detalhe">07:58 · 12:00<br>13:00 · 18:00</div>
+            <div class="cal-detalhe"><strong>8h 00</strong></div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">6</div>
+            <div class="cal-detalhe" style="color:var(--cinza)">home</div>
+            <div class="cal-detalhe"><strong>8h 12</strong></div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">7</div>
+            <div class="cal-detalhe">08:05 · 12:02<br>13:00 · 18:18</div>
+            <div class="cal-detalhe"><strong>8h 15</strong></div>
+            <div class="cal-tag he">+15min</div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">8</div>
+            <div class="cal-detalhe" style="color:var(--cinza)">home</div>
+            <div class="cal-detalhe"><strong>8h 00</strong></div>
+          </div>
+          <div class="cal-dia fimde"><div class="cal-num">9</div></div>
+
+          <!-- Semana 3 -->
+          <div class="cal-dia fimde"><div class="cal-num">10</div></div>
+          <div class="cal-dia">
+            <div class="cal-num">11</div>
+            <div class="cal-detalhe">08:00 · 12:00<br>13:00 · 18:00</div>
+            <div class="cal-detalhe"><strong>8h 00</strong></div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">12</div>
+            <div class="cal-detalhe">07:55 · 12:00<br>13:00 · 19:30</div>
+            <div class="cal-detalhe"><strong>9h 35</strong></div>
+            <div class="cal-tag he">+1h 30</div>
+          </div>
+          <div class="cal-dia atestado">
+            <div class="cal-num">13</div>
+            <div class="cal-tag atest">ATEST</div>
+            <div class="cal-detalhe">médico filho<br>4h abono</div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">14</div>
+            <div class="cal-detalhe">07:50 · 12:01<br>13:00 · 17:48</div>
+            <div class="cal-detalhe"><strong>7h 57</strong></div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">15</div>
+            <div class="cal-detalhe" style="color:var(--cinza)">home</div>
+            <div class="cal-detalhe"><strong>8h 00</strong></div>
+          </div>
+          <div class="cal-dia fimde"><div class="cal-num">16</div></div>
+
+          <!-- Semana 4 -->
+          <div class="cal-dia fimde"><div class="cal-num">17</div></div>
+          <div class="cal-dia">
+            <div class="cal-num">18</div>
+            <div class="cal-detalhe">07:58 · 12:00<br>13:00 · 18:02</div>
+            <div class="cal-detalhe"><strong>8h 04</strong></div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">19</div>
+            <div class="cal-detalhe">08:01 · 12:00<br>13:00 · 18:30</div>
+            <div class="cal-detalhe"><strong>8h 29</strong></div>
+            <div class="cal-tag he">+30min</div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">20</div>
+            <div class="cal-detalhe" style="color:var(--cinza)">home</div>
+            <div class="cal-detalhe"><strong>8h 00</strong></div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">21</div>
+            <div class="cal-detalhe">08:00 · 12:00<br>13:00 · 18:00</div>
+            <div class="cal-detalhe"><strong>8h 00</strong></div>
+          </div>
+          <div class="cal-dia">
+            <div class="cal-num">22</div>
+            <div class="cal-detalhe" style="color:var(--cinza)">home</div>
+            <div class="cal-detalhe"><strong>8h 00</strong></div>
+          </div>
+          <div class="cal-dia fimde"><div class="cal-num">23</div></div>
+
+          <!-- Semana 5 -->
+          <div class="cal-dia fimde"><div class="cal-num">24</div></div>
+          <div class="cal-dia">
+            <div class="cal-num">25</div>
+            <div class="cal-detalhe">08:02 · 12:00<br>13:00 · 19:42</div>
+            <div class="cal-detalhe"><strong>9h 40</strong></div>
+            <div class="cal-tag he">+1h 42</div>
+          </div>
+          <div class="cal-dia hoje">
+            <div class="cal-num">26</div>
+            <div class="cal-detalhe" style="font-style:italic;color:var(--laranja)">hoje</div>
+            <div class="cal-detalhe">07:48 · 13:00 ✓</div>
+          </div>
+          <div class="cal-dia fora"><div class="cal-num">27</div></div>
+          <div class="cal-dia fora"><div class="cal-num">28</div></div>
+          <div class="cal-dia fora"><div class="cal-num">29</div></div>
+          <div class="cal-dia fora fimde"><div class="cal-num">30</div></div>
+
+          <div class="cal-dia fora fimde"><div class="cal-num">31</div></div>
+          <div class="cal-dia fora"></div>
+          <div class="cal-dia fora"></div>
+          <div class="cal-dia fora"></div>
+          <div class="cal-dia fora"></div>
+          <div class="cal-dia fora"></div>
+          <div class="cal-dia fora"></div>
+        </div>
+
+        <div class="legenda-cal">
+          <div class="leg-item"><div class="leg-cor verde"></div>Normal · presente</div>
+          <div class="leg-item"><div class="leg-cor laranja"></div>Hoje</div>
+          <div class="leg-item"><div class="leg-cor amarelo"></div>Atestado</div>
+          <div class="leg-item"><div class="leg-cor vermelho"></div>Falta</div>
+          <div class="leg-item"><div class="leg-cor roxo"></div>Feriado</div>
+          <div class="leg-item"><div style="width:12px;height:12px;border-radius:2px;background:var(--cinza-fundo);border:1px solid var(--cinza-cl)"></div>Fim de semana</div>
+          <div class="leg-item"><span class="cal-tag he" style="margin:0">+min</span>Hora extra</div>
+        </div>
+      </div>
+
+      <!-- DETALHE DO DIA -->
+      <div class="painel">
+        <h3>Detalhe · <em>25/05/2026 segunda</em></h3>
+        <p class="sub-titulo">Dia com h. extras · solicitação de ajuste pendente</p>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+          <div style="padding:14px;background:var(--verde-cl);border:1px solid var(--verde);border-radius:2px">
+            <div style="font-family:var(--ui);font-size:9px;letter-spacing:1.5px;color:var(--verde);font-weight:700">▶ ENTRADA</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:26px;color:var(--marinho);margin-top:4px">08:02</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:4px">canteiro Sítio II · app · geo OK</div>
+          </div>
+          <div style="padding:14px;background:var(--amarelo-cl);border:1px solid var(--amarelo);border-radius:2px">
+            <div style="font-family:var(--ui);font-size:9px;letter-spacing:1.5px;color:#876715;font-weight:700">⏸ INÍCIO ALMOÇO</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:26px;color:var(--marinho);margin-top:4px">12:00</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:4px">canteiro Sítio II</div>
+          </div>
+          <div style="padding:14px;background:var(--amarelo-cl);border:1px solid var(--amarelo);border-radius:2px">
+            <div style="font-family:var(--ui);font-size:9px;letter-spacing:1.5px;color:#876715;font-weight:700">▶ RETORNO</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:26px;color:var(--marinho);margin-top:4px">13:00</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:4px">canteiro Sítio II</div>
+          </div>
+          <div style="padding:14px;background:var(--vermelho-cl);border:1px solid var(--vermelho);border-radius:2px">
+            <div style="font-family:var(--ui);font-size:9px;letter-spacing:1.5px;color:var(--vermelho);font-weight:700">⏹ SAÍDA <em>(solicitada)</em></div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:26px;color:var(--marinho);margin-top:4px">19:42</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--vermelho);margin-top:4px">esqueceu de bater · ajuste pendente</div>
+          </div>
+        </div>
+
+        <div class="alert alert-laranja" style="margin-bottom:0">
+          <span class="ic-grande">⚠</span>
+          <div>
+            <strong>Saída em ajuste · Pedro Aurélio Castro fez solicitação ontem</strong>
+            A IA recomenda aprovar (justificativa robusta + comprovante WhatsApp da Luísa). Se aprovado, gera <strong>+ 1h 42min</strong> em banco de horas (50%) ou pagamento de hora-extra na próxima folha.
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Ponto Eletrônico · Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-ponto-dashboard">📡 Dashboard Ao Vivo</option>
+    <option value="t-solicitacoes">✎ Solicitações de Ajuste</option>
+    <option value="t-banco-horas">⚖ Banco de Horas Consolidado</option>
+    <option value="t-espelho">📄 Espelho Individual (Fernando)</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+
+// Relógio ao vivo (apenas visual)
+function atualizarRelogio(){
+  const ag = new Date();
+  const hh = String(ag.getHours()).padStart(2,'0');
+  const mm = String(ag.getMinutes()).padStart(2,'0');
+  const ss = String(ag.getSeconds()).padStart(2,'0');
+  document.querySelectorAll('.relogio-tempo em').forEach(el=>{
+    el.textContent = `${hh}:${mm}:${ss}`;
+  });
+}
+setInterval(atualizarRelogio, 1000);
+atualizarRelogio();
+</script>
+</body>
+</html>

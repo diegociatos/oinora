@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Onboarding (Paula Marques)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-verde{background:var(--verde);color:white}
+  .btn-verde:hover{background:#1F5740}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL · RH */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  /* SHELL · TopBar empregado (mobile-like) */
+  .empregado-shell{min-height:100vh;background:linear-gradient(180deg,var(--cinza-fundo) 0%,var(--papel) 100%)}
+  .empregado-topbar{background:var(--marinho);color:var(--papel);padding:16px 30px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.06)}
+  .empregado-topbar .logo{font-size:22px}
+  .empregado-topbar .logo .nora{color:var(--papel)}
+  .empregado-topbar-direita{display:flex;align-items:center;gap:14px}
+  .topbar-saudacao{font-family:var(--ui);font-size:13px;opacity:.85}
+  .topbar-saudacao strong{font-family:var(--serif);font-style:italic;font-size:14px;font-weight:400;color:var(--laranja)}
+  .topbar-av{width:38px;height:38px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:15px;font-weight:600}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  /* HEADER */
+  .header-bar{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:24px 28px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+  .header-bar h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .header-bar h1 em{color:var(--laranja);font-style:italic}
+  .header-bar .meta{font-family:var(--ui);font-size:12px;color:var(--cinza);letter-spacing:.5px;margin-top:6px}
+  .header-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+  /* TAGS */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  /* ABAS */
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;overflow-x:auto;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:0 6px}
+  .aba{padding:14px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .aba .ic{font-size:14px}
+  .aba .cnt{background:var(--cinza-fundo);font-size:10px;padding:1px 7px;border-radius:10px;letter-spacing:.3px;font-weight:700;color:var(--cinza)}
+  .aba.ativa .cnt{background:var(--laranja);color:white}
+
+  /* PAINEL */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px;letter-spacing:-.2px}
+  .painel h3 em{color:var(--laranja);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+
+  /* KPIS */
+  .kpis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .kpi.destaque{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border-color:var(--laranja)}
+  .kpi-titulo{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .kpi-valor{font-size:28px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.3px;font-family:var(--serif);font-style:italic}
+  .kpi-valor em{color:var(--laranja)}
+  .kpi-valor span{font-size:13px;color:var(--cinza);font-style:normal}
+  .kpi-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;letter-spacing:.3px}
+
+  /* ALERT */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden}
+  .alert-marinho::before{content:"";position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .alert-marinho > *{position:relative}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert-verde{background:var(--verde-cl);border-left:3px solid var(--verde);color:var(--marinho)}
+  .alert-laranja{background:var(--laranja-cl);border-left:3px solid var(--laranja);color:var(--marinho)}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* CARDS DE ONBOARDING ATIVO */
+  .onb-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:20px;margin-bottom:14px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;transition:all .15s;cursor:pointer}
+  .onb-card:hover{border-color:var(--laranja);box-shadow:0 4px 14px rgba(31,42,68,.06);transform:translateY(-1px)}
+  .onb-card.atrasado{border-left:3px solid var(--vermelho);background:linear-gradient(135deg,var(--branco) 80%,var(--vermelho-cl))}
+  .onb-card.atencao{border-left:3px solid var(--amarelo);background:linear-gradient(135deg,var(--branco) 80%,var(--amarelo-cl))}
+  .onb-card.no-prazo{border-left:3px solid var(--verde)}
+  .onb-card.recem{border-left:3px solid var(--laranja);background:linear-gradient(135deg,var(--branco) 80%,var(--laranja-cl))}
+
+  .onb-av{width:54px;height:54px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:20px;font-weight:600;flex-shrink:0}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+
+  .onb-info{min-width:0}
+  .onb-nome{font-size:17px;font-weight:500;line-height:1.2;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .onb-cargo{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .onb-progresso-bar{margin-top:12px;height:8px;background:var(--cinza-fundo);border-radius:4px;overflow:hidden;position:relative}
+  .onb-progresso-fill{height:100%;background:linear-gradient(90deg,var(--verde),#1F5740);border-radius:4px;transition:width .3s}
+  .onb-progresso-fill.atrasado{background:linear-gradient(90deg,var(--vermelho),#8E2B2B)}
+  .onb-progresso-fill.recem{background:linear-gradient(90deg,var(--laranja),var(--laranja-esc))}
+  .onb-progresso-meta{display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;letter-spacing:.3px}
+  .onb-progresso-meta strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:13px;font-weight:400}
+
+  .onb-stats{display:flex;flex-direction:column;gap:6px;text-align:right;font-family:var(--ui);font-size:11px;color:var(--cinza)}
+  .onb-stats strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:15px;font-weight:400;display:block}
+
+  /* PESSOA HEADER - Paula */
+  .pessoa-header{background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:18px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}
+  .pessoa-foto{width:96px;height:96px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:38px;font-weight:600;background:linear-gradient(135deg,#C44545,#8E2B2B);flex-shrink:0;border:4px solid white;box-shadow:0 4px 14px rgba(31,42,68,.1)}
+  .pessoa-nome{font-size:30px;font-weight:400;letter-spacing:-.3px;line-height:1.1;margin-bottom:4px}
+  .pessoa-cargo-linha{font-family:var(--ui);font-size:13px;color:var(--cinza);letter-spacing:.3px;margin-bottom:12px}
+  .pessoa-cargo-linha strong{color:var(--marinho);font-family:var(--serif);font-weight:500}
+  .pessoa-tags{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* PROGRESSO GERAL DE 30 DIAS */
+  .progresso-30d{background:var(--marinho);color:var(--papel);padding:24px;border-radius:2px;margin-bottom:18px;position:relative;overflow:hidden}
+  .progresso-30d::before{content:"";position:absolute;top:-30%;right:-15%;width:300px;height:300px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .progresso-30d > *{position:relative}
+  .progresso-30d-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;gap:14px}
+  .progresso-30d h4{font-size:18px;font-weight:500;color:var(--papel)}
+  .progresso-30d h4 em{color:var(--laranja);font-style:italic}
+  .progresso-30d-sub{font-family:var(--ui);font-size:12px;opacity:.6;letter-spacing:.5px;margin-top:4px}
+  .progresso-30d-num{font-family:var(--serif);font-style:italic;font-size:42px;color:var(--laranja);line-height:1}
+  .progresso-30d-num span{font-size:14px;color:rgba(255,255,255,.4);font-style:normal}
+
+  .marcos-30d{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:rgba(255,255,255,.04);border-radius:2px;padding:14px;position:relative}
+  .marco{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative}
+  .marco:not(:last-child)::after{content:"";position:absolute;right:0;top:30px;width:60%;height:2px;background:rgba(255,255,255,.1)}
+  .marco.feito::after,.marco.atual::after{background:var(--laranja);opacity:.6}
+  .marco-bola{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--ui);font-size:13px;font-weight:700;margin-bottom:8px;border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:rgba(255,255,255,.4)}
+  .marco.feito .marco-bola{background:var(--verde);border-color:var(--verde);color:white}
+  .marco.atual .marco-bola{background:var(--laranja);border-color:var(--laranja);color:white;box-shadow:0 0 0 4px rgba(232,99,58,.2)}
+  .marco-titulo{font-family:var(--ui);font-size:11px;letter-spacing:1px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,.6)}
+  .marco.feito .marco-titulo,.marco.atual .marco-titulo{color:var(--papel)}
+  .marco-sub{font-family:var(--ui);font-size:10px;opacity:.5;margin-top:2px}
+
+  /* TIMELINE DAS TAREFAS */
+  .checklist-grupo{margin-bottom:24px}
+  .checklist-head{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--cinza-cl)}
+  .checklist-fase-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px;font-weight:600;color:white;flex-shrink:0}
+  .checklist-fase-num.f1{background:linear-gradient(135deg,var(--verde),#1F5740)}
+  .checklist-fase-num.f2{background:linear-gradient(135deg,var(--laranja),var(--laranja-esc))}
+  .checklist-fase-num.f3{background:linear-gradient(135deg,var(--roxo),#5B3FA0)}
+  .checklist-fase-num.f4{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc))}
+  .checklist-head-info h4{font-size:17px;font-weight:500;letter-spacing:-.1px}
+  .checklist-head-info p{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px;margin-top:3px}
+  .checklist-head-stats{margin-left:auto;font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px;text-align:right}
+  .checklist-head-stats strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:14px;font-weight:400}
+
+  .tarefa{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px 18px;margin-bottom:8px;display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;transition:all .15s}
+  .tarefa:hover{border-color:var(--marinho-med)}
+  .tarefa.feita{background:linear-gradient(135deg,var(--branco) 70%,var(--verde-cl));border-left:3px solid var(--verde)}
+  .tarefa.atraso{background:linear-gradient(135deg,var(--branco) 70%,var(--vermelho-cl));border-left:3px solid var(--vermelho)}
+  .tarefa.atual{background:linear-gradient(135deg,var(--branco) 70%,var(--laranja-cl));border-left:3px solid var(--laranja);box-shadow:0 2px 8px rgba(232,99,58,.06)}
+  .tarefa-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--cinza-cl);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;background:var(--branco);transition:all .15s}
+  .tarefa-check.feita{background:var(--verde);border-color:var(--verde);color:white}
+  .tarefa-check.atraso{background:var(--vermelho);border-color:var(--vermelho);color:white}
+  .tarefa-check.atual{border-color:var(--laranja);color:var(--laranja);background:var(--branco)}
+  .tarefa-info{min-width:0}
+  .tarefa-titulo{font-size:14px;font-weight:500;color:var(--marinho);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tarefa.feita .tarefa-titulo{text-decoration:line-through;color:var(--cinza)}
+  .tarefa-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;letter-spacing:.3px}
+  .tarefa-meta strong{color:var(--marinho);font-weight:600}
+  .tarefa-tags{display:flex;gap:4px;flex-wrap:wrap}
+  .tarefa-prazo{font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:right;letter-spacing:.3px;min-width:90px}
+  .tarefa-prazo strong{display:block;color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:14px;font-weight:400}
+  .tarefa-prazo.atraso strong{color:var(--vermelho)}
+  .tarefa-prazo.atual strong{color:var(--laranja)}
+
+  /* GRID com colunas */
+  .grid-2-1{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+  /* PESSOAS DE APOIO */
+  .apoio-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:16px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+  .apoio-papel{font-family:var(--ui);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:3px}
+  .apoio-nome{font-size:14px;font-weight:500;color:var(--marinho)}
+  .apoio-cargo{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+
+  /* CARD DA EMPREGADA · BOAS-VINDAS */
+  .boas-vindas-card{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);padding:36px;border-radius:4px;margin-bottom:18px;position:relative;overflow:hidden}
+  .boas-vindas-card::before{content:"";position:absolute;top:-30%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .boas-vindas-card > *{position:relative}
+  .boas-vindas-saudacao{font-family:var(--ui);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--laranja);font-weight:700;margin-bottom:12px}
+  .boas-vindas-card h2{font-size:36px;font-weight:400;letter-spacing:-.3px;line-height:1.2;color:var(--papel)}
+  .boas-vindas-card h2 em{color:var(--laranja);font-style:italic}
+  .boas-vindas-card p{font-family:var(--ui);font-size:14px;line-height:1.7;opacity:.85;margin-top:14px;max-width:680px}
+  .boas-vindas-meta{display:flex;gap:24px;margin-top:24px;font-family:var(--ui);font-size:12px;opacity:.7;letter-spacing:.5px;flex-wrap:wrap}
+  .boas-vindas-meta strong{color:var(--laranja);font-family:var(--serif);font-style:italic;font-size:15px;font-weight:400}
+
+  /* ROADMAP / TIMELINE 30D */
+  .roadmap-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+  .road-card{padding:16px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;text-align:center;cursor:pointer;transition:all .15s}
+  .road-card:hover{border-color:var(--marinho)}
+  .road-card.atual{border-color:var(--laranja);background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));box-shadow:0 2px 8px rgba(232,99,58,.08)}
+  .road-card.feito{border-left:3px solid var(--verde)}
+  .road-num{font-family:var(--serif);font-style:italic;font-size:32px;color:var(--marinho);line-height:1}
+  .road-card.atual .road-num{color:var(--laranja)}
+  .road-card.feito .road-num{color:var(--verde)}
+  .road-titulo{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-top:6px}
+  .road-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;letter-spacing:.3px;line-height:1.4}
+
+  /* QUICK ACTIONS */
+  .qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .qa-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;cursor:pointer;transition:all .15s}
+  .qa-card:hover{border-color:var(--laranja);transform:translateX(2px)}
+  .qa-ic{width:42px;height:42px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--cinza-fundo);border:1px solid var(--cinza-cl)}
+  .qa-ic.laranja{background:var(--laranja-cl);border-color:var(--laranja);color:var(--laranja)}
+  .qa-ic.verde{background:var(--verde-cl);border-color:var(--verde);color:var(--verde)}
+  .qa-ic.amarelo{background:var(--amarelo-cl);border-color:var(--amarelo);color:#876715}
+  .qa-titulo{font-size:13.5px;font-weight:500}
+  .qa-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .qa-status{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700}
+  .qa-status.pendente{color:var(--laranja)}
+  .qa-status.feito{color:var(--verde)}
+
+  /* CARD DO MENTOR */
+  .mentor-card{background:linear-gradient(135deg,var(--branco) 60%,var(--roxo-cl));border:1px solid var(--roxo);border-radius:2px;padding:18px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+  .mentor-av{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#7E5BCC,#5B3FA0);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:22px;font-weight:600;flex-shrink:0}
+  .mentor-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--roxo);font-weight:700}
+  .mentor-nome{font-size:18px;font-weight:500;margin-top:3px}
+  .mentor-cargo{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .mentor-quote{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--marinho-med);line-height:1.6;margin-top:10px;padding-left:12px;border-left:3px solid var(--roxo)}
+
+  /* PULSE CHECK / IA */
+  .pulse-card{background:linear-gradient(135deg,var(--branco) 50%,var(--verde-cl));border:1px solid var(--verde);border-radius:2px;padding:20px;margin-bottom:14px}
+  .pulse-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .pulse-ic-grande{width:54px;height:54px;border-radius:50%;background:var(--verde);color:white;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .pulse-titulo{font-size:16px;font-weight:500}
+  .pulse-titulo em{color:var(--verde);font-style:italic}
+  .pulse-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+
+  .pulse-emoji-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}
+  .emoji-opt{padding:14px;background:var(--branco);border:2px solid var(--cinza-cl);border-radius:2px;text-align:center;cursor:pointer;transition:all .15s}
+  .emoji-opt:hover{border-color:var(--verde);transform:translateY(-2px)}
+  .emoji-opt.sel{border-color:var(--verde);background:var(--verde-cl);box-shadow:0 4px 10px rgba(45,125,90,.15)}
+  .emoji-grande{font-size:32px}
+  .emoji-label{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:6px;letter-spacing:.5px;font-weight:600}
+
+  /* CONQUISTAS */
+  .conquistas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .conquista-card{padding:16px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;text-align:center;position:relative}
+  .conquista-card.ganha{background:linear-gradient(135deg,var(--branco) 60%,var(--amarelo-cl));border-color:var(--amarelo)}
+  .conquista-card.pendente{opacity:.5}
+  .conquista-ic{font-size:32px;margin-bottom:8px}
+  .conquista-titulo{font-family:var(--ui);font-size:11px;letter-spacing:1px;font-weight:700;text-transform:uppercase;color:var(--marinho);margin-bottom:4px}
+  .conquista-sub{font-family:var(--ui);font-size:10px;color:var(--cinza);line-height:1.4}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1050px){
+    .kpis-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2,.grid-2-1,.grid-3,.qa-grid{grid-template-columns:1fr}
+    .marcos-30d,.roadmap-mini{grid-template-columns:repeat(2,1fr)}
+    .marco::after{display:none}
+    .pulse-emoji-grid{grid-template-columns:repeat(3,1fr)}
+    .conquistas-grid{grid-template-columns:1fr}
+    .tarefa{grid-template-columns:auto 1fr;gap:8px}
+    .tarefa-prazo{grid-column:2;text-align:left}
+    .header-bar,.pessoa-header,.boas-vindas-card{grid-template-columns:1fr;text-align:center}
+    .pessoa-foto,.onb-av{margin:0 auto}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: DASHBOARD RH · ONBOARDINGS EM CURSO -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-dash-rh">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item ativo"><span class="ic">🎓</span> Onboarding</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner · Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Gestão de Pessoas</a> &gt; <span style="color:var(--laranja)">Onboarding</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Onboarding · <em>Novos empregados</em></h1>
+          <div class="meta">7 empregados em ciclo · template padrão de 30 dias · check-in semanal automático com IA</div>
+          <div class="header-tags">
+            <span class="tag verde">5 no prazo</span>
+            <span class="tag amarelo">1 atenção</span>
+            <span class="tag vermelho">1 atrasado</span>
+            <span class="tag laranja">Paula recém-chegada</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm">⚙ Configurar templates</button>
+          <button class="btn btn-primario btn-sm">+ Novo onboarding</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpis-grid">
+        <div class="kpi destaque">
+          <div class="kpi-titulo">Em onboarding agora</div>
+          <div class="kpi-valor"><em>7</em><span> empregados</span></div>
+          <div class="kpi-meta">média: dia 14 de 30</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Concluídos · últimos 90d</div>
+          <div class="kpi-valor">12</div>
+          <div class="kpi-meta">94% conclusão saudável</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Tempo médio até produtivo</div>
+          <div class="kpi-valor"><em>24</em><span> dias</span></div>
+          <div class="kpi-meta">▼ 4 dias vs ano passado</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">NPS de novos (90d)</div>
+          <div class="kpi-valor" style="color:var(--verde)"><em>+72</em></div>
+          <div class="kpi-meta">excelente · 11 respondentes</div>
+        </div>
+      </div>
+
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🤖</span>
+        <div>
+          <strong>Nora · IA enviou 3 alertas hoje</strong>
+          1 empregado pulou check-in de dia 7 · 1 tarefa atrasada bloqueia outras · Paula Marques está com humor "↑ animado" no pulse de hoje (dia 1).
+        </div>
+      </div>
+
+      <!-- ONBOARDINGS ATIVOS -->
+      <div class="painel">
+        <h3>Onboardings <em>em curso</em></h3>
+        <p class="sub-titulo">Ordenados por urgência · clique para ver detalhes</p>
+
+        <!-- PAULA · DIA 1 RECÉM -->
+        <div class="onb-card recem" onclick="irPara('t-checklist-paula')">
+          <div class="onb-av av-f">PM</div>
+          <div class="onb-info">
+            <div class="onb-nome">
+              Paula Marques Souza
+              <span class="tag laranja" style="font-size:10px">🆕 DIA 1 · hoje</span>
+            </div>
+            <div class="onb-cargo">Coordenadora de RH · MAT 0185 · admitida 26/05/2026 · reporta a Roberto</div>
+            <div class="onb-progresso-bar"><div class="onb-progresso-fill recem" style="width:6%"></div></div>
+            <div class="onb-progresso-meta">
+              <span>Boas-vindas e dia 1</span>
+              <span><strong>2 / 32</strong> tarefas concluídas · 6%</span>
+            </div>
+          </div>
+          <div class="onb-stats">
+            <strong>30 dias</strong>
+            <span>termina 25/06</span>
+            <span style="color:var(--laranja);font-weight:600">Mentor: Carla</span>
+          </div>
+        </div>
+
+        <!-- DANIEL · DIA 22 NO PRAZO -->
+        <div class="onb-card no-prazo">
+          <div class="onb-av av-e">DP</div>
+          <div class="onb-info">
+            <div class="onb-nome">
+              Daniel Pereira Lima
+              <span class="tag verde" style="font-size:10px">✓ NO PRAZO</span>
+            </div>
+            <div class="onb-cargo">Engenheiro Civil Pleno · admitido 04/05/2026 · reporta a Luísa Mendonça</div>
+            <div class="onb-progresso-bar"><div class="onb-progresso-fill" style="width:74%"></div></div>
+            <div class="onb-progresso-meta">
+              <span>Fase 3 · Integração técnica</span>
+              <span><strong>23 / 31</strong> tarefas · 74%</span>
+            </div>
+          </div>
+          <div class="onb-stats">
+            <strong>dia 22 de 30</strong>
+            <span>termina 03/06</span>
+            <span>Pulse hoje: 😊</span>
+          </div>
+        </div>
+
+        <!-- BRUNO · DIA 8 ATENÇÃO -->
+        <div class="onb-card atencao">
+          <div class="onb-av av-c">BC</div>
+          <div class="onb-info">
+            <div class="onb-nome">
+              Bruno Cavalcante
+              <span class="tag amarelo" style="font-size:10px">⚠ ATENÇÃO</span>
+            </div>
+            <div class="onb-cargo">Pedreiro · admitido 18/05/2026 · canteiro Sítio II</div>
+            <div class="onb-progresso-bar"><div class="onb-progresso-fill" style="width:35%;background:linear-gradient(90deg,var(--amarelo),#A37614)"></div></div>
+            <div class="onb-progresso-meta">
+              <span>NR-18 atrasada · sem treinamento de altura</span>
+              <span><strong>9 / 26</strong> · 35%</span>
+            </div>
+          </div>
+          <div class="onb-stats">
+            <strong>dia 8 de 30</strong>
+            <span>NR-18 vence em 5d</span>
+            <span style="color:#876715;font-weight:600">⚠ bloqueio em obra</span>
+          </div>
+        </div>
+
+        <!-- FERNANDA TOLEDO · 2 EMPREGADOS NO PRAZO -->
+        <div class="onb-card no-prazo">
+          <div class="onb-av av-c">FT</div>
+          <div class="onb-info">
+            <div class="onb-nome">
+              Fernanda Toledo
+              <span class="tag verde" style="font-size:10px">✓ NO PRAZO</span>
+            </div>
+            <div class="onb-cargo">Analista de R&amp;S Júnior · admitida 02/03/2026 · reporta a Carla Aurora</div>
+            <div class="onb-progresso-bar"><div class="onb-progresso-fill" style="width:96%"></div></div>
+            <div class="onb-progresso-meta">
+              <span>Praticamente concluído</span>
+              <span><strong>27 / 28</strong> · 96%</span>
+            </div>
+          </div>
+          <div class="onb-stats">
+            <strong>dia 28 de 30</strong>
+            <span>termina 01/06</span>
+            <span>Pulse: 🌟</span>
+          </div>
+        </div>
+
+        <!-- LARISSA · ATRASADO -->
+        <div class="onb-card atrasado">
+          <div class="onb-av av-d">LA</div>
+          <div class="onb-info">
+            <div class="onb-nome">
+              Larissa Andrade
+              <span class="tag vermelho" style="font-size:10px">✕ ATRASADO</span>
+            </div>
+            <div class="onb-cargo">Assistente Financeira · admitida 28/04/2026 · reporta a Eduardo Santos</div>
+            <div class="onb-progresso-bar"><div class="onb-progresso-fill atrasado" style="width:48%"></div></div>
+            <div class="onb-progresso-meta">
+              <span>5 tarefas pendentes · 1:1 dia 14 não realizado</span>
+              <span><strong>15 / 31</strong> · 48% (esperado 90%)</span>
+            </div>
+          </div>
+          <div class="onb-stats">
+            <strong>dia 28 de 30</strong>
+            <span style="color:var(--vermelho);font-weight:600">termina 28/05</span>
+            <span>Pulse: 😟</span>
+          </div>
+        </div>
+
+        <!-- + 3 OUTROS (compactos) -->
+        <div style="margin-top:14px;padding:14px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <span><strong style="color:var(--marinho)">+ 2 onboardings ativos:</strong> Pedro Lima (dia 18) · Camila Reis (dia 11) · todos no prazo.</span>
+          <a style="color:var(--laranja);font-weight:600">Ver todos os 7 →</a>
+        </div>
+      </div>
+
+      <!-- ESTATÍSTICAS DA AURORA -->
+      <div class="grid-2">
+        <div class="painel">
+          <h3>Templates <em>configurados</em></h3>
+          <p class="sub-titulo">Por família de cargo</p>
+
+          <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12.5px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--cinza-fundo);border-radius:2px">
+              <div>
+                <strong style="color:var(--marinho);font-size:13px">🏗 Operações &amp; Obra</strong>
+                <div style="color:var(--cinza);font-size:11px;margin-top:2px">Inclui NR-18 + NR-35 + integração canteiro</div>
+              </div>
+              <span class="tag verde" style="font-size:10px">26 tarefas</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--cinza-fundo);border-radius:2px">
+              <div>
+                <strong style="color:var(--marinho);font-size:13px">📐 Engenharia</strong>
+                <div style="color:var(--cinza);font-size:11px;margin-top:2px">CREA + Sienge + integração equipe</div>
+              </div>
+              <span class="tag verde" style="font-size:10px">31 tarefas</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--cinza-fundo);border-radius:2px">
+              <div>
+                <strong style="color:var(--marinho);font-size:13px">💼 Administrativo</strong>
+                <div style="color:var(--cinza);font-size:11px;margin-top:2px">RH, Financeiro, Comercial · base padrão</div>
+              </div>
+              <span class="tag verde" style="font-size:10px">28 tarefas</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--cinza-fundo);border-radius:2px">
+              <div>
+                <strong style="color:var(--marinho);font-size:13px">🎯 Liderança</strong>
+                <div style="color:var(--cinza);font-size:11px;margin-top:2px">Para cargos com is_leader · 1:1 com diretoria</div>
+              </div>
+              <span class="tag verde" style="font-size:10px">38 tarefas</span>
+            </div>
+          </div>
+
+          <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px;border-style:dashed">+ Criar template customizado</button>
+        </div>
+
+        <div class="painel">
+          <h3>Pulse Check · <em>últimas semanas</em></h3>
+          <p class="sub-titulo">Como os novos estão se sentindo</p>
+
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--verde-cl);border-radius:2px;border-left:3px solid var(--verde)">
+              <div style="font-size:24px">🌟</div>
+              <div style="flex:1">
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px">Animadas/animados</div>
+                <div style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--verde)">4 pessoas</div>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">57%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--cinza-fundo);border-radius:2px;border-left:3px solid var(--marinho)">
+              <div style="font-size:24px">😊</div>
+              <div style="flex:1">
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px">Bem</div>
+                <div style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--marinho)">2 pessoas</div>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">28%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--amarelo-cl);border-radius:2px;border-left:3px solid var(--amarelo)">
+              <div style="font-size:24px">😟</div>
+              <div style="flex:1">
+                <div style="font-family:var(--ui);font-size:11px;color:#876715;letter-spacing:.5px">Sobrecarregadas</div>
+                <div style="font-family:var(--serif);font-style:italic;font-size:20px;color:#876715">1 pessoa</div>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;color:#876715">Larissa Andrade</div>
+            </div>
+          </div>
+
+          <div class="alert alert-amarelo" style="margin-top:14px;margin-bottom:0">
+            <span class="ic-grande">💡</span>
+            <div>
+              <strong>Insight da IA</strong>
+              Larissa está sobrecarregada há 2 pulses consecutivos. Recomendo conversa <strong>hoje</strong> antes do encerramento do onboarding em 28/05.
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: CHECKLIST DETALHADO · PAULA -->
+<!-- ============================================== -->
+<div class="tela" id="t-checklist-paula">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item ativo"><span class="ic">🎓</span> Onboarding</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner · Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dash-rh')">Onboarding</a> &gt; <span style="color:var(--laranja)">Paula Marques Souza</span></div>
+
+      <!-- PESSOA HEADER -->
+      <div class="pessoa-header">
+        <div class="pessoa-foto">P</div>
+        <div>
+          <h1 class="pessoa-nome">Paula Marques Souza</h1>
+          <div class="pessoa-cargo-linha">
+            <strong>Coordenadora de RH</strong> · MAT 0185 · RH &amp; Pessoas · reporta a <strong>Roberto Aurora</strong>
+          </div>
+          <div class="pessoa-tags">
+            <span class="tag laranja">🆕 DIA 1 · 26/05/2026</span>
+            <span class="tag verde">Onboarding ativo</span>
+            <span class="tag marinho">CLT · efetivo</span>
+            <span class="tag">R$ 9.200</span>
+            <span class="tag">Híbrido</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-visao-paula')">👁 Ver como Paula vê</button>
+          <button class="btn btn-fantasma btn-sm">💬 Conversar</button>
+          <button class="btn btn-fantasma btn-sm">📋 Histórico</button>
+        </div>
+      </div>
+
+      <!-- PROGRESSO 30 DIAS -->
+      <div class="progresso-30d">
+        <div class="progresso-30d-head">
+          <div>
+            <h4>Onboarding · <em>30 dias</em></h4>
+            <div class="progresso-30d-sub">Iniciado em 26/05/2026 · término previsto 25/06/2026</div>
+          </div>
+          <div style="text-align:right">
+            <div class="progresso-30d-num">6<span>%</span></div>
+            <div style="font-family:var(--ui);font-size:11px;opacity:.5;letter-spacing:.5px;margin-top:4px">2 de 32 tarefas concluídas</div>
+          </div>
+        </div>
+
+        <div class="marcos-30d">
+          <div class="marco atual">
+            <div class="marco-bola">1</div>
+            <div class="marco-titulo">Dia 1</div>
+            <div class="marco-sub">Boas-vindas &amp; setup</div>
+          </div>
+          <div class="marco">
+            <div class="marco-bola">7</div>
+            <div class="marco-titulo">Semana 1</div>
+            <div class="marco-sub">Imersão na equipe</div>
+          </div>
+          <div class="marco">
+            <div class="marco-bola">15</div>
+            <div class="marco-titulo">Semana 2-3</div>
+            <div class="marco-sub">Integração técnica</div>
+          </div>
+          <div class="marco">
+            <div class="marco-bola">30</div>
+            <div class="marco-titulo">Dia 30</div>
+            <div class="marco-sub">Avaliação &amp; efetivação</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIME DE APOIO -->
+      <div class="grid-3">
+        <div class="apoio-card" style="border-left:3px solid var(--marinho)">
+          <div class="onb-av av-b" style="width:42px;height:42px;font-size:14px">RA</div>
+          <div>
+            <div class="apoio-papel">👔 Gestor (Manager)</div>
+            <div class="apoio-nome">Roberto Aurora</div>
+            <div class="apoio-cargo">Diretor de RH · 1:1 semanal · quintas 11h</div>
+          </div>
+          <button class="btn btn-fantasma btn-xs">💬</button>
+        </div>
+
+        <div class="apoio-card" style="border-left:3px solid var(--roxo)">
+          <div class="onb-av av-c" style="width:42px;height:42px;font-size:14px">CA</div>
+          <div>
+            <div class="apoio-papel" style="color:var(--roxo)">🤝 Buddy / Mentora</div>
+            <div class="apoio-nome">Carla Aurora</div>
+            <div class="apoio-cargo">Coord. RH · café diário · sempre disponível</div>
+          </div>
+          <button class="btn btn-fantasma btn-xs">💬</button>
+        </div>
+
+        <div class="apoio-card" style="border-left:3px solid var(--laranja)">
+          <div class="onb-av av-a" style="width:42px;height:42px;font-size:14px">M</div>
+          <div>
+            <div class="apoio-papel" style="color:var(--laranja)">🎯 Onboarding Lead</div>
+            <div class="apoio-nome">Mariana Costa</div>
+            <div class="apoio-cargo">Oi Nora · acompanha 14 dias</div>
+          </div>
+          <button class="btn btn-fantasma btn-xs">💬</button>
+        </div>
+      </div>
+
+      <!-- CHECKLIST · FASE 1 -->
+      <div class="painel" style="margin-top:18px">
+        <div class="checklist-grupo">
+          <div class="checklist-head">
+            <div class="checklist-fase-num f1">1</div>
+            <div class="checklist-head-info">
+              <h4>Fase 1 · <em>Antes do Dia 1</em> · pré-admissão</h4>
+              <p>Setup técnico e documental antes da chegada</p>
+            </div>
+            <div class="checklist-head-stats">
+              <strong>5 / 5</strong>
+              <div>100% concluído</div>
+            </div>
+          </div>
+
+          <div class="tarefa feita">
+            <div class="tarefa-check feita">✓</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Carta-oferta assinada digitalmente</div>
+              <div class="tarefa-meta">
+                <span>📤 <strong>D4Sign</strong> · assinado 18/05</span>
+                <span class="tag verde" style="font-size:9px">RH</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag" style="font-size:9px">📎 ICP-Brasil</span></div>
+            <div class="tarefa-prazo"><strong>18/05/2026</strong><span>✓ Cumprido</span></div>
+          </div>
+
+          <div class="tarefa feita">
+            <div class="tarefa-check feita">✓</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Documentos admissionais recebidos</div>
+              <div class="tarefa-meta">
+                <span>📄 RG · CPF · CTPS digital · diploma</span>
+                <span class="tag verde" style="font-size:9px">RH</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>20/05</strong><span>✓ Bruna</span></div>
+          </div>
+
+          <div class="tarefa feita">
+            <div class="tarefa-check feita">✓</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">eSocial S-2200 (admissão) enviado</div>
+              <div class="tarefa-meta">
+                <span>⚖ Obrigação legal · prazo 1 dia útil antes</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>23/05</strong><span>✓ Bruna</span></div>
+          </div>
+
+          <div class="tarefa feita">
+            <div class="tarefa-check feita">✓</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Crachá emitido e impresso</div>
+              <div class="tarefa-meta">
+                <span>🪪 Cartão de acesso · TI fez ontem · está com Carla</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>25/05</strong><span>✓ TI</span></div>
+          </div>
+
+          <div class="tarefa feita">
+            <div class="tarefa-check feita">✓</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Notebook configurado &amp; entregue</div>
+              <div class="tarefa-meta">
+                <span>💻 Dell Latitude 5450 · MFA configurado · acessos Oi Nora + Sienge + GSuite</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag verde" style="font-size:9px">termo equipamentos assinado</span></div>
+            <div class="tarefa-prazo"><strong>25/05</strong><span>✓ TI</span></div>
+          </div>
+        </div>
+
+        <!-- FASE 2 · DIA 1 - 7 -->
+        <div class="checklist-grupo">
+          <div class="checklist-head">
+            <div class="checklist-fase-num f2">2</div>
+            <div class="checklist-head-info">
+              <h4>Fase 2 · <em>Dia 1 a 7</em> · acolhimento e imersão</h4>
+              <p>Boas-vindas, conhecer a empresa, primeiras conexões</p>
+            </div>
+            <div class="checklist-head-stats">
+              <strong>2 / 11</strong>
+              <div>18% (em curso)</div>
+            </div>
+          </div>
+
+          <div class="tarefa feita">
+            <div class="tarefa-check feita">✓</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Recepção física · Café da manhã com a equipe RH</div>
+              <div class="tarefa-meta">
+                <span>👋 09:00 · sala de reunião 4 · Carla, Roberto, Bruna</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>Hoje 09:00</strong><span style="color:var(--verde)">✓ Feito</span></div>
+          </div>
+
+          <div class="tarefa feita">
+            <div class="tarefa-check feita">✓</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Primeiro acesso à plataforma Oi Nora</div>
+              <div class="tarefa-meta">
+                <span>🔐 Magic link · senha definida · 2FA ativado</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>Hoje 09:42</strong><span style="color:var(--verde)">✓ Feito</span></div>
+          </div>
+
+          <div class="tarefa atual">
+            <div class="tarefa-check atual">●</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">📚 Vídeo de boas-vindas · CEO Alfredo Aurora</div>
+              <div class="tarefa-meta">
+                <span>🎥 14min · história da Aurora · valores · cultura</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag laranja" style="font-size:9px">próxima</span></div>
+            <div class="tarefa-prazo atual"><strong>Hoje 14:00</strong><span>em 4h</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Tour da empresa · presencial</div>
+              <div class="tarefa-meta">
+                <span>🏢 sede BH · todos os andares · 60min · com Carla</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>Hoje 15:00</strong><span>1h após vídeo</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">📄 Aceitar Política LGPD v2.0</div>
+              <div class="tarefa-meta">
+                <span>⚖ Obrigatório · 15min de leitura · obrigação legal</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag amarelo" style="font-size:9px">obrigatório</span></div>
+            <div class="tarefa-prazo"><strong>Hoje 17:00</strong><span>até fim do dia</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">📄 Aceitar Código de Conduta v2.0</div>
+              <div class="tarefa-meta">
+                <span>⚖ Obrigatório · 12min de leitura</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag amarelo" style="font-size:9px">obrigatório</span></div>
+            <div class="tarefa-prazo"><strong>Hoje 17:30</strong><span>até fim do dia</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">🩺 ASO Admissional · Clínica MEDOCC</div>
+              <div class="tarefa-meta">
+                <span>📅 Agendado: amanhã 09:00 · Dr. Marcos Coelho</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag" style="font-size:9px">obrigatório legal</span></div>
+            <div class="tarefa-prazo"><strong>27/05 09:00</strong><span>amanhã</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Reunião 1:1 com Roberto (manager)</div>
+              <div class="tarefa-meta">
+                <span>📅 27/05 15:00 · sala 2 · pauta: expectativas, OKRs</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>27/05 15:00</strong><span>amanhã</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Apresentação aos diretores</div>
+              <div class="tarefa-meta">
+                <span>👥 Luísa, Eduardo, Carlos · café da tarde 16h</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>28/05 16:00</strong><span>quinta</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">📚 Curso introdutório · Oi Nora 101</div>
+              <div class="tarefa-meta">
+                <span>🎓 2h online · todas as features que vai usar</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>até 29/05</strong><span>3 dias</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">💬 Pulse Check · fim da semana 1</div>
+              <div class="tarefa-meta">
+                <span>📋 5 perguntas rápidas anônimas · IA analisa sentimento</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag verde" style="font-size:9px">automático</span></div>
+            <div class="tarefa-prazo"><strong>01/06</strong><span>segunda</span></div>
+          </div>
+        </div>
+
+        <!-- FASE 3 · DIAS 8 - 22 (compacta) -->
+        <div class="checklist-grupo">
+          <div class="checklist-head">
+            <div class="checklist-fase-num f3">3</div>
+            <div class="checklist-head-info">
+              <h4>Fase 3 · <em>Dia 8 a 22</em> · integração técnica</h4>
+              <p>Aprofundar processos, primeiras entregas, conexões na empresa</p>
+            </div>
+            <div class="checklist-head-stats">
+              <strong>0 / 11</strong>
+              <div>0% (futuro)</div>
+            </div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">🎓 Treinamento técnico: módulos Oi Nora (folha, ponto, ATS)</div>
+              <div class="tarefa-meta">
+                <span>📚 Trilha 8h · com Mariana (Oi Nora)</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>02-06/06</strong><span>semana 2</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Sombrear Carla por 2 dias</div>
+              <div class="tarefa-meta">
+                <span>👥 Ver o dia-a-dia · processos · contatos com diretores</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag roxo" style="font-size:9px">mentoria</span></div>
+            <div class="tarefa-prazo"><strong>09-10/06</strong><span>semana 3</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Conhecer canteiro Sítio II · visita técnica</div>
+              <div class="tarefa-meta">
+                <span>🏗 Visita 1 dia · com encarregado Daniel · NR-18 obrigatória antes</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag" style="font-size:9px">NR-18 obrigatória</span></div>
+            <div class="tarefa-prazo"><strong>11/06</strong><span>quarta</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Reunião 1:1 com Roberto · check-in dia 14</div>
+              <div class="tarefa-meta">
+                <span>📅 Pauta: progresso, dificuldades, ajustes</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag verde" style="font-size:9px">check-in obrigatório</span></div>
+            <div class="tarefa-prazo"><strong>09/06</strong><span>segunda</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">💬 Pulse Check · semana 2 e semana 3</div>
+              <div class="tarefa-meta">
+                <span>📋 Automatizado</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag verde" style="font-size:9px">automático</span></div>
+            <div class="tarefa-prazo"><strong>08/06 e 15/06</strong><span>2 ciclos</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Primeira entrega · processar uma admissão completa</div>
+              <div class="tarefa-meta">
+                <span>🎯 Marco de produtividade · com supervisão da Carla</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag laranja" style="font-size:9px">marco</span></div>
+            <div class="tarefa-prazo"><strong>até 16/06</strong><span>dia 22</span></div>
+          </div>
+        </div>
+
+        <!-- FASE 4 · DIAS 23 - 30 (compacta) -->
+        <div class="checklist-grupo">
+          <div class="checklist-head">
+            <div class="checklist-fase-num f4">4</div>
+            <div class="checklist-head-info">
+              <h4>Fase 4 · <em>Dia 23 a 30</em> · efetivação</h4>
+              <p>Avaliação, autonomia e fim do ciclo de experiência</p>
+            </div>
+            <div class="checklist-head-stats">
+              <strong>0 / 5</strong>
+              <div>0% (futuro)</div>
+            </div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">📋 Autoavaliação dos 30 dias</div>
+              <div class="tarefa-meta">
+                <span>📝 Paula reflete: o que aprendeu, dificuldades, ajustes desejados</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>22/06</strong><span>até dia 28</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Avaliação do gestor · Roberto</div>
+              <div class="tarefa-meta">
+                <span>👔 Roberto avalia · indicadores: integração, autonomia, fit cultural</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"></div>
+            <div class="tarefa-prazo"><strong>23/06</strong><span>até dia 28</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">💬 Pulse Check · dia 30 (NPS interno)</div>
+              <div class="tarefa-meta">
+                <span>📋 Pergunta-chave: "Você recomendaria a Aurora?"</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag verde" style="font-size:9px">automático</span></div>
+            <div class="tarefa-prazo"><strong>25/06</strong><span>dia 30</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">Reunião de encerramento · 1:1 final</div>
+              <div class="tarefa-meta">
+                <span>🎯 Roberto + Paula · feedback duplo · plano dos próximos 90 dias</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag laranja" style="font-size:9px">crucial</span></div>
+            <div class="tarefa-prazo"><strong>25/06 15:00</strong><span>dia 30</span></div>
+          </div>
+
+          <div class="tarefa">
+            <div class="tarefa-check">○</div>
+            <div class="tarefa-info">
+              <div class="tarefa-titulo">🎉 Marco · 30 dias completos</div>
+              <div class="tarefa-meta">
+                <span>🌟 Status muda para "Efetiva" · sai do onboarding · continua no contrato de experiência (90d totais)</span>
+              </div>
+            </div>
+            <div class="tarefa-tags"><span class="tag verde" style="font-size:9px">automático</span></div>
+            <div class="tarefa-prazo"><strong>25/06</strong><span>fim</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: VISÃO DA PAULA · DIA 1 -->
+<!-- ============================================== -->
+<div class="tela" id="t-visao-paula">
+  <div class="empregado-shell">
+    <div class="empregado-topbar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empregado-topbar-direita">
+        <div class="topbar-saudacao">Bem-vinda, <strong>Paula</strong></div>
+        <div class="topbar-av av-f">PM</div>
+      </div>
+    </div>
+
+    <main class="app-main" style="max-width:1100px;margin:0 auto">
+
+      <!-- CARD DE BOAS-VINDAS -->
+      <div class="boas-vindas-card">
+        <div class="boas-vindas-saudacao">26/05/2026 · Terça-feira</div>
+        <h2>Que bom <em>ter você aqui</em>, Paula!</h2>
+        <p>Hoje começa sua jornada como <strong style="color:var(--laranja)">Coordenadora de RH na Construtora Aurora</strong>. Os próximos 30 dias foram preparados com carinho para te ajudar a se integrar, conhecer o time e começar a fazer a diferença.</p>
+        <p style="margin-top:8px">Não estamos com pressa — vai no seu ritmo. Carla, Roberto e Mariana estão aqui pra te apoiar. 🌟</p>
+        <div class="boas-vindas-meta">
+          <div>📅 Dia <strong>1</strong> de 30</div>
+          <div>🎯 Próxima tarefa em <strong>4h</strong></div>
+          <div>👥 <strong>3</strong> pessoas te ajudam</div>
+          <div>📚 <strong>2</strong> documentos para revisar hoje</div>
+        </div>
+      </div>
+
+      <!-- ROADMAP DOS 30 DIAS -->
+      <div class="roadmap-mini">
+        <div class="road-card atual">
+          <div class="road-num">1</div>
+          <div class="road-titulo">Você está aqui</div>
+          <div class="road-sub">Dia 1 · acolhimento &amp; setup</div>
+        </div>
+        <div class="road-card">
+          <div class="road-num">7</div>
+          <div class="road-titulo">Semana 1</div>
+          <div class="road-sub">Imersão na equipe</div>
+        </div>
+        <div class="road-card">
+          <div class="road-num">15</div>
+          <div class="road-titulo">Semanas 2-3</div>
+          <div class="road-sub">Integração técnica</div>
+        </div>
+        <div class="road-card">
+          <div class="road-num">30</div>
+          <div class="road-titulo">Conclusão</div>
+          <div class="road-sub">25/06 · efetivação</div>
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div>
+          <!-- TAREFAS DO DIA -->
+          <div class="painel">
+            <h3>Suas tarefas <em>de hoje</em></h3>
+            <p class="sub-titulo">7 tarefas no total · 2 já concluídas</p>
+
+            <div class="tarefa feita">
+              <div class="tarefa-check feita">✓</div>
+              <div class="tarefa-info">
+                <div class="tarefa-titulo">Café da manhã com o time RH</div>
+                <div class="tarefa-meta">
+                  <span>09:00 · sala de reunião 4</span>
+                </div>
+              </div>
+              <div class="tarefa-tags"></div>
+              <div class="tarefa-prazo"><strong>09:00</strong><span style="color:var(--verde)">✓ feito</span></div>
+            </div>
+
+            <div class="tarefa feita">
+              <div class="tarefa-check feita">✓</div>
+              <div class="tarefa-info">
+                <div class="tarefa-titulo">Primeiro acesso à plataforma</div>
+                <div class="tarefa-meta">
+                  <span>Senha + 2FA configurados</span>
+                </div>
+              </div>
+              <div class="tarefa-tags"></div>
+              <div class="tarefa-prazo"><strong>09:42</strong><span style="color:var(--verde)">✓ feito</span></div>
+            </div>
+
+            <div class="tarefa atual">
+              <div class="tarefa-check atual">●</div>
+              <div class="tarefa-info">
+                <div class="tarefa-titulo">📚 Vídeo de boas-vindas · CEO Alfredo</div>
+                <div class="tarefa-meta">
+                  <span>🎥 14min · cultura e valores da Aurora</span>
+                </div>
+              </div>
+              <div class="tarefa-tags"><span class="tag laranja" style="font-size:9px">próxima</span></div>
+              <div class="tarefa-prazo atual"><strong>14:00</strong><span>em 4h</span></div>
+            </div>
+
+            <div class="tarefa">
+              <div class="tarefa-check">○</div>
+              <div class="tarefa-info">
+                <div class="tarefa-titulo">Tour da empresa com Carla</div>
+                <div class="tarefa-meta">
+                  <span>🏢 60min · todos os andares</span>
+                </div>
+              </div>
+              <div class="tarefa-tags"></div>
+              <div class="tarefa-prazo"><strong>15:00</strong><span>em 5h</span></div>
+            </div>
+
+            <div class="tarefa">
+              <div class="tarefa-check">○</div>
+              <div class="tarefa-info">
+                <div class="tarefa-titulo">📄 Política LGPD v2.0</div>
+                <div class="tarefa-meta">
+                  <span>⚖ Obrigatório · 15min · digital + assinar</span>
+                </div>
+              </div>
+              <div class="tarefa-tags"><span class="tag amarelo" style="font-size:9px">obrigatório</span></div>
+              <div class="tarefa-prazo"><strong>17:00</strong><span>fim do dia</span></div>
+            </div>
+
+            <div class="tarefa">
+              <div class="tarefa-check">○</div>
+              <div class="tarefa-info">
+                <div class="tarefa-titulo">📄 Código de Conduta</div>
+                <div class="tarefa-meta">
+                  <span>⚖ Obrigatório · 12min de leitura</span>
+                </div>
+              </div>
+              <div class="tarefa-tags"><span class="tag amarelo" style="font-size:9px">obrigatório</span></div>
+              <div class="tarefa-prazo"><strong>17:30</strong><span>fim do dia</span></div>
+            </div>
+
+            <div class="tarefa">
+              <div class="tarefa-check">○</div>
+              <div class="tarefa-info">
+                <div class="tarefa-titulo">💭 Como você está se sentindo?</div>
+                <div class="tarefa-meta">
+                  <span>Pulse rapidinho · 30 segundos · anônimo</span>
+                </div>
+              </div>
+              <div class="tarefa-tags"><span class="tag roxo" style="font-size:9px">opcional mas importa</span></div>
+              <div class="tarefa-prazo"><strong>fim do dia</strong><span>30s</span></div>
+            </div>
+          </div>
+
+          <!-- PULSE CHECK HOJE -->
+          <div class="pulse-card">
+            <div class="pulse-head">
+              <div class="pulse-ic-grande">💭</div>
+              <div>
+                <div class="pulse-titulo">Como está sendo o <em>primeiro dia</em>?</div>
+                <div class="pulse-sub">Sua resposta é anônima · 30 segundos · ajuda o RH a fazer melhor</div>
+              </div>
+            </div>
+            <div class="pulse-emoji-grid">
+              <div class="emoji-opt">
+                <div class="emoji-grande">😟</div>
+                <div class="emoji-label">Difícil</div>
+              </div>
+              <div class="emoji-opt">
+                <div class="emoji-grande">😐</div>
+                <div class="emoji-label">Mais ou menos</div>
+              </div>
+              <div class="emoji-opt">
+                <div class="emoji-grande">🙂</div>
+                <div class="emoji-label">Bom</div>
+              </div>
+              <div class="emoji-opt sel">
+                <div class="emoji-grande">😊</div>
+                <div class="emoji-label">Muito bom</div>
+              </div>
+              <div class="emoji-opt">
+                <div class="emoji-grande">🌟</div>
+                <div class="emoji-label">Animadíssima!</div>
+              </div>
+            </div>
+            <div style="margin-top:14px;padding:12px;background:var(--verde-cl);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--marinho);text-align:center">
+              ✓ Sua resposta foi registrada · obrigada pela honestidade!
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- MENTORA CARLA -->
+          <div class="mentor-card">
+            <div class="mentor-av">CA</div>
+            <div>
+              <div class="mentor-titulo">🤝 Sua mentora</div>
+              <div class="mentor-nome">Carla Aurora</div>
+              <div class="mentor-cargo">Coordenadora de RH · 6 anos de casa</div>
+              <div class="mentor-quote">"Qualquer dúvida me chama no chat ou na sala 3. Estou pra te apoiar nesse primeiro mês, viu? 💙"</div>
+              <button class="btn btn-primario btn-sm" style="width:100%;justify-content:center;margin-top:14px">💬 Conversar com Carla</button>
+            </div>
+          </div>
+
+          <!-- QUICK ACTIONS -->
+          <div class="painel" style="margin-top:14px">
+            <h3 style="font-size:16px">Atalhos <em>úteis</em></h3>
+            <p class="sub-titulo">O que você pode precisar</p>
+
+            <div class="qa-grid" style="grid-template-columns:1fr">
+              <div class="qa-card">
+                <div class="qa-ic laranja">📚</div>
+                <div>
+                  <div class="qa-titulo">Manual do empregado</div>
+                  <div class="qa-sub">Tudo sobre benefícios, férias, ponto</div>
+                </div>
+                <div class="qa-status pendente">VER</div>
+              </div>
+
+              <div class="qa-card">
+                <div class="qa-ic verde">👥</div>
+                <div>
+                  <div class="qa-titulo">Quem é quem</div>
+                  <div class="qa-sub">Conheça os 128 colegas em fotos</div>
+                </div>
+                <div class="qa-status pendente">VER</div>
+              </div>
+
+              <div class="qa-card">
+                <div class="qa-ic amarelo">🍽</div>
+                <div>
+                  <div class="qa-titulo">Lugares para almoçar</div>
+                  <div class="qa-sub">Sugestões da galera · próximos à sede</div>
+                </div>
+                <div class="qa-status pendente">VER</div>
+              </div>
+
+              <div class="qa-card">
+                <div class="qa-ic laranja">🎁</div>
+                <div>
+                  <div class="qa-titulo">Seus benefícios</div>
+                  <div class="qa-sub">VR, plano de saúde, Gympass...</div>
+                </div>
+                <div class="qa-status pendente">VER</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONQUISTAS -->
+          <div class="painel">
+            <h3 style="font-size:16px">🏆 Conquistas</h3>
+            <p class="sub-titulo">Marcos do onboarding</p>
+
+            <div class="conquistas-grid" style="grid-template-columns:1fr 1fr">
+              <div class="conquista-card ganha">
+                <div class="conquista-ic">🚪</div>
+                <div class="conquista-titulo">Primeiro acesso</div>
+                <div class="conquista-sub">Conquistado · hoje 09:42</div>
+              </div>
+              <div class="conquista-card pendente">
+                <div class="conquista-ic">🌟</div>
+                <div class="conquista-titulo">Primeira semana</div>
+                <div class="conquista-sub">Em 6 dias</div>
+              </div>
+              <div class="conquista-card pendente">
+                <div class="conquista-ic">🏗</div>
+                <div class="conquista-titulo">Visita obra</div>
+                <div class="conquista-sub">Em 16 dias</div>
+              </div>
+              <div class="conquista-card pendente">
+                <div class="conquista-ic">🎉</div>
+                <div class="conquista-titulo">30 dias!</div>
+                <div class="conquista-sub">Em 30 dias</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Onboarding · Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-dash-rh">📋 Dashboard RH · 7 ativos</option>
+    <option value="t-checklist-paula">📝 Checklist Paula · 32 tarefas</option>
+    <option value="t-visao-paula">👁 Visão da Paula · Dia 1</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+
+// Toggle tarefas (visual)
+document.querySelectorAll('.tarefa-check:not(.feita):not(.atraso)').forEach(c=>{
+  c.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(this.textContent==='○'){
+      this.textContent='✓';
+      this.classList.add('feita');
+      this.closest('.tarefa').classList.add('feita');
+    } else if(this.textContent==='●') {
+      this.textContent='✓';
+      this.classList.remove('atual');
+      this.classList.add('feita');
+      this.closest('.tarefa').classList.remove('atual');
+      this.closest('.tarefa').classList.add('feita');
+    }
+  });
+});
+
+// Pulse emoji
+document.querySelectorAll('.emoji-opt').forEach(e=>{
+  e.addEventListener('click',function(){
+    document.querySelectorAll('.emoji-opt').forEach(o=>o.classList.remove('sel'));
+    this.classList.add('sel');
+  });
+});
+</script>
+</body>
+</html>

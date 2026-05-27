@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora — Avaliação, Pesquisas & Analytics Aprofundado</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .filete{display:flex;align-items:center;gap:10px;font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--marinho-med);text-transform:uppercase}
+  .filete::before,.filete::after{content:"";flex:1;height:1px;background:var(--cinza-cl)}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc);transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,99,58,.25)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL EMPRESA (igual fase 3) */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.5}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-item .badge{margin-left:auto;background:var(--laranja);color:white;font-family:var(--ui);font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;letter-spacing:.5px}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:18px}
+  .topbar h1{font-size:30px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .topbar h1 em{color:var(--laranja);font-style:italic}
+  .topbar .topbar-meta{font-family:var(--ui);font-size:12.5px;color:var(--cinza);margin-top:5px}
+  .topbar-acoes{display:flex;gap:8px;align-items:center}
+
+  /* CARDS */
+  .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .cards-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+  .card{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px;transition:all .2s}
+  .card-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:10px}
+  .card-valor{font-size:30px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.3px}
+  .card-valor em{color:var(--laranja);font-style:italic}
+  .card-valor span{font-size:14px;color:var(--cinza)}
+  .card-delta{font-family:var(--ui);font-size:11px;color:var(--verde);margin-top:8px;letter-spacing:.3px}
+  .card-delta.neg{color:var(--vermelho)}
+  .card-delta.neutro{color:var(--cinza)}
+
+  .grid-2{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+  .grid-2-eq{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-3-eq{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px}
+
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:22px;overflow-x:auto}
+  .aba{padding:11px 20px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+
+  /* AVATARES */
+  .av{width:36px;height:36px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;flex-shrink:0;font-weight:600}
+  .av-sm{width:28px;height:28px;font-size:11px}
+  .av-lg{width:48px;height:48px;font-size:18px}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+
+  /* BARRA HORIZONTAL */
+  .barra-progresso{height:6px;background:var(--cinza-fundo);border-radius:3px;overflow:hidden}
+  .barra-progresso .preenchimento{height:100%;background:linear-gradient(90deg,var(--laranja),var(--laranja-esc));transition:width .6s}
+
+  /* CICLO TIMELINE */
+  .ciclo-timeline{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+  .ciclo-etapa{background:var(--cinza-fundo);padding:14px;border-radius:2px;border-top:3px solid var(--cinza-cl);text-align:center}
+  .ciclo-etapa.atual{background:var(--laranja-cl);border-top-color:var(--laranja)}
+  .ciclo-etapa.concluida{background:var(--verde-cl);border-top-color:var(--verde)}
+  .ciclo-etapa.futura{background:var(--cinza-fundo);border-top-color:var(--cinza-cl);opacity:.7}
+  .ciclo-etapa-num{font-family:var(--ui);font-size:9px;letter-spacing:1px;color:var(--cinza);font-weight:700;text-transform:uppercase;margin-bottom:4px}
+  .ciclo-etapa h6{font-size:13px;font-weight:500;margin-bottom:4px}
+  .ciclo-etapa-data{font-family:var(--ui);font-size:10px;color:var(--cinza)}
+  .ciclo-etapa.atual h6{color:var(--laranja)}
+
+  /* 360 RADAR */
+  .radar-wrap{position:relative;width:100%;max-width:480px;margin:0 auto;aspect-ratio:1}
+  .radar-wrap svg{width:100%;height:100%}
+  .radar-grid{fill:none;stroke:var(--cinza-cl);stroke-width:1}
+  .radar-grid-50{fill:rgba(232,99,58,.04)}
+  .radar-axis{stroke:var(--cinza-cl);stroke-width:1;stroke-dasharray:2,2}
+  .radar-area-self{fill:rgba(31,42,68,.15);stroke:var(--marinho);stroke-width:2}
+  .radar-area-others{fill:rgba(232,99,58,.18);stroke:var(--laranja);stroke-width:2}
+  .radar-label{font-family:var(--ui);font-size:11px;fill:var(--marinho);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+  /* AVALIADORES */
+  .avaliador-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--cinza-cl)}
+  .avaliador-row:last-child{border:none}
+  .av-status{padding:4px 10px;border-radius:14px;font-family:var(--ui);font-size:10px;letter-spacing:.5px;font-weight:600}
+  .av-status.enviado{background:var(--verde-cl);color:var(--verde)}
+  .av-status.pendente{background:var(--amarelo-cl);color:#876715}
+  .av-status.atrasado{background:var(--vermelho-cl);color:var(--vermelho)}
+
+  /* COMPETÊNCIA */
+  .comp-item{display:grid;grid-template-columns:1fr 2fr 60px;gap:18px;align-items:center;padding:12px 0;border-bottom:1px solid var(--cinza-cl);font-family:var(--ui);font-size:13px}
+  .comp-nome{font-weight:500;color:var(--marinho)}
+  .comp-nome small{display:block;font-weight:400;color:var(--cinza);font-size:11px;margin-top:2px}
+  .comp-barra-dupla{display:flex;flex-direction:column;gap:4px}
+  .comp-barra-dupla > div{display:grid;grid-template-columns:60px 1fr 32px;gap:8px;align-items:center;font-size:10px;color:var(--cinza)}
+  .comp-barra-dupla .b{height:7px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden}
+  .comp-barra-dupla .b .p{height:100%}
+  .comp-barra-dupla .b .p.self{background:var(--marinho)}
+  .comp-barra-dupla .b .p.others{background:var(--laranja)}
+  .comp-final{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--laranja);text-align:right}
+
+  /* 9-BOX MINI */
+  .nine-box-mini{display:grid;grid-template-columns:60px repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px;font-family:var(--ui);font-size:10px}
+  .nine-box-mini .y-label{align-self:center;text-align:right;color:var(--cinza);letter-spacing:.5px;font-weight:600;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);font-size:9px}
+  .nb-cell{padding:14px 8px;border-radius:2px;text-align:center;cursor:pointer;min-height:100px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+  .nb-cell .titulo{font-weight:700;font-size:10px;letter-spacing:.5px;text-transform:uppercase;line-height:1.2}
+  .nb-cell .contador{font-family:var(--serif);font-style:italic;font-size:22px}
+  .nb-1{background:#FBEAEA;color:var(--vermelho)} /*baixo dp baixo pot*/
+  .nb-2{background:#FAF1DA;color:#876715}
+  .nb-3{background:#EAF5EE;color:var(--verde)}
+  .nb-4{background:#FAF1DA;color:#876715}
+  .nb-5{background:#EFE9FB;color:var(--roxo)}
+  .nb-6{background:var(--verde-cl);color:var(--verde);border:2px solid var(--verde)}
+  .nb-7{background:#EAF5EE;color:var(--verde)}
+  .nb-8{background:var(--verde-cl);color:var(--verde);border:2px solid var(--verde)}
+  .nb-9{background:var(--laranja-cl);color:var(--laranja);border:2px solid var(--laranja)}
+  .nb-eu{position:absolute;top:8px;right:8px;font-family:var(--serif);font-style:italic;font-size:11px;background:var(--marinho);color:white;padding:2px 6px;border-radius:10px;letter-spacing:.3px}
+
+  /* CALIBRAÇÃO */
+  .calib-wrap{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .calib-coluna{background:var(--cinza-fundo);padding:14px;border-radius:2px;min-height:380px}
+  .calib-coluna h5{font-family:var(--ui);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+  .calib-coluna h5 .cnt{background:var(--marinho);color:white;font-size:10px;padding:2px 7px;border-radius:8px;letter-spacing:.3px}
+  .calib-pessoa{background:var(--branco);padding:10px;border-radius:2px;margin-bottom:8px;border:1px solid var(--cinza-cl);cursor:grab;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}
+  .calib-pessoa:hover{border-color:var(--laranja)}
+  .calib-pessoa .nome{font-size:12px;font-weight:500}
+  .calib-pessoa .cargo{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px}
+  .calib-pessoa .notas{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:4px;display:flex;gap:6px}
+  .calib-pessoa .notas span{padding:1px 6px;background:var(--cinza-fundo);border-radius:2px;letter-spacing:.3px}
+
+  /* EDITOR PESQUISA - canvas */
+  .editor-wrap{display:grid;grid-template-columns:240px 1fr 280px;gap:14px;min-height:600px}
+  .editor-tipos{background:var(--branco);border:1px solid var(--cinza-cl);padding:14px;border-radius:2px}
+  .editor-tipos h6{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:10px}
+  .tipo-pergunta{padding:10px;background:var(--cinza-fundo);border-radius:2px;margin-bottom:6px;cursor:grab;display:flex;align-items:center;gap:10px;font-size:12px;border:1px solid transparent;transition:all .15s}
+  .tipo-pergunta:hover{border-color:var(--laranja);background:var(--laranja-cl)}
+  .tipo-pergunta .ic{width:24px;height:24px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:11px}
+
+  .editor-canvas{background:var(--branco);border:1px solid var(--cinza-cl);padding:24px;border-radius:2px}
+  .editor-pergunta{padding:16px;border:1px solid var(--cinza-cl);border-radius:2px;margin-bottom:10px;background:var(--branco);position:relative}
+  .editor-pergunta.ativa{border-color:var(--laranja);background:var(--laranja-cl);box-shadow:0 0 0 3px rgba(232,99,58,.1)}
+  .editor-pergunta-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .editor-pergunta-num{font-family:var(--ui);font-size:10px;letter-spacing:1px;color:var(--cinza);font-weight:700;text-transform:uppercase}
+  .editor-pergunta-tipo{font-family:var(--ui);font-size:10px;background:var(--marinho);color:white;padding:2px 8px;border-radius:2px;letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+  .editor-pergunta-texto{font-size:15px;font-weight:500;margin-bottom:10px}
+  .editor-pergunta-opcoes{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+  .editor-opt{padding:8px 12px;background:var(--cinza-fundo);border:1px solid var(--cinza-cl);border-radius:2px;font-size:13px;display:flex;align-items:center;gap:10px}
+  .escala-nps{display:flex;gap:4px}
+  .escala-nps span{flex:1;text-align:center;padding:8px 4px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:13px;font-weight:600;color:var(--cinza)}
+
+  .editor-config{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .editor-config h6{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--cinza-cl)}
+  .campo{margin-bottom:14px}
+  .campo label{display:block;font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--marinho-med);margin-bottom:6px;font-weight:600}
+  .campo input,.campo select,.campo textarea{width:100%;padding:8px 10px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:13px;color:var(--marinho);border-radius:2px}
+
+  /* HEATMAP */
+  .heatmap-tabela{display:grid;grid-template-columns:200px repeat(6,1fr);gap:4px;font-family:var(--ui);font-size:11px}
+  .hm-head{padding:10px 6px;text-align:center;color:var(--cinza);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:10px}
+  .hm-label{padding:10px 12px;font-weight:500;color:var(--marinho);display:flex;align-items:center;font-size:12px}
+  .hm-cell{padding:14px 6px;text-align:center;font-family:var(--serif);font-style:italic;font-size:16px;border-radius:2px;color:white;font-weight:500}
+  .hm-9{background:#1F5740}
+  .hm-8{background:#2D7D5A}
+  .hm-7{background:#62A076;color:white}
+  .hm-6{background:#D4A02C;color:white}
+  .hm-5{background:#D87F2A;color:white}
+  .hm-4{background:#C94E28}
+  .hm-3{background:#C44545}
+
+  /* SENTIMENTO */
+  .sent-bar{display:flex;height:24px;border-radius:2px;overflow:hidden;margin:14px 0}
+  .sent-bar > div{display:flex;align-items:center;justify-content:center;font-family:var(--ui);font-size:11px;color:white;font-weight:700;letter-spacing:.5px}
+  .sent-pos{background:var(--verde)}
+  .sent-neu{background:#D4A02C}
+  .sent-neg{background:var(--vermelho)}
+
+  /* INSIGHT IA card */
+  .insight-ia{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);padding:24px;border-radius:2px;position:relative;overflow:hidden;margin-bottom:18px}
+  .insight-ia::before{content:"";position:absolute;top:-60%;right:-15%;width:380px;height:380px;background:radial-gradient(circle,rgba(232,99,58,.13) 0%,transparent 65%);pointer-events:none}
+  .insight-ia-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;position:relative}
+  .insight-ia-tag{background:var(--laranja);color:white;font-family:var(--ui);font-size:9px;padding:3px 8px;letter-spacing:1.5px;font-weight:700;border-radius:2px;display:inline-flex;align-items:center;gap:4px}
+  .insight-ia-tag::before{content:"●";font-size:8px;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .insight-ia h4{font-size:18px;font-weight:400;line-height:1.3;color:var(--papel);position:relative}
+  .insight-ia h4 em{color:var(--laranja);font-style:italic}
+  .insight-ia p{font-family:var(--ui);font-size:13px;line-height:1.55;opacity:.85;margin-top:10px;position:relative}
+  .insight-ia .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;position:relative}
+  .insight-ia .stats div{background:rgba(255,255,255,.05);padding:12px;border-radius:2px;text-align:center}
+  .insight-ia .stats .v{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--papel);display:block}
+  .insight-ia .stats .v em{color:var(--laranja)}
+  .insight-ia .stats .l{font-family:var(--ui);font-size:10px;opacity:.6;letter-spacing:.5px;text-transform:uppercase;margin-top:4px;font-weight:600}
+
+  /* COMPARAÇÃO CICLOS */
+  .comp-ciclo{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px;text-align:center}
+  .comp-ciclo h5{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:10px}
+  .comp-ciclo .nota{font-family:var(--serif);font-size:48px;font-style:italic;color:var(--marinho);line-height:1}
+  .comp-ciclo .nota em{color:var(--laranja)}
+  .comp-ciclo .delta{font-family:var(--ui);font-size:12px;color:var(--verde);margin-top:6px;font-weight:600}
+  .comp-ciclo .delta.neg{color:var(--vermelho)}
+
+  /* PALAVRA NUVEM */
+  .nuvem-palavras{padding:30px;background:var(--cinza-fundo);border-radius:2px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;line-height:1.4}
+  .nuvem-palavras span{font-family:var(--serif);font-style:italic;color:var(--marinho);transition:all .15s;cursor:pointer}
+  .nuvem-palavras span:hover{color:var(--laranja)}
+  .nuvem-palavras span.tam-lg{font-size:38px}
+  .nuvem-palavras span.tam-md{font-size:26px;color:var(--marinho-med)}
+  .nuvem-palavras span.tam-sm{font-size:18px;color:var(--cinza)}
+  .nuvem-palavras span.tam-xs{font-size:14px;color:var(--cinza);opacity:.7}
+  .nuvem-palavras span.positivo{color:var(--verde)}
+  .nuvem-palavras span.negativo{color:var(--vermelho)}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:260px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1100px){
+    .cards-grid,.cards-grid-3{grid-template-columns:repeat(2,1fr)}
+    .grid-2,.grid-2-eq{grid-template-columns:1fr}
+    .editor-wrap{grid-template-columns:1fr}
+    .calib-wrap{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: CICLO DE AVALIAÇÃO (Visão Geral RH) -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-ciclo-aval">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item ativo"><span class="ic">⭐</span> Avaliação &amp; PDI <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-editor-pesquisa')"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item" onclick="irPara('t-clima-ia')"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-item"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av av-b">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Ciclo de <em>Avaliação</em> 2026-S1</h1>
+          <p class="topbar-meta">128 empregados sendo avaliados · 7 etapas · Atualmente em "Autoavaliação" · 67% concluído</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">⚙ Configurar ciclo</button>
+          <button class="btn btn-fantasma btn-sm">📊 Acompanhamento ao vivo</button>
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-aval-360')">Ver avaliação individual →</button>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>Etapas do Ciclo 2026-S1</h3>
+        <div class="sub-titulo">09 jun a 28 jul · 7 semanas</div>
+
+        <div class="ciclo-timeline">
+          <div class="ciclo-etapa concluida">
+            <div class="ciclo-etapa-num">ETAPA 1 · ✓</div>
+            <h6>Preparação</h6>
+            <div class="ciclo-etapa-data">19/05 a 06/06</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--verde);margin-top:6px;font-weight:600">Concluída</div>
+          </div>
+          <div class="ciclo-etapa atual">
+            <div class="ciclo-etapa-num">ETAPA 2 · ATUAL</div>
+            <h6>Autoavaliação</h6>
+            <div class="ciclo-etapa-data">09/06 a 23/06</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);margin-top:6px;font-weight:600">86/128 (67%)</div>
+          </div>
+          <div class="ciclo-etapa futura">
+            <div class="ciclo-etapa-num">ETAPA 3</div>
+            <h6>Pares e Gestor</h6>
+            <div class="ciclo-etapa-data">23/06 a 07/07</div>
+          </div>
+          <div class="ciclo-etapa futura">
+            <div class="ciclo-etapa-num">ETAPA 4</div>
+            <h6>Calibração</h6>
+            <div class="ciclo-etapa-data">07/07 a 14/07</div>
+          </div>
+          <div class="ciclo-etapa futura">
+            <div class="ciclo-etapa-num">ETAPA 5</div>
+            <h6>Feedbacks 1:1</h6>
+            <div class="ciclo-etapa-data">14/07 a 21/07</div>
+          </div>
+          <div class="ciclo-etapa futura">
+            <div class="ciclo-etapa-num">ETAPA 6</div>
+            <h6>PDI &amp; Fechamento</h6>
+            <div class="ciclo-etapa-data">21/07 a 28/07</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Empregados no Ciclo</div>
+          <div class="card-valor"><em>128</em></div>
+          <div class="card-delta">100% elegíveis</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Autoavaliações Feitas</div>
+          <div class="card-valor"><em>86</em><span>/128</span></div>
+          <div class="card-delta">67% concluído</div>
+        </div>
+        <div class="card" style="background:var(--amarelo-cl);border-color:var(--amarelo)">
+          <div class="card-titulo" style="color:#876715">Pendentes &gt; 7 dias</div>
+          <div class="card-valor" style="color:#876715"><em>14</em></div>
+          <div class="card-delta neutro" style="color:#876715">Lembrete enviado</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Nota Média (autoaval)</div>
+          <div class="card-valor"><em>7,8</em></div>
+          <div class="card-delta neutro">vs gestor: ainda não</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Acompanhamento por área</h3><div class="sub-titulo">Status das autoavaliações</div></div>
+              <button class="btn btn-fantasma btn-sm">Filtrar área ▾</button>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:grid;grid-template-columns:180px 1fr 120px;gap:14px;align-items:center;padding:12px;background:var(--cinza-fundo);border-radius:2px">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Engenharia</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Luísa Mendonça · 32 pessoas</div>
+                </div>
+                <div class="barra-progresso"><div class="preenchimento" style="width:78%"></div></div>
+                <div style="font-family:var(--ui);font-size:12px;text-align:right">
+                  <strong>25/32</strong><br>
+                  <span style="color:var(--cinza);font-size:10px;letter-spacing:.5px">78%</span>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:180px 1fr 120px;gap:14px;align-items:center;padding:12px;background:var(--cinza-fundo);border-radius:2px">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Operações &amp; Obra</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Carlos Aurora · 54 pessoas</div>
+                </div>
+                <div class="barra-progresso"><div class="preenchimento" style="width:54%"></div></div>
+                <div style="font-family:var(--ui);font-size:12px;text-align:right">
+                  <strong>29/54</strong><br>
+                  <span style="color:var(--cinza);font-size:10px;letter-spacing:.5px">54%</span>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:180px 1fr 120px;gap:14px;align-items:center;padding:12px;background:var(--cinza-fundo);border-radius:2px">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Financeiro &amp; Adm</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Eduardo Santos · 22 pessoas</div>
+                </div>
+                <div class="barra-progresso"><div class="preenchimento" style="width:91%;background:linear-gradient(90deg,var(--verde),#1F5740)"></div></div>
+                <div style="font-family:var(--ui);font-size:12px;text-align:right">
+                  <strong>20/22</strong><br>
+                  <span style="color:var(--verde);font-size:10px;letter-spacing:.5px">91%</span>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:180px 1fr 120px;gap:14px;align-items:center;padding:12px;background:var(--cinza-fundo);border-radius:2px">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Comercial</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Marina Aurora · 14 pessoas</div>
+                </div>
+                <div class="barra-progresso"><div class="preenchimento" style="width:71%"></div></div>
+                <div style="font-family:var(--ui);font-size:12px;text-align:right">
+                  <strong>10/14</strong><br>
+                  <span style="color:var(--cinza);font-size:10px;letter-spacing:.5px">71%</span>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:180px 1fr 120px;gap:14px;align-items:center;padding:12px;background:var(--amarelo-cl);border:1px solid var(--amarelo);border-radius:2px">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Suprimentos</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Renato Vieira · 6 pessoas</div>
+                </div>
+                <div class="barra-progresso"><div class="preenchimento" style="width:33%;background:var(--amarelo)"></div></div>
+                <div style="font-family:var(--ui);font-size:12px;text-align:right">
+                  <strong>2/6</strong><br>
+                  <span style="color:#876715;font-size:10px;letter-spacing:.5px">⚠ 33%</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-fantasma btn-sm" style="margin-top:14px;width:100%;justify-content:center">📧 Enviar lembrete aos pendentes (42)</button>
+          </div>
+
+          <div class="painel">
+            <h3>Modelo de avaliação em uso</h3>
+            <div class="sub-titulo">Configurado por Roberto · ativo neste ciclo</div>
+
+            <div class="grid-2-eq" style="margin-top:14px">
+              <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1px;font-weight:700;margin-bottom:6px">DIMENSÕES (5)</div>
+                <div style="font-size:13px;line-height:1.7">
+                  • Resultados &amp; Entrega<br>
+                  • Conhecimento Técnico<br>
+                  • Trabalho em Equipe<br>
+                  • Liderança &amp; Influência<br>
+                  • Inovação &amp; Iniciativa
+                </div>
+              </div>
+              <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1px;font-weight:700;margin-bottom:6px">PESOS</div>
+                <div style="font-size:13px;line-height:1.7">
+                  Autoavaliação · 30%<br>
+                  Gestor direto · 45%<br>
+                  Pares (até 4) · 15%<br>
+                  Liderados (se for líder) · 10%
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;display:flex;gap:8px">
+              <span class="tag verde">Escala 1-10</span>
+              <span class="tag marinho">Inclui comentários abertos</span>
+              <span class="tag laranja">Calibração obrigatória</span>
+              <span class="tag roxo">9-Box automatizado</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:17px">Próximas ações da semana</h3>
+            <div class="sub-titulo">O que requer sua atenção</div>
+
+            <div style="padding:12px;background:var(--vermelho-cl);border-left:3px solid var(--vermelho);border-radius:2px;margin-bottom:8px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--vermelho);font-weight:700;letter-spacing:.5px">URGENTE</div>
+              <div style="font-size:13px;font-weight:500;margin-top:4px">14 pessoas atrasadas &gt; 7 dias</div>
+              <button class="btn btn-primario btn-sm" style="margin-top:8px;padding:5px 12px;font-size:11px">Acionar gestores</button>
+            </div>
+
+            <div style="padding:12px;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px;margin-bottom:8px">
+              <div style="font-family:var(--ui);font-size:10px;color:#876715;font-weight:700;letter-spacing:.5px">EM 3 DIAS</div>
+              <div style="font-size:13px;font-weight:500;margin-top:4px">Abrir Etapa 3: Pares e Gestor</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">23/06 · revisar lista de pares antes</div>
+            </div>
+
+            <div style="padding:12px;background:var(--cinza-fundo);border-left:3px solid var(--marinho);border-radius:2px;cursor:pointer" onclick="irPara('t-calibracao')">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700;letter-spacing:.5px">EM 14 DIAS · CLIQUE PARA SIMULAR</div>
+              <div style="font-size:13px;font-weight:500;margin-top:4px">Sessão de Calibração</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">07/07 · 6 gestores · Sala Diretoria</div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:17px">Histórico de ciclos</h3>
+            <div class="sub-titulo">Comparar com anteriores</div>
+
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px;cursor:pointer" onclick="irPara('t-comparar-ciclos')">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-size:13px;font-weight:500">2025-S2</div>
+                    <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">119 avaliados · concluído 28/04</div>
+                  </div>
+                  <div style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--laranja)">7,9</div>
+                </div>
+              </div>
+              <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px;cursor:pointer" onclick="irPara('t-comparar-ciclos')">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-size:13px;font-weight:500">2025-S1</div>
+                    <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">112 avaliados · concluído 30/07/2025</div>
+                  </div>
+                  <div style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--marinho)">7,6</div>
+                </div>
+              </div>
+              <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px;cursor:pointer" onclick="irPara('t-comparar-ciclos')">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-size:13px;font-weight:500">2024-S2</div>
+                    <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">98 avaliados · concluído 30/01/2025</div>
+                  </div>
+                  <div style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--marinho)">7,4</div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px" onclick="irPara('t-comparar-ciclos')">📊 Comparar ciclos →</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: AVALIAÇÃO 360° INDIVIDUAL (FERNANDO) -->
+<!-- ============================================== -->
+<div class="tela" id="t-aval-360">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item ativo" onclick="irPara('t-ciclo-aval')"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item" onclick="irPara('t-editor-pesquisa')"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item" onclick="irPara('t-clima-ia')"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-item"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av av-b">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <button class="btn btn-fantasma btn-xs" onclick="irPara('t-ciclo-aval')" style="margin-bottom:12px">← Ciclo 2026-S1</button>
+
+      <!-- HEADER PESSOA -->
+      <div class="painel" style="display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl))">
+        <div class="av av-lg av-a" style="width:80px;height:80px;font-size:32px">F</div>
+        <div>
+          <h2 style="font-size:26px;font-weight:400;margin-bottom:4px">Fernando Lacerda Costa</h2>
+          <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:10px;letter-spacing:.3px">Engenheiro Civil Sênior · MAT 0112 · Equipe Eng. (Luísa Mendonça)</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="tag laranja">Ciclo 2026-S1</span>
+            <span class="tag marinho">4 anos de casa</span>
+            <span class="tag verde">★ 9-Box: Alto Desempenho (2025-S2)</span>
+            <span class="tag">Próx. nível: Eng. Especialista</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button class="btn btn-primario btn-sm">📅 Agendar 1:1</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar avaliação</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">360° · Resultado Consolidado</div>
+        <div class="aba">Avaliadores</div>
+        <div class="aba">Comentários Abertos</div>
+        <div class="aba" onclick="irPara('t-pdi-editor')">PDI Editor</div>
+        <div class="aba">Histórico</div>
+      </div>
+
+      <div class="insight-ia">
+        <div class="insight-ia-head">
+          <span class="insight-ia-tag">🤖 NORA · IA</span>
+          <span style="font-family:var(--ui);font-size:10px;opacity:.6;letter-spacing:.5px">Análise gerada agora</span>
+        </div>
+        <h4>Fernando é um <em>profissional consistente e em ascensão</em> — sua autopercepção está alinhada com a visão da equipe (gap &lt; 0,5 ponto).</h4>
+        <p>Pontos fortes amplamente reconhecidos: conhecimento técnico e entrega de resultados. <strong style="color:var(--papel)">Oportunidade clara em Liderança</strong>: pares notam que poderia delegar mais e dar mais autonomia aos juniores. Recomendamos foco em mentoria reversa e curso de Liderança Servidora (já no PDI atual, 50% concluído).</p>
+        <div class="stats">
+          <div><span class="v"><em>8,4</em></span><span class="l">Média ponderada</span></div>
+          <div><span class="v"><em>0,3</em></span><span class="l">Gap autoaval ↔ outros</span></div>
+          <div><span class="v"><em>9</em>/9</span><span class="l">Avaliadores responderam</span></div>
+        </div>
+      </div>
+
+      <div class="grid-2-eq">
+        <div class="painel">
+          <h3>Radar 360° por dimensão</h3>
+          <div class="sub-titulo">Autoavaliação × Outros (gestor + pares + liderados)</div>
+
+          <div class="radar-wrap">
+            <svg viewBox="-200 -200 400 400">
+              <!-- Grade -->
+              <polygon class="radar-grid radar-grid-50" points="0,-50 47.5,-15.5 29.4,40.5 -29.4,40.5 -47.5,-15.5"/>
+              <polygon class="radar-grid" points="0,-100 95.1,-30.9 58.8,80.9 -58.8,80.9 -95.1,-30.9"/>
+              <polygon class="radar-grid" points="0,-150 142.7,-46.4 88.2,121.4 -88.2,121.4 -142.7,-46.4"/>
+              <polygon class="radar-grid" points="0,-180 171.2,-55.6 105.8,145.7 -105.8,145.7 -171.2,-55.6"/>
+
+              <!-- Eixos -->
+              <line class="radar-axis" x1="0" y1="0" x2="0" y2="-180"/>
+              <line class="radar-axis" x1="0" y1="0" x2="171.2" y2="-55.6"/>
+              <line class="radar-axis" x1="0" y1="0" x2="105.8" y2="145.7"/>
+              <line class="radar-axis" x1="0" y1="0" x2="-105.8" y2="145.7"/>
+              <line class="radar-axis" x1="0" y1="0" x2="-171.2" y2="-55.6"/>
+
+              <!-- Auto: 8.2 técnico, 8.8 result, 8.0 equipe, 7.2 lid, 8.5 inov (escala /10) -->
+              <polygon class="radar-area-self" points="0,-152 138.1,-44.8 84,115.5 -77.6,107.5 -136.4,-44.3"/>
+
+              <!-- Outros: 9.2 técnico, 8.8 result, 8.0 equipe, 7.0 lid, 8.5 inov -->
+              <polygon class="radar-area-others" points="0,-160 152.6,-49.5 84,115.5 -75.4,104.6 -136.4,-44.3"/>
+
+              <!-- Labels -->
+              <text class="radar-label" x="0" y="-190" text-anchor="middle">Resultados</text>
+              <text class="radar-label" x="185" y="-55" text-anchor="start">Conhecimento</text>
+              <text class="radar-label" x="115" y="160" text-anchor="middle">Equipe</text>
+              <text class="radar-label" x="-115" y="160" text-anchor="middle">Liderança</text>
+              <text class="radar-label" x="-185" y="-55" text-anchor="end">Inovação</text>
+            </svg>
+          </div>
+
+          <div style="display:flex;justify-content:center;gap:24px;margin-top:14px;font-family:var(--ui);font-size:12px">
+            <div style="display:flex;align-items:center;gap:8px"><div style="width:14px;height:14px;background:rgba(31,42,68,.15);border:2px solid var(--marinho);border-radius:2px"></div><span>Autoavaliação</span></div>
+            <div style="display:flex;align-items:center;gap:8px"><div style="width:14px;height:14px;background:rgba(232,99,58,.18);border:2px solid var(--laranja);border-radius:2px"></div><span>Outros (8 pessoas)</span></div>
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3>Notas por competência</h3>
+          <div class="sub-titulo">Detalhamento ponderado</div>
+
+          <div class="comp-item" style="grid-template-columns:1fr 2fr 60px;border-top:1px solid var(--cinza-cl)">
+            <div class="comp-nome">Resultados<small>Entrega · qualidade</small></div>
+            <div class="comp-barra-dupla">
+              <div><span>Auto</span><div class="b"><div class="p self" style="width:88%"></div></div><span>8,8</span></div>
+              <div><span>Outros</span><div class="b"><div class="p others" style="width:88%"></div></div><span>8,8</span></div>
+            </div>
+            <div class="comp-final">8,8</div>
+          </div>
+
+          <div class="comp-item">
+            <div class="comp-nome">Conhec. Técnico<small>Domínio profundo</small></div>
+            <div class="comp-barra-dupla">
+              <div><span>Auto</span><div class="b"><div class="p self" style="width:82%"></div></div><span>8,2</span></div>
+              <div><span>Outros</span><div class="b"><div class="p others" style="width:92%"></div></div><span>9,2</span></div>
+            </div>
+            <div class="comp-final">8,9</div>
+          </div>
+
+          <div class="comp-item">
+            <div class="comp-nome">Trab. em Equipe<small>Colaboração</small></div>
+            <div class="comp-barra-dupla">
+              <div><span>Auto</span><div class="b"><div class="p self" style="width:80%"></div></div><span>8,0</span></div>
+              <div><span>Outros</span><div class="b"><div class="p others" style="width:80%"></div></div><span>8,0</span></div>
+            </div>
+            <div class="comp-final">8,0</div>
+          </div>
+
+          <div class="comp-item" style="background:var(--amarelo-cl);padding:14px;margin:0 -8px;border:none;border-radius:2px">
+            <div class="comp-nome" style="padding-left:8px">Liderança ⚠<small>Influência · mentoria</small></div>
+            <div class="comp-barra-dupla">
+              <div><span>Auto</span><div class="b"><div class="p self" style="width:72%"></div></div><span>7,2</span></div>
+              <div><span>Outros</span><div class="b"><div class="p others" style="width:70%"></div></div><span>7,0</span></div>
+            </div>
+            <div class="comp-final" style="padding-right:8px">7,1</div>
+          </div>
+
+          <div class="comp-item">
+            <div class="comp-nome">Inovação<small>Ideias · iniciativa</small></div>
+            <div class="comp-barra-dupla">
+              <div><span>Auto</span><div class="b"><div class="p self" style="width:85%"></div></div><span>8,5</span></div>
+              <div><span>Outros</span><div class="b"><div class="p others" style="width:85%"></div></div><span>8,5</span></div>
+            </div>
+            <div class="comp-final">8,5</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-top:18px;padding:18px;background:var(--laranja-cl);border-radius:2px;border:2px solid var(--laranja)">
+            <div>
+              <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1.5px;font-weight:700">NOTA FINAL PONDERADA</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px">Pesos: Self 30% · Gestor 45% · Pares 15% · Liderados 10%</div>
+            </div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:46px;color:var(--laranja);line-height:1">8,4</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>Quem avaliou Fernando</h3>
+        <div class="sub-titulo">9 avaliadores · 9 respostas · ciclo 2026-S1</div>
+
+        <div class="avaliador-row" style="border-top:1px solid var(--cinza-cl)">
+          <div class="av av-a">F</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">Fernando Lacerda <span class="tag laranja" style="font-size:10px;margin-left:6px">SELF</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Autoavaliação · 14/06</div>
+          </div>
+          <span class="av-status enviado">✓ Enviado</span>
+          <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">8,2</span>
+        </div>
+
+        <div class="avaliador-row">
+          <div class="av av-b">L</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">Luísa Mendonça <span class="tag marinho" style="font-size:10px;margin-left:6px">GESTORA</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Diretora de Eng. · 22/06</div>
+          </div>
+          <span class="av-status enviado">✓ Enviado</span>
+          <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">8,5</span>
+        </div>
+
+        <div class="avaliador-row">
+          <div class="av av-d">A</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">Ana Carolina Souza <span class="tag verde" style="font-size:10px;margin-left:6px">PAR</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Engenheira Pl · 20/06</div>
+          </div>
+          <span class="av-status enviado">✓ Enviado</span>
+          <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">8,3</span>
+        </div>
+
+        <div class="avaliador-row">
+          <div class="av av-e">G</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">Gabriela Tavares <span class="tag verde" style="font-size:10px;margin-left:6px">PAR</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Arquiteta Sr · 21/06</div>
+          </div>
+          <span class="av-status enviado">✓ Enviado</span>
+          <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">8,7</span>
+        </div>
+
+        <div class="avaliador-row">
+          <div class="av av-c">D</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">Daniel Pinheiro <span class="tag roxo" style="font-size:10px;margin-left:6px">LIDERADO</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Engenheiro Jr · 18/06</div>
+          </div>
+          <span class="av-status enviado">✓ Enviado</span>
+          <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">8,1</span>
+        </div>
+
+        <div class="avaliador-row">
+          <div class="av av-e">P</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">Pedro Aurélio Lima <span class="tag roxo" style="font-size:10px;margin-left:6px">LIDERADO</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Estagiário Eng. · 19/06</div>
+          </div>
+          <span class="av-status enviado">✓ Enviado</span>
+          <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">8,4</span>
+        </div>
+
+        <div class="avaliador-row">
+          <div class="av av-c">E</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">Eduardo Santos <span class="tag amarelo" style="font-size:10px;margin-left:6px">STAKEHOLDER</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Dir. Financeiro · 17/06</div>
+          </div>
+          <span class="av-status enviado">✓ Enviado</span>
+          <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">8,6</span>
+        </div>
+
+        <div class="avaliador-row">
+          <div class="av av-b">M</div>
+          <div>
+            <div style="font-size:14px;font-weight:500">Marcelo Andrade <span class="tag verde" style="font-size:10px;margin-left:6px">PAR</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Engenheiro Sr · 23/06</div>
+          </div>
+          <span class="av-status enviado">✓ Enviado</span>
+          <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">8,4</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: CALIBRAÇÃO ENTRE GESTORES -->
+<!-- ============================================== -->
+<div class="tela" id="t-calibracao">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item ativo" onclick="irPara('t-ciclo-aval')"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item" onclick="irPara('t-editor-pesquisa')"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item" onclick="irPara('t-clima-ia')"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-item"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av av-b">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <button class="btn btn-fantasma btn-xs" onclick="irPara('t-ciclo-aval')" style="margin-bottom:12px">← Ciclo 2026-S1</button>
+
+      <div class="topbar">
+        <div>
+          <h1>Sessão de <em>Calibração</em> · 07/07/2026</h1>
+          <p class="topbar-meta">6 gestores · 128 empregados na malha · arraste para reposicionar no 9-Box · salva automático</p>
+        </div>
+        <div class="topbar-acoes">
+          <span class="tag verde">● Ao vivo · 6 participando</span>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar resultado</button>
+          <button class="btn btn-primario btn-sm">✓ Finalizar calibração</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>9-Box · Engenharia (32 pessoas)</h3><div class="sub-titulo">Luísa Mendonça apresentando · arraste para mover</div></div>
+              <select style="padding:6px 12px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:13px">
+                <option>Filtro: Eng. (32)</option>
+                <option>Operações (54)</option>
+                <option>Financeiro (22)</option>
+                <option>Comercial (14)</option>
+                <option>Suprimentos (6)</option>
+              </select>
+            </div>
+
+            <div class="nine-box-mini">
+              <div></div>
+              <div class="hm-head" style="padding:0;font-size:9px">BAIXO</div>
+              <div class="hm-head" style="padding:0;font-size:9px">MÉDIO</div>
+              <div class="hm-head" style="padding:0;font-size:9px">ALTO →</div>
+
+              <div class="y-label">ALTO →</div>
+              <div class="nb-cell nb-3">
+                <div class="titulo">Enigma</div>
+                <div class="contador">2</div>
+              </div>
+              <div class="nb-cell nb-6">
+                <div class="titulo">Forte Performance</div>
+                <div class="contador">5</div>
+              </div>
+              <div class="nb-cell nb-9">
+                <div class="titulo">★ Estrela</div>
+                <div class="contador">3</div>
+                <span class="nb-eu">Fernando aqui</span>
+              </div>
+
+              <div class="y-label">POTENCIAL · MÉDIO</div>
+              <div class="nb-cell nb-2">
+                <div class="titulo">Inconsistente</div>
+                <div class="contador">3</div>
+              </div>
+              <div class="nb-cell nb-5">
+                <div class="titulo">Mantenedor</div>
+                <div class="contador">9</div>
+              </div>
+              <div class="nb-cell nb-8">
+                <div class="titulo">Alto Desempenho</div>
+                <div class="contador">5</div>
+              </div>
+
+              <div class="y-label">BAIXO</div>
+              <div class="nb-cell nb-1">
+                <div class="titulo">Insuficiente</div>
+                <div class="contador">1</div>
+              </div>
+              <div class="nb-cell nb-4">
+                <div class="titulo">Em Dúvida</div>
+                <div class="contador">2</div>
+              </div>
+              <div class="nb-cell nb-7">
+                <div class="titulo">Especialista Forte</div>
+                <div class="contador">2</div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding:14px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.6">
+              <strong>Eixo X — Desempenho</strong>: nota final ponderada do ciclo &nbsp;|&nbsp; <strong>Eixo Y — Potencial</strong>: avaliação subjetiva do gestor + indicadores de crescimento (mobilidade, novos desafios, feedback de líderes diretos)
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>Discussão de casos em destaque</h3>
+            <div class="sub-titulo">Pessoas que mereceram ajuste durante a calibração</div>
+
+            <div class="calib-wrap">
+              <div class="calib-coluna">
+                <h5>Subiram de quadrante <span class="cnt">3</span></h5>
+                <div class="calib-pessoa">
+                  <div class="av av-a">F</div>
+                  <div>
+                    <div class="nome">Fernando Lacerda</div>
+                    <div class="cargo">Eng. Civil Sr</div>
+                    <div class="notas"><span>era: Alto Desemp.</span><span style="color:var(--laranja);font-weight:600">→ ★ Estrela</span></div>
+                  </div>
+                </div>
+                <div class="calib-pessoa">
+                  <div class="av av-d">A</div>
+                  <div>
+                    <div class="nome">Ana Carolina Souza</div>
+                    <div class="cargo">Eng. Pl</div>
+                    <div class="notas"><span>era: Mantenedor</span><span style="color:var(--laranja);font-weight:600">→ Alto Desemp.</span></div>
+                  </div>
+                </div>
+                <div class="calib-pessoa">
+                  <div class="av av-c">D</div>
+                  <div>
+                    <div class="nome">Daniel Pinheiro</div>
+                    <div class="cargo">Eng. Jr</div>
+                    <div class="notas"><span>era: Enigma</span><span style="color:var(--laranja);font-weight:600">→ Forte Perf.</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="calib-coluna">
+                <h5>Mantidos <span class="cnt">25</span></h5>
+                <div class="calib-pessoa">
+                  <div class="av av-e">G</div>
+                  <div>
+                    <div class="nome">Gabriela Tavares</div>
+                    <div class="cargo">Arquiteta Sr</div>
+                    <div class="notas"><span>★ Estrela</span><span>★ Estrela</span></div>
+                  </div>
+                </div>
+                <div class="calib-pessoa">
+                  <div class="av av-b">M</div>
+                  <div>
+                    <div class="nome">Marcelo Andrade</div>
+                    <div class="cargo">Eng. Sr</div>
+                    <div class="notas"><span>Alto Desemp.</span><span>Alto Desemp.</span></div>
+                  </div>
+                </div>
+                <div class="calib-pessoa">
+                  <div class="av av-f">P</div>
+                  <div>
+                    <div class="nome">Pedro Aurélio</div>
+                    <div class="cargo">Estagiário</div>
+                    <div class="notas"><span>Enigma</span><span>Enigma</span></div>
+                  </div>
+                </div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:center;padding:8px;font-style:italic">+ 22 outras pessoas mantidas</div>
+              </div>
+
+              <div class="calib-coluna">
+                <h5>Desceram <span class="cnt" style="background:var(--vermelho)">2</span></h5>
+                <div class="calib-pessoa">
+                  <div class="av av-b">R</div>
+                  <div>
+                    <div class="nome">Rodrigo Vargas</div>
+                    <div class="cargo">Eng. Pl</div>
+                    <div class="notas"><span>era: Forte Perf.</span><span style="color:var(--vermelho);font-weight:600">→ Mantenedor</span></div>
+                  </div>
+                </div>
+                <div class="calib-pessoa">
+                  <div class="av av-d">J</div>
+                  <div>
+                    <div class="nome">Joana Beltrão</div>
+                    <div class="cargo">Eng. Jr</div>
+                    <div class="notas"><span>era: Mantenedor</span><span style="color:var(--vermelho);font-weight:600">→ Em Dúvida</span></div>
+                  </div>
+                </div>
+                <div style="margin-top:10px;padding:10px;background:var(--vermelho-cl);border-left:3px solid var(--vermelho);border-radius:2px;font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">
+                  <strong style="color:var(--vermelho)">Atenção LGPD:</strong> ajustes negativos exigem registro do critério e plano de ação. Roberto, registre em ata.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:17px">Sessão ao vivo</h3>
+            <div class="sub-titulo">Participantes</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--laranja-cl);border-radius:2px">
+                <div class="av av-sm av-b" style="position:relative">L<span style="position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;background:var(--verde);border:2px solid var(--branco);border-radius:50%"></span></div>
+                <div style="flex:1">
+                  <div style="font-size:12px;font-weight:500">Luísa Mendonça</div>
+                  <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);font-weight:700">APRESENTANDO</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:6px 8px">
+                <div class="av av-sm av-c" style="position:relative">C<span style="position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;background:var(--verde);border:2px solid var(--branco);border-radius:50%"></span></div>
+                <div style="font-size:12px">Carlos Aurora · Dir. Ops</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:6px 8px">
+                <div class="av av-sm av-d" style="position:relative">E<span style="position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;background:var(--verde);border:2px solid var(--branco);border-radius:50%"></span></div>
+                <div style="font-size:12px">Eduardo Santos · Dir. Fin</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:6px 8px">
+                <div class="av av-sm av-e" style="position:relative">M<span style="position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;background:var(--verde);border:2px solid var(--branco);border-radius:50%"></span></div>
+                <div style="font-size:12px">Marina Aurora · Dir. Com</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:6px 8px">
+                <div class="av av-sm av-f" style="position:relative">R<span style="position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;background:var(--verde);border:2px solid var(--branco);border-radius:50%"></span></div>
+                <div style="font-size:12px">Renato Vieira · Suprim</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:6px 8px;background:var(--cinza-fundo);border-radius:2px">
+                <div class="av av-sm av-b" style="position:relative">RA<span style="position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;background:var(--laranja);border:2px solid var(--branco);border-radius:50%"></span></div>
+                <div style="flex:1">
+                  <div style="font-size:12px">Roberto Aurora</div>
+                  <div style="font-family:var(--ui);font-size:10px;color:var(--cinza)">FACILITADOR</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:17px">Distribuição da empresa</h3>
+            <div class="sub-titulo">128 empregados após calibração</div>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:10px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span style="color:var(--laranja);font-weight:600">★ Estrela</span>
+                <div class="barra-progresso"><div class="preenchimento" style="width:9%"></div></div>
+                <span style="text-align:right;font-weight:600">12</span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:10px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span style="color:var(--verde);font-weight:600">Alto Desempenho</span>
+                <div class="barra-progresso"><div class="preenchimento" style="width:24%;background:var(--verde)"></div></div>
+                <span style="text-align:right;font-weight:600">31</span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:10px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span style="color:var(--verde)">Forte Performance</span>
+                <div class="barra-progresso"><div class="preenchimento" style="width:21%;background:#62A076"></div></div>
+                <span style="text-align:right;font-weight:600">27</span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:10px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span style="color:var(--roxo)">Mantenedor</span>
+                <div class="barra-progresso"><div class="preenchimento" style="width:28%;background:var(--roxo)"></div></div>
+                <span style="text-align:right;font-weight:600">36</span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:10px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span style="color:#876715">Enigma</span>
+                <div class="barra-progresso"><div class="preenchimento" style="width:7%;background:var(--amarelo)"></div></div>
+                <span style="text-align:right;font-weight:600">9</span>
+              </div>
+              <div style="display:grid;grid-template-columns:120px 1fr 60px;gap:10px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span style="color:var(--vermelho)">Risco</span>
+                <div class="barra-progresso"><div class="preenchimento" style="width:10%;background:var(--vermelho)"></div></div>
+                <span style="text-align:right;font-weight:600">13</span>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding:12px;background:var(--verde-cl);border-left:3px solid var(--verde);border-radius:2px;font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">
+              <strong style="color:var(--verde)">Distribuição saudável.</strong> 33% acima da curva normal — Aurora performando acima do benchmark de construção (28%).
+            </div>
+          </div>
+
+          <div class="painel" style="background:var(--marinho);color:var(--papel);border:none">
+            <h3 style="color:var(--papel);font-size:16px">Notas da sessão</h3>
+            <div class="sub-titulo" style="color:rgba(255,255,255,.5)">Ata sendo gravada</div>
+            <div style="margin-top:10px;padding:10px;background:rgba(255,255,255,.05);border-radius:2px;font-family:var(--ui);font-size:11px;line-height:1.6;opacity:.85">
+              <strong style="color:var(--laranja)">14:32 · Eduardo:</strong> "Concordo em subir Fernando — ele coordenou o orçamento do Sítio I com excelência."<br><br>
+              <strong style="color:var(--laranja)">14:38 · Luísa:</strong> "Rodrigo precisa de feedback duro — entregas inconsistentes nos últimos 3 meses."<br><br>
+              <strong style="color:var(--laranja)">14:45 · Roberto:</strong> "Joana vai precisar de PIP (plano de melhoria) por 90 dias."
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: PDI EDITOR (FERNANDO) -->
+<!-- ============================================== -->
+<div class="tela" id="t-pdi-editor">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item ativo" onclick="irPara('t-ciclo-aval')"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item" onclick="irPara('t-editor-pesquisa')"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item" onclick="irPara('t-clima-ia')"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-item"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av av-b">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <button class="btn btn-fantasma btn-xs" onclick="irPara('t-aval-360')" style="margin-bottom:12px">← Avaliação 360° de Fernando</button>
+
+      <div class="topbar">
+        <div>
+          <h1>PDI · <em>Fernando Lacerda</em></h1>
+          <p class="topbar-meta">Plano de Desenvolvimento Individual · ciclo 2026-S2 · co-criado com Luísa Mendonça (gestora)</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">Salvar rascunho</button>
+          <button class="btn btn-marinho btn-sm">📅 Agendar 1:1 (Luísa)</button>
+          <button class="btn btn-primario btn-sm">Publicar &amp; notificar Fernando</button>
+        </div>
+      </div>
+
+      <div class="cards-grid-3">
+        <div class="card">
+          <div class="card-titulo">Tipo de PDI</div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--marinho);margin-top:4px;font-style:italic">Aspiracional</div>
+          <div class="card-delta neutro">Prep. p/ promoção</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Horizonte</div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--marinho);margin-top:4px;font-style:italic">6 meses</div>
+          <div class="card-delta neutro">Jul/2026 a Dez/2026</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Metas SMART</div>
+          <div style="font-family:var(--serif);font-size:18px;color:var(--marinho);margin-top:4px;font-style:italic">4 ativas</div>
+          <div class="card-delta neutro">2 técnicas · 2 comportamentais</div>
+        </div>
+      </div>
+
+      <div class="painel" style="background:linear-gradient(135deg,var(--laranja-cl),var(--branco));border-color:var(--laranja)">
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center">
+          <div style="font-size:42px">🎯</div>
+          <div>
+            <h3 style="font-size:18px;color:var(--marinho)">Objetivo central do PDI</h3>
+            <p style="font-family:var(--serif);font-size:18px;font-style:italic;color:var(--marinho);margin-top:6px;line-height:1.5">Preparar Fernando para a posição de <strong>Engenheiro Especialista (Coordenador de Obra)</strong> até dezembro/2026, fortalecendo competências de liderança e ampliando visão de negócio.</p>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:8px;letter-spacing:.3px">Acordado entre Fernando, Luísa e Roberto · 28/07/2026</div>
+          </div>
+          <button class="btn btn-fantasma btn-sm">✏ Editar</button>
+        </div>
+      </div>
+
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>Metas SMART do PDI</h3><div class="sub-titulo">Específicas · Mensuráveis · Atingíveis · Relevantes · Temporais</div></div>
+          <button class="btn btn-primario btn-sm">+ Adicionar meta</button>
+        </div>
+
+        <!-- Meta 1 -->
+        <div style="border:1px solid var(--cinza-cl);border-left:3px solid var(--laranja);border-radius:2px;padding:18px;margin-bottom:14px;background:var(--branco)">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:flex-start;margin-bottom:12px">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span class="tag laranja" style="font-size:10px">META 1 · LIDERANÇA</span>
+                <span class="tag" style="font-size:10px">Comportamental</span>
+              </div>
+              <h5 style="font-size:16px;font-weight:500">Concluir a trilha "Liderança Servidora" da FDC</h5>
+            </div>
+            <span class="tag verde">50% concluído</span>
+          </div>
+          <div style="font-family:var(--ui);font-size:13px;color:var(--cinza);line-height:1.55">
+            <strong>Específico:</strong> Trilha de 16h (8 módulos) sobre liderança servidora.<br>
+            <strong>Mensurável:</strong> Certificado FDC + apresentação interna de 1 case aplicado.<br>
+            <strong>Prazo:</strong> 31 de dezembro de 2026.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 80px;gap:14px;margin-top:14px;align-items:center">
+            <div class="barra-progresso"><div class="preenchimento" style="width:50%"></div></div>
+            <span style="font-family:var(--ui);font-size:12px;font-weight:600;text-align:right">4/8 módulos</span>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:6px">
+            <button class="btn btn-fantasma btn-xs">✏ Editar</button>
+            <button class="btn btn-fantasma btn-xs">📎 Anexar evidência</button>
+            <button class="btn btn-fantasma btn-xs">💬 Comentar</button>
+          </div>
+        </div>
+
+        <!-- Meta 2 -->
+        <div style="border:1px solid var(--cinza-cl);border-left:3px solid var(--marinho);border-radius:2px;padding:18px;margin-bottom:14px;background:var(--branco)">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:flex-start;margin-bottom:12px">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span class="tag marinho" style="font-size:10px">META 2 · TÉCNICA</span>
+                <span class="tag" style="font-size:10px">Certificação</span>
+              </div>
+              <h5 style="font-size:16px;font-weight:500">Certificação BIM (Building Information Modeling)</h5>
+            </div>
+            <span class="tag amarelo">20% concluído</span>
+          </div>
+          <div style="font-family:var(--ui);font-size:13px;color:var(--cinza);line-height:1.55">
+            <strong>Específico:</strong> BuildingSmart Brazil · 80h · curso patrocinado pela Aurora.<br>
+            <strong>Mensurável:</strong> Aprovação no exame + aplicação em 1 projeto real da empresa.<br>
+            <strong>Prazo:</strong> 30 de agosto de 2026.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 80px;gap:14px;margin-top:14px;align-items:center">
+            <div class="barra-progresso"><div class="preenchimento" style="width:20%"></div></div>
+            <span style="font-family:var(--ui);font-size:12px;font-weight:600;text-align:right">16/80h</span>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:6px">
+            <button class="btn btn-fantasma btn-xs">✏ Editar</button>
+            <button class="btn btn-fantasma btn-xs">📎 Anexar evidência</button>
+            <button class="btn btn-fantasma btn-xs">💬 Comentar</button>
+          </div>
+        </div>
+
+        <!-- Meta 3 -->
+        <div style="border:1px solid var(--cinza-cl);border-left:3px solid var(--roxo);border-radius:2px;padding:18px;margin-bottom:14px;background:var(--branco)">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:flex-start;margin-bottom:12px">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span class="tag roxo" style="font-size:10px">META 3 · IDIOMA</span>
+                <span class="tag" style="font-size:10px">Acadêmica</span>
+              </div>
+              <h5 style="font-size:16px;font-weight:500">Atingir nível B2 de Inglês</h5>
+            </div>
+            <span class="tag verde">78% concluído</span>
+          </div>
+          <div style="font-family:var(--ui);font-size:13px;color:var(--cinza);line-height:1.55">
+            <strong>Específico:</strong> Curso Cultura Inglesa · prep para projetos com investidores estrangeiros.<br>
+            <strong>Mensurável:</strong> Aprovação no teste B2 + simulação de pitch em inglês.<br>
+            <strong>Prazo:</strong> 31 de dezembro de 2026.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 80px;gap:14px;margin-top:14px;align-items:center">
+            <div class="barra-progresso"><div class="preenchimento" style="width:78%"></div></div>
+            <span style="font-family:var(--ui);font-size:12px;font-weight:600;text-align:right">B1.5/B2</span>
+          </div>
+        </div>
+
+        <!-- Meta 4 -->
+        <div style="border:1px solid var(--cinza-cl);border-left:3px solid var(--verde);border-radius:2px;padding:18px;background:var(--branco)">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:flex-start;margin-bottom:12px">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span class="tag verde" style="font-size:10px">META 4 · NOVA</span>
+                <span class="tag" style="font-size:10px">Comportamental</span>
+              </div>
+              <h5 style="font-size:16px;font-weight:500">Mentoria reversa com 2 estagiários</h5>
+            </div>
+            <span class="tag">Não iniciada</span>
+          </div>
+          <div style="font-family:var(--ui);font-size:13px;color:var(--cinza);line-height:1.55">
+            <strong>Específico:</strong> Mentorar Pedro Aurélio e mais 1 estagiário em 1:1 mensal.<br>
+            <strong>Mensurável:</strong> 6 sessões registradas + feedback positivo &gt;8/10 dos mentorados.<br>
+            <strong>Prazo:</strong> Iniciar 01/08/2026 · concluir até 31/12/2026.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 80px;gap:14px;margin-top:14px;align-items:center">
+            <div class="barra-progresso"><div class="preenchimento" style="width:0%"></div></div>
+            <span style="font-family:var(--ui);font-size:12px;font-weight:600;text-align:right">0/6</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2-eq">
+        <div class="painel">
+          <h3 style="font-size:17px">Recursos de apoio</h3>
+          <div class="sub-titulo">O que a Aurora vai oferecer</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:13px">
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between"><span>💰 Orçamento p/ cursos &amp; certificações</span><strong>R$ 8.000</strong></div>
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between"><span>👥 Mentor designado</span><strong>Luísa Mendonça</strong></div>
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between"><span>⏱ Tempo protegido p/ estudos</span><strong>4h/semana</strong></div>
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between"><span>🎯 Projetos para aplicar aprendizado</span><strong>Obra Sítio II</strong></div>
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3 style="font-size:17px">Check-ins programados</h3>
+          <div class="sub-titulo">1:1 mensais com Luísa</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="padding:12px;background:var(--laranja-cl);border-left:3px solid var(--laranja);border-radius:2px">
+              <div style="display:flex;justify-content:space-between"><strong style="font-size:13px">PRÓXIMO · 28/07</strong><span class="tag laranja" style="font-size:9px">Confirmado</span></div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">Kickoff do PDI · 1h · Sala Diretoria</div>
+            </div>
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px"><strong style="font-size:13px">28/08</strong> <span style="font-family:var(--ui);font-size:11px;color:var(--cinza)">· Check-in mensal</span></div>
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px"><strong style="font-size:13px">28/09</strong> <span style="font-family:var(--ui);font-size:11px;color:var(--cinza)">· Check-in mensal</span></div>
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px"><strong style="font-size:13px">28/10</strong> <span style="font-family:var(--ui);font-size:11px;color:var(--cinza)">· Check-in mensal</span></div>
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px"><strong style="font-size:13px">28/11</strong> <span style="font-family:var(--ui);font-size:11px;color:var(--cinza)">· Check-in mensal</span></div>
+            <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px"><strong style="font-size:13px">15/12</strong> <span style="font-family:var(--ui);font-size:11px;color:var(--cinza)">· Avaliação final do PDI</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: COMPARAÇÃO ENTRE CICLOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-comparar-ciclos">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item ativo" onclick="irPara('t-ciclo-aval')"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item" onclick="irPara('t-editor-pesquisa')"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item" onclick="irPara('t-clima-ia')"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-item"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av av-b">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <button class="btn btn-fantasma btn-xs" onclick="irPara('t-ciclo-aval')" style="margin-bottom:12px">← Ciclo 2026-S1</button>
+
+      <div class="topbar">
+        <div>
+          <h1>Comparação <em>entre ciclos</em></h1>
+          <p class="topbar-meta">Evolução da Aurora ao longo de 4 ciclos · 24 meses de dados · análise tendencial</p>
+        </div>
+        <div class="topbar-acoes">
+          <select style="padding:7px 12px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:13px"><option>Todos os ciclos</option></select>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar análise</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="comp-ciclo">
+          <h5>2024-S2</h5>
+          <div class="nota">7,4</div>
+          <div class="delta neutro">Linha de base</div>
+          <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:8px">98 avaliados</div>
+        </div>
+        <div class="comp-ciclo">
+          <h5>2025-S1</h5>
+          <div class="nota">7,6</div>
+          <div class="delta">+0,2</div>
+          <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:8px">112 avaliados</div>
+        </div>
+        <div class="comp-ciclo">
+          <h5>2025-S2</h5>
+          <div class="nota">7,9</div>
+          <div class="delta">+0,3</div>
+          <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:8px">119 avaliados</div>
+        </div>
+        <div class="comp-ciclo" style="border:2px solid var(--laranja);background:var(--laranja-cl)">
+          <h5 style="color:var(--laranja)">2026-S1 · EM CURSO</h5>
+          <div class="nota"><em>8,1</em></div>
+          <div class="delta">+0,2 projetado</div>
+          <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);margin-top:8px">128 · 67% concluído</div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>Heatmap de competências por ciclo</h3>
+        <div class="sub-titulo">Como cada dimensão evoluiu</div>
+
+        <div class="heatmap-tabela" style="margin-top:14px">
+          <div></div>
+          <div class="hm-head">2024-S2</div>
+          <div class="hm-head">2025-S1</div>
+          <div class="hm-head">2025-S2</div>
+          <div class="hm-head">2026-S1*</div>
+          <div class="hm-head">Δ TOTAL</div>
+          <div class="hm-head">TENDÊNCIA</div>
+
+          <div class="hm-label">Resultados &amp; Entrega</div>
+          <div class="hm-cell hm-7">7,5</div>
+          <div class="hm-cell hm-7">7,7</div>
+          <div class="hm-cell hm-8">8,1</div>
+          <div class="hm-cell hm-8">8,3</div>
+          <div class="hm-label" style="justify-content:center;color:var(--verde)">+0,8 ↑</div>
+          <div class="hm-label" style="justify-content:center">📈 forte</div>
+
+          <div class="hm-label">Conhecimento Técnico</div>
+          <div class="hm-cell hm-8">8,0</div>
+          <div class="hm-cell hm-8">8,1</div>
+          <div class="hm-cell hm-8">8,2</div>
+          <div class="hm-cell hm-8">8,3</div>
+          <div class="hm-label" style="justify-content:center;color:var(--verde)">+0,3 ↑</div>
+          <div class="hm-label" style="justify-content:center">→ estável</div>
+
+          <div class="hm-label">Trabalho em Equipe</div>
+          <div class="hm-cell hm-7">7,4</div>
+          <div class="hm-cell hm-7">7,6</div>
+          <div class="hm-cell hm-7">7,8</div>
+          <div class="hm-cell hm-8">8,0</div>
+          <div class="hm-label" style="justify-content:center;color:var(--verde)">+0,6 ↑</div>
+          <div class="hm-label" style="justify-content:center">📈 forte</div>
+
+          <div class="hm-label">Liderança</div>
+          <div class="hm-cell hm-6">6,8</div>
+          <div class="hm-cell hm-6">6,9</div>
+          <div class="hm-cell hm-7">7,2</div>
+          <div class="hm-cell hm-7">7,4</div>
+          <div class="hm-label" style="justify-content:center;color:var(--verde)">+0,6 ↑</div>
+          <div class="hm-label" style="justify-content:center">⚠ ainda gap</div>
+
+          <div class="hm-label">Inovação</div>
+          <div class="hm-cell hm-7">7,3</div>
+          <div class="hm-cell hm-8">8,0</div>
+          <div class="hm-cell hm-8">8,1</div>
+          <div class="hm-cell hm-8">8,2</div>
+          <div class="hm-label" style="justify-content:center;color:var(--verde)">+0,9 ↑</div>
+          <div class="hm-label" style="justify-content:center">📈 forte</div>
+        </div>
+
+        <div style="margin-top:14px;font-family:var(--ui);font-size:11px;color:var(--cinza);font-style:italic">* Ciclo 2026-S1 com nota parcial (67% concluído)</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="painel">
+          <h3>Evolução da Matriz 9-Box</h3>
+          <div class="sub-titulo">Distribuição da empresa por ciclo</div>
+
+          <div style="overflow-x:auto;margin-top:14px">
+            <table style="width:100%;border-collapse:collapse;font-family:var(--ui);font-size:12px">
+              <thead>
+                <tr style="background:var(--cinza-fundo)">
+                  <th style="padding:10px;text-align:left;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:10px;color:var(--cinza)">Quadrante</th>
+                  <th style="padding:10px;text-align:center;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:10px;color:var(--cinza)">2024-S2</th>
+                  <th style="padding:10px;text-align:center;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:10px;color:var(--cinza)">2025-S1</th>
+                  <th style="padding:10px;text-align:center;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:10px;color:var(--cinza)">2025-S2</th>
+                  <th style="padding:10px;text-align:center;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:10px;color:var(--cinza)">2026-S1</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--cinza-cl)">
+                  <td style="padding:10px;color:var(--laranja);font-weight:600">★ Estrela</td>
+                  <td style="padding:10px;text-align:center">6</td>
+                  <td style="padding:10px;text-align:center">8</td>
+                  <td style="padding:10px;text-align:center">10</td>
+                  <td style="padding:10px;text-align:center;font-weight:700;color:var(--laranja)">12 ↑</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--cinza-cl)">
+                  <td style="padding:10px;color:var(--verde)">Alto Desempenho</td>
+                  <td style="padding:10px;text-align:center">21</td>
+                  <td style="padding:10px;text-align:center">24</td>
+                  <td style="padding:10px;text-align:center">28</td>
+                  <td style="padding:10px;text-align:center;font-weight:700;color:var(--verde)">31 ↑</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--cinza-cl)">
+                  <td style="padding:10px">Forte Performance</td>
+                  <td style="padding:10px;text-align:center">22</td>
+                  <td style="padding:10px;text-align:center">25</td>
+                  <td style="padding:10px;text-align:center">26</td>
+                  <td style="padding:10px;text-align:center;font-weight:700">27</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--cinza-cl)">
+                  <td style="padding:10px">Mantenedor</td>
+                  <td style="padding:10px;text-align:center">29</td>
+                  <td style="padding:10px;text-align:center">32</td>
+                  <td style="padding:10px;text-align:center">34</td>
+                  <td style="padding:10px;text-align:center;font-weight:700">36</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--cinza-cl)">
+                  <td style="padding:10px;color:var(--amarelo);font-weight:600">Enigma (alto potencial)</td>
+                  <td style="padding:10px;text-align:center">8</td>
+                  <td style="padding:10px;text-align:center">11</td>
+                  <td style="padding:10px;text-align:center">10</td>
+                  <td style="padding:10px;text-align:center;font-weight:700;color:#876715">9</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px;color:var(--vermelho)">Risco</td>
+                  <td style="padding:10px;text-align:center">12</td>
+                  <td style="padding:10px;text-align:center">12</td>
+                  <td style="padding:10px;text-align:center">11</td>
+                  <td style="padding:10px;text-align:center;font-weight:700;color:var(--vermelho)">13</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3>Top Movers · 4 ciclos</h3>
+          <div class="sub-titulo">Quem mais evoluiu</div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+            <div style="padding:12px;background:var(--laranja-cl);border-radius:2px;border-left:3px solid var(--laranja)">
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px">
+                <div class="av av-sm av-a">F</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Fernando Lacerda</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Eng. Civil Sr</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-family:var(--serif);font-style:italic;color:var(--laranja);font-size:18px">+1,3</div>
+                  <div style="font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:.5px">7,1 → 8,4</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px">
+              <div style="display:flex;gap:10px;align-items:center">
+                <div class="av av-sm av-d">A</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Ana Carolina Souza</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Eng. Pl</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:16px">+1,1</div>
+                  <div style="font-family:var(--ui);font-size:9px;color:var(--cinza)">6,9 → 8,0</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px">
+              <div style="display:flex;gap:10px;align-items:center">
+                <div class="av av-sm av-c">D</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Daniel Pinheiro</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Eng. Jr</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:16px">+0,9</div>
+                  <div style="font-family:var(--ui);font-size:9px;color:var(--cinza)">7,2 → 8,1</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px">
+              <div style="display:flex;gap:10px;align-items:center">
+                <div class="av av-sm av-e">C</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Camila Reis</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Asst. Adm</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:16px">+0,8</div>
+                  <div style="font-family:var(--ui);font-size:9px;color:var(--cinza)">7,4 → 8,2</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px;background:var(--vermelho-cl);border-radius:2px;border-left:3px solid var(--vermelho)">
+              <div style="display:flex;gap:10px;align-items:center">
+                <div class="av av-sm av-b">R</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Rodrigo Vargas</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Eng. Pl</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-family:var(--serif);font-style:italic;color:var(--vermelho);font-size:16px">-0,7</div>
+                  <div style="font-family:var(--ui);font-size:9px;color:var(--cinza)">8,0 → 7,3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 6: EDITOR DE PESQUISAS (CANVAS) -->
+<!-- ============================================== -->
+<div class="tela" id="t-editor-pesquisa">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-ciclo-aval')"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item ativo"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item" onclick="irPara('t-clima-ia')"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-item"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av av-b">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Editor de <em>Pesquisas</em></h1>
+          <p class="topbar-meta">Crie do zero ou use template · Pulse · Clima · eNPS · Onboarding · Saída</p>
+        </div>
+        <div class="topbar-acoes">
+          <span class="tag amarelo">● Rascunho · salvo agora</span>
+          <button class="btn btn-fantasma btn-sm">👁 Pré-visualizar</button>
+          <button class="btn btn-fantasma btn-sm">📅 Agendar envio</button>
+          <button class="btn btn-primario btn-sm">✓ Publicar pesquisa</button>
+        </div>
+      </div>
+
+      <div class="painel" style="background:linear-gradient(135deg,var(--laranja-cl),var(--branco));border-color:var(--laranja);padding:18px 24px">
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center">
+          <div style="font-size:36px">📋</div>
+          <div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1.5px;font-weight:700">EDITANDO</div>
+            <h3 style="font-size:20px;margin-top:4px">Pulse · Junho 2026 — "Como você está?"</h3>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">Pesquisa curta de pulso · base no modelo Pulse Trimestral</div>
+          </div>
+          <div style="text-align:right;font-family:var(--ui);font-size:11px;color:var(--cinza)">
+            <div><strong style="color:var(--marinho);font-family:var(--serif);font-size:18px;font-style:italic">6</strong> perguntas</div>
+            <div>~3min de resposta</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-wrap">
+        <!-- COLUNA ESQUERDA: Tipos -->
+        <div class="editor-tipos">
+          <h6>Tipos de pergunta</h6>
+          <div class="tipo-pergunta"><div class="ic">≡</div><div>Múltipla escolha</div></div>
+          <div class="tipo-pergunta"><div class="ic">☑</div><div>Caixas (várias)</div></div>
+          <div class="tipo-pergunta"><div class="ic">★</div><div>Escala 1-5</div></div>
+          <div class="tipo-pergunta"><div class="ic">↔</div><div>Escala 0-10 (NPS)</div></div>
+          <div class="tipo-pergunta"><div class="ic">😊</div><div>Emoji rating</div></div>
+          <div class="tipo-pergunta"><div class="ic">▦</div><div>Matriz</div></div>
+          <div class="tipo-pergunta"><div class="ic">¶</div><div>Texto aberto curto</div></div>
+          <div class="tipo-pergunta"><div class="ic">¶¶</div><div>Texto aberto longo</div></div>
+          <div class="tipo-pergunta"><div class="ic">✓</div><div>Sim/Não</div></div>
+          <div class="tipo-pergunta"><div class="ic">↓</div><div>Drop-down</div></div>
+
+          <h6 style="margin-top:18px">Templates prontos</h6>
+          <div style="padding:10px;background:var(--marinho);color:white;border-radius:2px;font-family:var(--ui);font-size:11px;line-height:1.6;cursor:pointer">
+            <strong>🤖 Sugerir com IA</strong><br>
+            <span style="opacity:.7">A Nora cria perguntas baseadas em seu objetivo</span>
+          </div>
+          <div style="margin-top:8px;padding:8px;border:1px solid var(--cinza-cl);border-radius:2px;font-size:12px;cursor:pointer">📊 Clima Anual</div>
+          <div style="margin-top:6px;padding:8px;border:1px solid var(--cinza-cl);border-radius:2px;font-size:12px;cursor:pointer">⚡ Pulse Trimestral</div>
+          <div style="margin-top:6px;padding:8px;border:1px solid var(--cinza-cl);border-radius:2px;font-size:12px;cursor:pointer">👋 Onboarding 30d</div>
+          <div style="margin-top:6px;padding:8px;border:1px solid var(--cinza-cl);border-radius:2px;font-size:12px;cursor:pointer">🚪 Pesquisa de Saída</div>
+          <div style="margin-top:6px;padding:8px;border:1px solid var(--cinza-cl);border-radius:2px;font-size:12px;cursor:pointer">👤 Avaliação do Líder</div>
+        </div>
+
+        <!-- CENTRO: Canvas -->
+        <div class="editor-canvas">
+          <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700;margin-bottom:14px">PERGUNTAS</div>
+
+          <div class="editor-pergunta">
+            <div class="editor-pergunta-head">
+              <span class="editor-pergunta-num">PERGUNTA 1</span>
+              <span class="editor-pergunta-tipo">EMOJI RATING</span>
+            </div>
+            <div class="editor-pergunta-texto">Como você está se sentindo no trabalho esta semana?</div>
+            <div style="display:flex;gap:14px;justify-content:center;padding:18px 0;background:var(--cinza-fundo);border-radius:2px;font-size:32px">
+              <span style="cursor:pointer">😰</span>
+              <span style="cursor:pointer">🙁</span>
+              <span style="cursor:pointer">😐</span>
+              <span style="cursor:pointer">🙂</span>
+              <span style="cursor:pointer">😍</span>
+            </div>
+          </div>
+
+          <div class="editor-pergunta ativa">
+            <div class="editor-pergunta-head">
+              <span class="editor-pergunta-num">PERGUNTA 2 · EDITANDO</span>
+              <span class="editor-pergunta-tipo">NPS (0-10)</span>
+            </div>
+            <div class="editor-pergunta-texto">Numa escala de 0 a 10, quanto você recomendaria trabalhar na Aurora para uma pessoa próxima?</div>
+            <div class="escala-nps">
+              <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-family:var(--ui);font-size:11px;color:var(--cinza)">
+              <span>Pouco provável</span><span>Muito provável</span>
+            </div>
+          </div>
+
+          <div class="editor-pergunta">
+            <div class="editor-pergunta-head">
+              <span class="editor-pergunta-num">PERGUNTA 3</span>
+              <span class="editor-pergunta-tipo">ESCALA 1-5</span>
+            </div>
+            <div class="editor-pergunta-texto">Eu me sinto reconhecido(a) pelo meu trabalho.</div>
+            <div style="display:flex;gap:6px;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza)">
+              <div style="text-align:center;flex:1"><div style="width:38px;height:38px;background:var(--cinza-fundo);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">1</div><div style="margin-top:4px">Discordo<br>totalmente</div></div>
+              <div style="text-align:center;flex:1"><div style="width:38px;height:38px;background:var(--cinza-fundo);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">2</div></div>
+              <div style="text-align:center;flex:1"><div style="width:38px;height:38px;background:var(--cinza-fundo);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">3</div><div style="margin-top:4px">Neutro</div></div>
+              <div style="text-align:center;flex:1"><div style="width:38px;height:38px;background:var(--cinza-fundo);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">4</div></div>
+              <div style="text-align:center;flex:1"><div style="width:38px;height:38px;background:var(--cinza-fundo);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">5</div><div style="margin-top:4px">Concordo<br>totalmente</div></div>
+            </div>
+          </div>
+
+          <div class="editor-pergunta">
+            <div class="editor-pergunta-head">
+              <span class="editor-pergunta-num">PERGUNTA 4</span>
+              <span class="editor-pergunta-tipo">MÚLTIPLA ESCOLHA</span>
+            </div>
+            <div class="editor-pergunta-texto">Qual destes temas você gostaria que recebesse mais atenção neste semestre?</div>
+            <div class="editor-pergunta-opcoes">
+              <div class="editor-opt">○ Reconhecimento e remuneração</div>
+              <div class="editor-opt">○ Equilíbrio entre vida pessoal e trabalho</div>
+              <div class="editor-opt">○ Oportunidades de desenvolvimento</div>
+              <div class="editor-opt">○ Liderança e gestão</div>
+              <div class="editor-opt">○ Ambiente e cultura</div>
+              <div class="editor-opt">○ Comunicação interna</div>
+            </div>
+          </div>
+
+          <div class="editor-pergunta">
+            <div class="editor-pergunta-head">
+              <span class="editor-pergunta-num">PERGUNTA 5</span>
+              <span class="editor-pergunta-tipo">TEXTO ABERTO</span>
+            </div>
+            <div class="editor-pergunta-texto">Qual seria <em>uma coisa</em> que mudaria seu dia-a-dia para melhor?</div>
+            <textarea rows="3" style="width:100%;padding:11px;border:1px solid var(--cinza-cl);font-family:var(--serif);border-radius:2px;background:var(--cinza-fundo)" placeholder="Sua resposta aqui... (opcional, anônima)" readonly></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px"><span class="tag verde" style="font-size:9px">✓ Anônima</span><span class="tag" style="font-size:9px">🤖 Análise de sentimento ativada</span></div>
+          </div>
+
+          <div class="editor-pergunta">
+            <div class="editor-pergunta-head">
+              <span class="editor-pergunta-num">PERGUNTA 6</span>
+              <span class="editor-pergunta-tipo">SIM/NÃO</span>
+            </div>
+            <div class="editor-pergunta-texto">Você acredita que sua voz é ouvida na empresa?</div>
+            <div style="display:flex;gap:10px;margin-top:8px">
+              <div style="flex:1;padding:14px;background:var(--cinza-fundo);border-radius:2px;text-align:center;font-weight:500">Sim</div>
+              <div style="flex:1;padding:14px;background:var(--cinza-fundo);border-radius:2px;text-align:center;font-weight:500">Não</div>
+            </div>
+          </div>
+
+          <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px;padding:14px;border-style:dashed">+ Adicionar pergunta</button>
+        </div>
+
+        <!-- DIREITA: Config -->
+        <div class="editor-config">
+          <h6>Configurações da pesquisa</h6>
+
+          <div class="campo">
+            <label>Título</label>
+            <input value="Pulse Junho 2026"/>
+          </div>
+          <div class="campo">
+            <label>Descrição (vista pelos empregados)</label>
+            <textarea rows="3" style="width:100%;padding:8px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:13px;border-radius:2px">Pesquisa rápida (~3min). Sua resposta é anônima.</textarea>
+          </div>
+
+          <div class="campo">
+            <label>Audiência</label>
+            <select>
+              <option>Todos os empregados (128)</option>
+              <option>Área específica</option>
+              <option>Por liderança</option>
+              <option>Por tempo de casa</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Privacidade</label>
+            <select>
+              <option>🔒 Anônima total</option>
+              <option>👤 Identificada</option>
+              <option>📊 Agrupada por área (mín. 5)</option>
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Frequência</label>
+            <select>
+              <option>Única (one-shot)</option>
+              <option selected>Trimestral (recorrente)</option>
+              <option>Mensal</option>
+            </select>
+          </div>
+
+          <h6 style="margin-top:18px">Cronograma</h6>
+          <div class="campo">
+            <label>Data de envio</label>
+            <input type="date" value="2026-06-02"/>
+          </div>
+          <div class="campo">
+            <label>Encerramento</label>
+            <input type="date" value="2026-06-09"/>
+          </div>
+
+          <h6 style="margin-top:18px">Notificações</h6>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+            <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" checked> E-mail no lançamento</label>
+            <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" checked> Push no app</label>
+            <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" checked> Lembrete após 3 dias</label>
+            <label style="display:flex;align-items:center;gap:6px"><input type="checkbox"> Whatsapp (opcional)</label>
+          </div>
+
+          <div style="padding:12px;background:var(--marinho);color:white;border-radius:2px;margin-top:18px;font-family:var(--ui);font-size:11px;line-height:1.5">
+            <strong>🔒 LGPD</strong><br>
+            <span style="opacity:.7">Respostas anônimas são impossíveis de associar à pessoa, mesmo internamente.</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 7: ANALYTICS DE CLIMA (com IA) -->
+<!-- ============================================== -->
+<div class="tela" id="t-clima-ia">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-ciclo-aval')"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item" onclick="irPara('t-editor-pesquisa')"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item ativo"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-item"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av av-b">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Analytics de <em>Clima</em> com IA</h1>
+          <p class="topbar-meta">Pulse Mai/2026 · 94 respostas (73%) · análise de sentimento + clustering temático · LGPD-safe</p>
+        </div>
+        <div class="topbar-acoes">
+          <select style="padding:7px 12px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:13px"><option>Pulse Mai/2026</option><option>Clima Anual 2025</option></select>
+          <button class="btn btn-fantasma btn-sm">⤓ Relatório executivo</button>
+        </div>
+      </div>
+
+      <div class="insight-ia">
+        <div class="insight-ia-head">
+          <span class="insight-ia-tag">🤖 NORA · IA</span>
+          <span style="font-family:var(--ui);font-size:10px;opacity:.6;letter-spacing:.5px">Análise atualizada há 2h · 94 respostas</span>
+        </div>
+        <h4>O clima na Aurora está <em>positivo e em alta</em>, mas há <em>sinal de alerta crescente em "Reconhecimento"</em> na Engenharia.</h4>
+        <p>Análise temática identificou 3 clusters dominantes nos comentários: orgulho da empresa (42%), busca por crescimento (28%) e <strong style="color:var(--papel)">frustração com reconhecimento financeiro (18% — sendo 32% concentrado na Eng.)</strong>. eNPS subiu de +52 para +58, mas o sub-grupo "Eng. Pleno" caiu de +48 → +12 em 6 meses.</p>
+        <div class="stats">
+          <div><span class="v"><em>+58</em></span><span class="l">eNPS Geral</span></div>
+          <div><span class="v"><em>73</em>%</span><span class="l">Taxa de resposta</span></div>
+          <div><span class="v"><em>4,2</em></span><span class="l">Satisfação geral (/5)</span></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <h3>Sentimento dos comentários abertos</h3>
+            <div class="sub-titulo">62 comentários analisados · IA detecta tom</div>
+
+            <div class="sent-bar">
+              <div class="sent-pos" style="flex:54">54% positivo</div>
+              <div class="sent-neu" style="flex:28">28% neutro</div>
+              <div class="sent-neg" style="flex:18">18% negativo</div>
+            </div>
+
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:14px;display:flex;justify-content:space-between">
+              <span>Pulse anterior: 48% / 32% / 20%</span>
+              <span style="color:var(--verde);font-weight:600">Tom positivo +6pp ↑</span>
+            </div>
+
+            <div style="margin-top:18px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700;margin-bottom:10px">EXEMPLOS POR SENTIMENTO</div>
+
+              <div style="padding:14px;background:var(--verde-cl);border-left:3px solid var(--verde);border-radius:2px;margin-bottom:8px;font-family:var(--serif);font-style:italic;font-size:13px;line-height:1.55">"O clima na minha equipe melhorou muito desde que mudou a coordenação. Sinto que somos ouvidos." <span style="font-style:normal;font-family:var(--ui);font-size:10px;color:var(--cinza);display:block;margin-top:6px">— Anônimo · Ops</span></div>
+
+              <div style="padding:14px;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px;margin-bottom:8px;font-family:var(--serif);font-style:italic;font-size:13px;line-height:1.55">"Está ok. Não tenho do que reclamar, mas também não tenho nada que me anime de manhã." <span style="font-style:normal;font-family:var(--ui);font-size:10px;color:var(--cinza);display:block;margin-top:6px">— Anônimo · Adm</span></div>
+
+              <div style="padding:14px;background:var(--vermelho-cl);border-left:3px solid var(--vermelho);border-radius:2px;font-family:var(--serif);font-style:italic;font-size:13px;line-height:1.55">"Meu salário não acompanhou minha responsabilidade. Recebi 3% de reajuste depois de assumir liderança técnica do projeto." <span style="font-style:normal;font-family:var(--ui);font-size:10px;color:var(--cinza);display:block;margin-top:6px">— Anônimo · Engenharia</span></div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>O que as pessoas estão falando</h3>
+            <div class="sub-titulo">Nuvem semântica · agrupada por tema · LGPD-safe</div>
+
+            <div class="nuvem-palavras">
+              <span class="tam-lg positivo">crescimento</span>
+              <span class="tam-md negativo">salário</span>
+              <span class="tam-lg positivo">equipe</span>
+              <span class="tam-sm">benefícios</span>
+              <span class="tam-md positivo">orgulho</span>
+              <span class="tam-sm negativo">reconhecimento</span>
+              <span class="tam-md">liderança</span>
+              <span class="tam-sm">aprendizado</span>
+              <span class="tam-xs">férias</span>
+              <span class="tam-sm positivo">propósito</span>
+              <span class="tam-md">desafio</span>
+              <span class="tam-sm">comunicação</span>
+              <span class="tam-xs negativo">burocracia</span>
+              <span class="tam-md positivo">cultura</span>
+              <span class="tam-xs">horários</span>
+              <span class="tam-sm">obra</span>
+              <span class="tam-xs">treinamento</span>
+              <span class="tam-md positivo">confiança</span>
+              <span class="tam-xs negativo">processo</span>
+              <span class="tam-sm">aprender</span>
+              <span class="tam-xs">trânsito</span>
+            </div>
+
+            <div style="display:flex;justify-content:center;gap:18px;margin-top:14px;font-family:var(--ui);font-size:11px">
+              <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;background:var(--verde);border-radius:50%"></div>Tom positivo</div>
+              <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;background:var(--marinho);border-radius:50%"></div>Neutro</div>
+              <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;background:var(--vermelho);border-radius:50%"></div>Tom negativo</div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>eNPS por subgrupo</h3>
+            <div class="sub-titulo">Onde o sentimento está mais alto e mais baixo</div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+              <div style="display:grid;grid-template-columns:200px 1fr 60px;gap:14px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Diretoria/Liderança</span>
+                <div style="position:relative;height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden">
+                  <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--cinza)"></div>
+                  <div style="position:absolute;left:50%;height:100%;background:var(--verde);width:42%"></div>
+                </div>
+                <span style="text-align:right;font-weight:600;color:var(--verde)">+84</span>
+              </div>
+              <div style="display:grid;grid-template-columns:200px 1fr 60px;gap:14px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Operações &amp; Obra</span>
+                <div style="position:relative;height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden">
+                  <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--cinza)"></div>
+                  <div style="position:absolute;left:50%;height:100%;background:var(--verde);width:34%"></div>
+                </div>
+                <span style="text-align:right;font-weight:600;color:var(--verde)">+68</span>
+              </div>
+              <div style="display:grid;grid-template-columns:200px 1fr 60px;gap:14px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Financeiro/Adm</span>
+                <div style="position:relative;height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden">
+                  <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--cinza)"></div>
+                  <div style="position:absolute;left:50%;height:100%;background:var(--verde);width:33%"></div>
+                </div>
+                <span style="text-align:right;font-weight:600;color:var(--verde)">+66</span>
+              </div>
+              <div style="display:grid;grid-template-columns:200px 1fr 60px;gap:14px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Engenharia Sr/Esp.</span>
+                <div style="position:relative;height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden">
+                  <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--cinza)"></div>
+                  <div style="position:absolute;left:50%;height:100%;background:var(--verde);width:28%"></div>
+                </div>
+                <span style="text-align:right;font-weight:600;color:var(--verde)">+56</span>
+              </div>
+              <div style="display:grid;grid-template-columns:200px 1fr 60px;gap:14px;align-items:center;font-family:var(--ui);font-size:12px;background:var(--amarelo-cl);padding:6px;margin:0 -6px;border-radius:2px">
+                <span style="padding-left:6px;color:#876715"><strong>⚠ Engenharia Pleno</strong></span>
+                <div style="position:relative;height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden">
+                  <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--cinza)"></div>
+                  <div style="position:absolute;left:50%;height:100%;background:var(--amarelo);width:6%"></div>
+                </div>
+                <span style="text-align:right;font-weight:600;color:#876715;padding-right:6px">+12</span>
+              </div>
+              <div style="display:grid;grid-template-columns:200px 1fr 60px;gap:14px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Suprimentos</span>
+                <div style="position:relative;height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden">
+                  <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--cinza)"></div>
+                  <div style="position:absolute;left:50%;height:100%;background:var(--verde);width:20%"></div>
+                </div>
+                <span style="text-align:right;font-weight:600;color:var(--verde)">+40</span>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding:12px;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px;font-family:var(--ui);font-size:12px;line-height:1.5;color:#876715">
+              <strong>Padrão detectado</strong>: Engenheiros Plenos têm 5 pessoas — todas com tempo de casa entre 3-5 anos, sem promoção nos últimos 24 meses. <strong>Sinal forte de risco de churn</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel" style="background:var(--marinho);color:var(--papel);border:none">
+            <h3 style="color:var(--papel);font-size:17px">🎯 Recomendações da IA</h3>
+            <div class="sub-titulo" style="color:rgba(255,255,255,.5)">Ações priorizadas por impacto</div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;margin-top:14px;border-left:3px solid var(--vermelho)">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--vermelho);letter-spacing:1px;font-weight:700;margin-bottom:6px">PRIORIDADE 1 · URGENTE</div>
+              <h5 style="font-size:14px;color:var(--papel);margin-bottom:6px">Revisão salarial para Eng. Pleno</h5>
+              <p style="font-family:var(--ui);font-size:11px;opacity:.75;line-height:1.5">5 pessoas em risco · benchmark mercado +18% vs salário atual · impacto: reter R$ 60k/ano em CAC de substituição</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;margin-top:8px;border-left:3px solid var(--laranja)">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1px;font-weight:700;margin-bottom:6px">PRIORIDADE 2 · ALTA</div>
+              <h5 style="font-size:14px;color:var(--papel);margin-bottom:6px">Programa de reconhecimento</h5>
+              <p style="font-family:var(--ui);font-size:11px;opacity:.75;line-height:1.5">"Reconhecimento" foi tema em 18% dos comentários · sugerimos: kudos peer-to-peer + bônus discretos por entrega</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;margin-top:8px;border-left:3px solid var(--amarelo)">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--amarelo);letter-spacing:1px;font-weight:700;margin-bottom:6px">PRIORIDADE 3 · MÉDIA</div>
+              <h5 style="font-size:14px;color:var(--papel);margin-bottom:6px">Trilha para promover Eng. Pleno → Sr</h5>
+              <p style="font-family:var(--ui);font-size:11px;opacity:.75;line-height:1.5">Definir critérios objetivos e cronograma · "crescimento" em 28% dos comentários</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;margin-top:8px;border-left:3px solid var(--verde)">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--verde);letter-spacing:1px;font-weight:700;margin-bottom:6px">CONTINUE · O QUE FUNCIONA</div>
+              <h5 style="font-size:14px;color:var(--papel);margin-bottom:6px">Cultura &amp; confiança</h5>
+              <p style="font-family:var(--ui);font-size:11px;opacity:.75;line-height:1.5">42% dos comentários positivos mencionam "equipe" e "orgulho" — Aurora tem patrimônio cultural forte</p>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:17px">Evolução · 4 pulses</h3>
+            <div class="sub-titulo">eNPS últimos 12 meses</div>
+
+            <div style="height:140px;display:flex;align-items:flex-end;gap:14px;padding:14px 0;border-bottom:1px solid var(--cinza-cl);margin-top:14px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--marinho)">+38</div>
+                <div style="width:100%;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:50%;border-radius:2px 2px 0 0"></div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--marinho)">+44</div>
+                <div style="width:100%;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:62%;border-radius:2px 2px 0 0"></div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--marinho)">+52</div>
+                <div style="width:100%;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:76%;border-radius:2px 2px 0 0"></div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--laranja);font-weight:600">+58</div>
+                <div style="width:100%;background:linear-gradient(180deg,var(--laranja),var(--laranja-esc));height:88%;border-radius:2px 2px 0 0;border:1px solid var(--laranja-esc)"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:6px;letter-spacing:.5px">
+              <span>Jun/25</span><span>Set/25</span><span>Fev/26</span><span>Mai/26</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--cinza-cl);font-family:var(--ui);font-size:12px">
+              <span style="color:var(--cinza)">12 meses</span>
+              <span style="color:var(--verde);font-weight:600">+20 pts ↑</span>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:17px">Próximas pesquisas</h3>
+            <div class="sub-titulo">Calendário</div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+              <div style="padding:10px;background:var(--laranja-cl);border-left:3px solid var(--laranja);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);font-weight:700">EM 8 DIAS</div>
+                <div style="font-size:13px;margin-top:3px"><strong>Pulse Junho</strong> · todos · 6 perguntas</div>
+              </div>
+              <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700">EM 45 DIAS</div>
+                <div style="font-size:13px;margin-top:3px">Avaliação de Líderes · liderados → líderes</div>
+              </div>
+              <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700">EM 90 DIAS</div>
+                <div style="font-size:13px;margin-top:3px">Clima Anual 2026 · todos · 28 perguntas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Fase 6 — Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-ciclo-aval">⭐ Ciclo de Avaliação (visão geral)</option>
+    <option value="t-aval-360">🎯 Avaliação 360° · Fernando</option>
+    <option value="t-calibracao">⚖ Sessão de Calibração</option>
+    <option value="t-pdi-editor">📝 PDI Editor · Fernando</option>
+    <option value="t-comparar-ciclos">📊 Comparação entre Ciclos</option>
+    <option value="t-editor-pesquisa">📋 Editor de Pesquisas</option>
+    <option value="t-clima-ia">🤖 Analytics Clima com IA</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+</script>
+</body>
+</html>

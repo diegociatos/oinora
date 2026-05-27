@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Hierarquia de Papéis</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+  .wrapper{max-width:1280px;margin:0 auto;padding:50px 40px 80px}
+
+  .header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:30px;border-bottom:1px solid var(--cinza-cl);margin-bottom:50px;gap:30px;flex-wrap:wrap}
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-size:32px;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+  .header-tag{font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--marinho-med);text-transform:uppercase;margin-top:6px;font-weight:600}
+  .header h1{font-size:38px;font-weight:400;letter-spacing:-.3px;line-height:1.1;text-align:right}
+  .header h1 em{color:var(--laranja);font-style:italic}
+  .header h1 + p{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px;text-align:right}
+
+  .filete{display:flex;align-items:center;gap:14px;font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--marinho-med);text-transform:uppercase;font-weight:600;margin-bottom:30px}
+  .filete::before,.filete::after{content:"";flex:1;height:1px;background:var(--cinza-cl)}
+
+  /* === ZONAS === */
+  .zona{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:24px;position:relative}
+  .zona-oinora{border-left:5px solid var(--laranja);background:linear-gradient(135deg,var(--branco) 70%,var(--laranja-cl))}
+  .zona-tenant{border-left:5px solid var(--marinho)}
+  .zona-cross{border-left:5px solid var(--roxo);background:linear-gradient(135deg,var(--branco) 70%,var(--roxo-cl))}
+
+  .zona-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:20px}
+  .zona-head h2{font-size:24px;font-weight:400;letter-spacing:-.3px}
+  .zona-head h2 em{color:var(--laranja);font-style:italic}
+  .zona-head .descricao{font-family:var(--ui);font-size:12.5px;color:var(--cinza);line-height:1.55;margin-top:6px;max-width:480px}
+  .zona-tag{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;padding:6px 12px;border-radius:2px;align-self:flex-start;white-space:nowrap}
+  .zt-laranja{background:var(--laranja);color:white}
+  .zt-marinho{background:var(--marinho);color:white}
+  .zt-roxo{background:var(--roxo);color:white}
+
+  /* === PAPEL CARD === */
+  .papeis-grid{display:grid;gap:14px}
+  .grid-2{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:1fr 1fr 1fr}
+  .grid-4{grid-template-columns:repeat(4,1fr)}
+
+  .papel{background:var(--cinza-fundo);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;display:flex;flex-direction:column;gap:10px;position:relative;transition:all .15s}
+  .papel:hover{border-color:var(--laranja);transform:translateY(-2px);box-shadow:0 4px 14px rgba(31,42,68,.06)}
+  .papel-head{display:flex;align-items:center;gap:12px}
+  .papel-ic{width:42px;height:42px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--branco);border:1px solid var(--cinza-cl)}
+  .papel-ic.laranja{background:var(--laranja-cl);border-color:var(--laranja);color:var(--laranja)}
+  .papel-ic.marinho{background:#EEF1F6;border-color:var(--marinho);color:var(--marinho)}
+  .papel-ic.verde{background:var(--verde-cl);border-color:var(--verde);color:var(--verde)}
+  .papel-ic.roxo{background:var(--roxo-cl);border-color:var(--roxo);color:var(--roxo)}
+  .papel-ic.amarelo{background:var(--amarelo-cl);border-color:var(--amarelo);color:#876715}
+  .papel-ic.vermelho{background:var(--vermelho-cl);border-color:var(--vermelho);color:var(--vermelho)}
+  .papel-titulo{flex:1;min-width:0}
+  .papel-nome{font-size:15px;font-weight:500;line-height:1.2}
+  .papel-codigo{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px;margin-top:3px;font-weight:600}
+  .papel-personas{font-family:var(--ui);font-size:11.5px;color:var(--cinza);line-height:1.5;padding-top:8px;border-top:1px solid var(--cinza-cl);font-style:italic}
+  .papel-personas strong{color:var(--marinho);font-style:normal;font-weight:600}
+
+  .pode-nao{display:grid;grid-template-columns:1fr;gap:8px;margin-top:4px}
+  .pode,.nao{font-family:var(--ui);font-size:11.5px;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+  .pode .ic,.nao .ic{flex-shrink:0;font-weight:700;font-size:11px;width:14px}
+  .pode .ic{color:var(--verde)}
+  .nao .ic{color:var(--vermelho)}
+  .pode span,.nao span{color:var(--marinho-med)}
+
+  .escopo-tag{display:inline-flex;align-items:center;gap:4px;font-family:var(--ui);font-size:10px;letter-spacing:.5px;padding:2px 8px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:10px;color:var(--cinza);font-weight:600;text-transform:uppercase;width:fit-content}
+  .escopo-tag.global{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .escopo-tag.tenant{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .escopo-tag.proprio{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .escopo-tag.cross{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  /* === PROPRIEDADES DERIVADAS === */
+  .propriedades-bloco{background:var(--marinho);color:var(--papel);border-radius:2px;padding:28px;margin-bottom:24px;position:relative;overflow:hidden}
+  .propriedades-bloco::before{content:"";position:absolute;top:-30%;right:-10%;width:380px;height:380px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 60%);pointer-events:none}
+  .propriedades-bloco h2{font-size:22px;font-weight:400;color:var(--papel);position:relative}
+  .propriedades-bloco h2 em{color:var(--laranja);font-style:italic}
+  .propriedades-bloco .sub{font-family:var(--ui);font-size:12px;opacity:.6;letter-spacing:.3px;margin-top:6px;position:relative;line-height:1.6}
+  .props-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px;position:relative}
+  .prop-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:2px;padding:16px;border-left:3px solid var(--laranja)}
+  .prop-titulo{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .prop-titulo h4{font-size:14px;font-weight:500;color:var(--papel)}
+  .prop-titulo code{font-family:'SF Mono','Monaco',monospace;font-size:10px;background:rgba(255,255,255,.1);padding:2px 6px;border-radius:2px;color:var(--laranja)}
+  .prop-desc{font-family:var(--ui);font-size:11.5px;opacity:.75;line-height:1.55}
+  .prop-exemplo{font-family:var(--ui);font-size:11px;opacity:.55;font-style:italic;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)}
+
+  /* === STATUS BAR === */
+  .status-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:30px}
+  .status-pill{padding:14px 16px;border-radius:2px;display:flex;align-items:center;gap:12px}
+  .sp-pending{background:var(--amarelo-cl);border:1px solid var(--amarelo)}
+  .sp-active{background:var(--verde-cl);border:1px solid var(--verde)}
+  .sp-suspended{background:var(--cinza-fundo);border:1px solid var(--cinza-cl)}
+  .sp-alumni{background:var(--roxo-cl);border:1px solid var(--roxo)}
+  .sp-ic{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .sp-pending .sp-ic{background:var(--amarelo);color:white}
+  .sp-active .sp-ic{background:var(--verde);color:white}
+  .sp-suspended .sp-ic{background:var(--cinza);color:white}
+  .sp-alumni .sp-ic{background:var(--roxo);color:white}
+  .sp-info{flex:1;min-width:0}
+  .sp-nome{font-family:var(--ui);font-size:11px;letter-spacing:1.5px;font-weight:700;text-transform:uppercase}
+  .sp-pending .sp-nome{color:#876715}
+  .sp-active .sp-nome{color:var(--verde)}
+  .sp-suspended .sp-nome{color:var(--cinza)}
+  .sp-alumni .sp-nome{color:var(--roxo)}
+  .sp-desc{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px;line-height:1.4}
+
+  /* === EXEMPLO CONCRETO === */
+  .exemplo-bloco{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:24px}
+  .exemplo-bloco h2{font-size:22px;font-weight:400;margin-bottom:4px}
+  .exemplo-bloco h2 em{color:var(--laranja);font-style:italic}
+  .exemplo-bloco .sub{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;font-weight:600}
+
+  .pessoa-row{display:grid;grid-template-columns:auto 1fr 2fr;gap:18px;align-items:flex-start;padding:18px 0;border-bottom:1px solid var(--cinza-cl)}
+  .pessoa-row:last-child{border:none;padding-bottom:0}
+  .pessoa-av{width:48px;height:48px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:18px;flex-shrink:0;font-weight:600}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .pessoa-nome{font-size:15px;font-weight:500}
+  .pessoa-cargo{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .pessoa-papeis{display:flex;flex-wrap:wrap;gap:6px}
+  .papel-tag{font-family:var(--ui);font-size:10px;padding:4px 10px;border-radius:14px;font-weight:600;letter-spacing:.3px;display:inline-flex;align-items:center;gap:4px}
+  .pt-oinora{background:var(--laranja-cl);color:var(--laranja);border:1px solid var(--laranja)}
+  .pt-owner{background:var(--marinho);color:white}
+  .pt-admin{background:#EEF1F6;color:var(--marinho);border:1px solid var(--marinho)}
+  .pt-employee{background:var(--verde-cl);color:var(--verde);border:1px solid var(--verde)}
+  .pt-candidate{background:var(--roxo-cl);color:var(--roxo);border:1px solid var(--roxo)}
+  .pt-leader{background:var(--amarelo-cl);color:#876715;border:1px solid var(--amarelo)}
+  .pt-approver{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .pt-recruiter{background:#EEF1F6;color:var(--marinho-med);border:1px solid var(--marinho-med)}
+  .pt-hr-ops{background:var(--branco);color:var(--cinza);border:1px solid var(--cinza-cl)}
+
+  /* === RODAPÉ === */
+  .rodape{margin-top:50px;padding-top:24px;border-top:1px solid var(--cinza-cl);font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:center;letter-spacing:.3px;line-height:1.7}
+
+  @media (max-width:900px){
+    .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+    .props-grid{grid-template-columns:1fr}
+    .status-strip{grid-template-columns:1fr 1fr}
+    .pessoa-row{grid-template-columns:1fr;text-align:center}
+    .pessoa-av{margin:0 auto}
+    .pessoa-papeis{justify-content:center}
+    .header h1{font-size:28px;text-align:left}
+    .header h1 + p{text-align:left}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="header">
+    <div>
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="header-tag">Hierarquia de Papéis · v1.0</div>
+    </div>
+    <div>
+      <h1>Quem pode <em>fazer o quê</em>.</h1>
+      <p>8 papéis explícitos + propriedades derivadas + 4 estados de conta</p>
+    </div>
+  </div>
+
+  <!-- ESTADOS DE CONTA -->
+  <div class="filete">Estados de conta (independente do papel)</div>
+  <div class="status-strip">
+    <div class="status-pill sp-pending">
+      <div class="sp-ic">⏳</div>
+      <div class="sp-info">
+        <div class="sp-nome">Pending Invite</div>
+        <div class="sp-desc">Convite enviado, ainda não fez 1º acesso</div>
+      </div>
+    </div>
+    <div class="status-pill sp-active">
+      <div class="sp-ic">✓</div>
+      <div class="sp-info">
+        <div class="sp-nome">Active</div>
+        <div class="sp-desc">Operando normalmente</div>
+      </div>
+    </div>
+    <div class="status-pill sp-suspended">
+      <div class="sp-ic">⏸</div>
+      <div class="sp-info">
+        <div class="sp-nome">Suspended</div>
+        <div class="sp-desc">Temporariamente sem acesso (mantém histórico)</div>
+      </div>
+    </div>
+    <div class="status-pill sp-alumni">
+      <div class="sp-ic">📁</div>
+      <div class="sp-info">
+        <div class="sp-nome">Alumni</div>
+        <div class="sp-desc">Ex-empregado · acesso só aos próprios dados</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONA 1: OI NORA -->
+  <div class="filete">Nível 1 · A própria Oi Nora</div>
+  <div class="zona zona-oinora">
+    <div class="zona-head">
+      <div>
+        <h2>Nível Oi <em>Nora</em></h2>
+        <p class="descricao">Quem opera <strong>a Oi Nora como empresa</strong>. Acessa todos os tenants para atender clientes. Escopo: global.</p>
+      </div>
+      <span class="zona-tag zt-laranja">Cross-tenant · Global</span>
+    </div>
+
+    <div class="papeis-grid grid-2">
+
+      <div class="papel">
+        <div class="papel-head">
+          <div class="papel-ic laranja">👑</div>
+          <div class="papel-titulo">
+            <div class="papel-nome">Super Admin Oi Nora</div>
+            <div class="papel-codigo">oinora_super_admin</div>
+          </div>
+        </div>
+        <span class="escopo-tag global">● Acesso total</span>
+        <div class="pode-nao">
+          <div class="pode"><span class="ic">✓</span><span>Cria e suspende empresas-clientes</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Aprova mudanças de plano e contratos</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Promove operadores Oi Nora</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Vê faturamento, analytics, churn</span></div>
+        </div>
+        <div class="papel-personas"><strong>Quem é:</strong> Cláudia Vasconcelos · co-fundadoras · CTO</div>
+      </div>
+
+      <div class="papel">
+        <div class="papel-head">
+          <div class="papel-ic laranja">🤝</div>
+          <div class="papel-titulo">
+            <div class="papel-nome">Operador Oi Nora</div>
+            <div class="papel-codigo">oinora_operator</div>
+          </div>
+        </div>
+        <span class="escopo-tag global">● Operacional global</span>
+        <div class="pode-nao">
+          <div class="pode"><span class="ic">✓</span><span>Atende clientes via inbox unificada</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Acessa Banco Master de candidatos</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Cria vagas para os clientes que atende</span></div>
+          <div class="nao"><span class="ic">✕</span><span>Não vê faturamento nem altera planos</span></div>
+        </div>
+        <div class="papel-personas"><strong>Quem é:</strong> Mariana, Rafael, Beatriz, Fernanda, Patrícia</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ZONA 2: TENANT (EMPRESA-CLIENTE) -->
+  <div class="filete">Nível 2 · Empresa-cliente (tenant)</div>
+  <div class="zona zona-tenant">
+    <div class="zona-head">
+      <div>
+        <h2>Nível Tenant · <em>uma empresa-cliente</em></h2>
+        <p class="descricao">Pessoas <strong>dentro de uma empresa-cliente específica</strong>, com RLS isolando dados de outros tenants. Hierarquia interna do RH.</p>
+      </div>
+      <span class="zona-tag zt-marinho">Isolado por RLS</span>
+    </div>
+
+    <div class="papeis-grid grid-2">
+
+      <div class="papel" style="background:linear-gradient(135deg,var(--cinza-fundo) 50%,var(--laranja-cl));border-color:var(--laranja)">
+        <div class="papel-head">
+          <div class="papel-ic laranja">⭐</div>
+          <div class="papel-titulo">
+            <div class="papel-nome">Owner do Tenant</div>
+            <div class="papel-codigo">tenant_owner · "usuário master"</div>
+          </div>
+        </div>
+        <span class="escopo-tag tenant">▣ 1 tenant · todos os poderes</span>
+        <div class="pode-nao">
+          <div class="pode"><span class="ic">✓</span><span>Configura tudo da empresa</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Convida e remove qualquer usuário</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Cancela contrato com Oi Nora</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Transfere ownership para outra pessoa</span></div>
+        </div>
+        <div class="papel-personas"><strong>Quem é:</strong> normalmente o CEO ou Dir. RH na Aurora · Roberto Aurora</div>
+      </div>
+
+      <div class="papel">
+        <div class="papel-head">
+          <div class="papel-ic marinho">🛡</div>
+          <div class="papel-titulo">
+            <div class="papel-nome">Admin do Tenant</div>
+            <div class="papel-codigo">tenant_admin</div>
+          </div>
+        </div>
+        <span class="escopo-tag tenant">▣ 1 tenant · configura</span>
+        <div class="pode-nao">
+          <div class="pode"><span class="ic">✓</span><span>Configura cargos, salários, organograma</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Convida usuários menores</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Vê e altera dados de qualquer empregado</span></div>
+          <div class="nao"><span class="ic">✕</span><span>Não pode promover ninguém a Owner</span></div>
+        </div>
+        <div class="papel-personas"><strong>Quem é:</strong> assistentes de RH com poder de configuração · gerente de RH</div>
+      </div>
+
+      <div class="papel">
+        <div class="papel-head">
+          <div class="papel-ic marinho">🎯</div>
+          <div class="papel-titulo">
+            <div class="papel-nome">Recrutador (do cliente)</div>
+            <div class="papel-codigo">tenant_recruiter</div>
+          </div>
+        </div>
+        <span class="escopo-tag tenant">▣ 1 tenant · só recrutamento</span>
+        <div class="pode-nao">
+          <div class="pode"><span class="ic">✓</span><span>Cria vagas, gerencia pipeline</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Acessa banco de talentos do tenant</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Envia ofertas (dentro da faixa pré-aprovada)</span></div>
+          <div class="nao"><span class="ic">✕</span><span>Não vê folha, ponto, férias, avaliações</span></div>
+        </div>
+        <div class="papel-personas"><strong>Quem é:</strong> em empresas grandes, alguém só de R&amp;S · estagiários de RH focados</div>
+      </div>
+
+      <div class="papel">
+        <div class="papel-head">
+          <div class="papel-ic marinho">📋</div>
+          <div class="papel-titulo">
+            <div class="papel-nome">Gestor de Pessoas</div>
+            <div class="papel-codigo">tenant_hr_ops</div>
+          </div>
+        </div>
+        <span class="escopo-tag tenant">▣ 1 tenant · só HRIS</span>
+        <div class="pode-nao">
+          <div class="pode"><span class="ic">✓</span><span>Processa folha, ajusta ponto, aprova férias</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Vê fichas de empregados</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Configura benefícios (com aprovação)</span></div>
+          <div class="nao"><span class="ic">✕</span><span>Não recruta, não altera salários</span></div>
+        </div>
+        <div class="papel-personas"><strong>Quem é:</strong> DP / Departamento Pessoal · contador interno</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ZONA 3: EMPREGADO E CANDIDATO -->
+  <div class="filete">Nível 3 · Usuários finais</div>
+  <div class="zona zona-cross">
+    <div class="zona-head">
+      <div>
+        <h2>Empregados &amp; <em>Candidatos</em></h2>
+        <p class="descricao">As <strong>duas pontas que a plataforma serve</strong>. Empregados vivem em 1 tenant; candidatos vivem na Oi Nora (cross-tenant) e podem se candidatar em qualquer empresa.</p>
+      </div>
+      <span class="zona-tag zt-roxo">Os usuários reais</span>
+    </div>
+
+    <div class="papeis-grid grid-2">
+
+      <div class="papel">
+        <div class="papel-head">
+          <div class="papel-ic verde">👷</div>
+          <div class="papel-titulo">
+            <div class="papel-nome">Empregado</div>
+            <div class="papel-codigo">employee</div>
+          </div>
+        </div>
+        <span class="escopo-tag proprio">● Só os próprios dados</span>
+        <div class="pode-nao">
+          <div class="pode"><span class="ic">✓</span><span>Bate ponto, solicita férias, vê holerites</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Edita os próprios dados de contato</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Responde autoavaliação e avalia pares designados</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Conversa com RH via chat</span></div>
+        </div>
+        <div class="papel-personas"><strong>Quem é:</strong> Fernando, Daniel, Ana Carolina · todos os CLT</div>
+      </div>
+
+      <div class="papel">
+        <div class="papel-head">
+          <div class="papel-ic roxo">🎓</div>
+          <div class="papel-titulo">
+            <div class="papel-nome">Candidato</div>
+            <div class="papel-codigo">candidate</div>
+          </div>
+        </div>
+        <span class="escopo-tag cross">◆ Cross-tenant · vive na Oi Nora</span>
+        <div class="pode-nao">
+          <div class="pode"><span class="ic">✓</span><span>Cria 1 cadastro e se candidata em N empresas</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Controla visibilidade do perfil (público/restrito/invisível)</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Conversa com recrutadora Oi Nora</span></div>
+          <div class="pode"><span class="ic">✓</span><span>Pede exclusão da conta (LGPD)</span></div>
+        </div>
+        <div class="papel-personas"><strong>Quem é:</strong> Letícia, 2.847 outros no Banco Master</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PROPRIEDADES DERIVADAS -->
+  <div class="filete">Não são papéis — são propriedades derivadas</div>
+  <div class="propriedades-bloco">
+    <h2>3 <em>propriedades</em> que modificam comportamento</h2>
+    <div class="sub">Estas não são atribuídas manualmente — emergem da estrutura. Mais robustas que papéis: você não esquece de remover quando a pessoa muda de função.</div>
+
+    <div class="props-grid">
+
+      <div class="prop-card">
+        <div class="prop-titulo">
+          <h4>É Líder</h4>
+          <code>is_leader</code>
+        </div>
+        <div class="prop-desc">Verdadeiro automaticamente se existe algum empregado com <code style="background:rgba(255,255,255,.1);padding:1px 4px;border-radius:2px">manager_id = você</code>. Dá acesso ao quadro da equipe, aprovação de férias dos liderados, avaliação 360 deles, edição de PDIs.</div>
+        <div class="prop-exemplo">Ex.: Luísa Mendonça é líder porque Fernando, Daniel, Ana Carolina, Gabriela, Pedro e Marcelo apontam para ela como gestor.</div>
+      </div>
+
+      <div class="prop-card">
+        <div class="prop-titulo">
+          <h4>É Aprovador</h4>
+          <code>is_approver</code>
+        </div>
+        <div class="prop-desc">Flag explícita por tipo. Tipos previstos: <code style="background:rgba(255,255,255,.1);padding:1px 4px;border-radius:2px">offer</code> (oferta de contratação), <code style="background:rgba(255,255,255,.1);padding:1px 4px;border-radius:2px">expense</code> (despesa), <code style="background:rgba(255,255,255,.1);padding:1px 4px;border-radius:2px">vacation</code> (férias), <code style="background:rgba(255,255,255,.1);padding:1px 4px;border-radius:2px">exception</code> (exceções de política). Cada flag tem <em>limite</em> em R$ e <em>escopo</em> (departamento ou geral).</div>
+        <div class="prop-exemplo">Ex.: Eduardo Santos (Dir. Financeiro) tem flag offer_approver, limite R$ 50k, escopo all. Roberto envia offer de R$ 22k → notifica Eduardo.</div>
+      </div>
+
+      <div class="prop-card">
+        <div class="prop-titulo">
+          <h4>Papel em Avaliação</h4>
+          <code>evaluation_role</code>
+        </div>
+        <div class="prop-desc">Papel <strong>transacional dentro de uma avaliação 360 específica</strong>: <em>self, manager, peer, direct_report, stakeholder</em>. Existe apenas dentro do contexto daquele ciclo. Não dá nenhuma permissão fora dali.</div>
+        <div class="prop-exemplo">Ex.: Eduardo Santos avalia Fernando como <em>stakeholder</em> no ciclo 2026-S1, mesmo sem ser gestor dele.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EXEMPLO CONCRETO -->
+  <div class="filete">Como fica na prática</div>
+  <div class="exemplo-bloco">
+    <h2>Construtora Aurora · <em>quem é o quê</em></h2>
+    <div class="sub">Mesmo cenário do protótipo · uma pessoa pode acumular papéis</div>
+
+    <div class="pessoa-row">
+      <div class="pessoa-av av-b">RA</div>
+      <div>
+        <div class="pessoa-nome">Roberto Aurora</div>
+        <div class="pessoa-cargo">Diretor de RH · Construtora Aurora</div>
+      </div>
+      <div class="pessoa-papeis">
+        <span class="papel-tag pt-owner">⭐ tenant_owner</span>
+        <span class="papel-tag pt-employee">👷 employee (na Aurora)</span>
+        <span class="papel-tag pt-leader">⊕ is_leader (RH)</span>
+      </div>
+    </div>
+
+    <div class="pessoa-row">
+      <div class="pessoa-av av-b">LM</div>
+      <div>
+        <div class="pessoa-nome">Luísa Mendonça</div>
+        <div class="pessoa-cargo">Diretora de Engenharia · Aurora</div>
+      </div>
+      <div class="pessoa-papeis">
+        <span class="papel-tag pt-employee">👷 employee</span>
+        <span class="papel-tag pt-leader">⊕ is_leader (6 liderados)</span>
+        <span class="papel-tag pt-approver">⊕ vacation_approver</span>
+      </div>
+    </div>
+
+    <div class="pessoa-row">
+      <div class="pessoa-av av-c">ES</div>
+      <div>
+        <div class="pessoa-nome">Eduardo Santos</div>
+        <div class="pessoa-cargo">Diretor Financeiro · Aurora</div>
+      </div>
+      <div class="pessoa-papeis">
+        <span class="papel-tag pt-employee">👷 employee</span>
+        <span class="papel-tag pt-leader">⊕ is_leader (Fin)</span>
+        <span class="papel-tag pt-approver">⊕ offer_approver (limite R$50k)</span>
+      </div>
+    </div>
+
+    <div class="pessoa-row">
+      <div class="pessoa-av av-a">F</div>
+      <div>
+        <div class="pessoa-nome">Fernando Lacerda</div>
+        <div class="pessoa-cargo">Eng. Civil Sr · Aurora</div>
+      </div>
+      <div class="pessoa-papeis">
+        <span class="papel-tag pt-employee">👷 employee</span>
+        <span style="font-family:var(--ui);font-size:11px;color:var(--cinza);align-self:center">— só esse, sem propriedades extras (ainda)</span>
+      </div>
+    </div>
+
+    <div class="pessoa-row">
+      <div class="pessoa-av av-a">M</div>
+      <div>
+        <div class="pessoa-nome">Mariana Costa</div>
+        <div class="pessoa-cargo">Recrutadora Sr · Oi Nora</div>
+      </div>
+      <div class="pessoa-papeis">
+        <span class="papel-tag pt-oinora">🤝 oinora_operator</span>
+        <span style="font-family:var(--ui);font-size:11px;color:var(--cinza);align-self:center">— atende Aurora, Pluma, Casa Lumière</span>
+      </div>
+    </div>
+
+    <div class="pessoa-row">
+      <div class="pessoa-av av-a">L</div>
+      <div>
+        <div class="pessoa-nome">Letícia Ferraz</div>
+        <div class="pessoa-cargo">Candidata · Analista Financeira Sr</div>
+      </div>
+      <div class="pessoa-papeis">
+        <span class="papel-tag pt-candidate">🎓 candidate</span>
+        <span style="font-family:var(--ui);font-size:11px;color:var(--cinza);align-self:center">— cross-tenant · candidata na Aurora, Pluma, RioMar</span>
+      </div>
+    </div>
+
+    <div class="pessoa-row">
+      <div class="pessoa-av av-c">CV</div>
+      <div>
+        <div class="pessoa-nome">Cláudia Vasconcelos</div>
+        <div class="pessoa-cargo">CEO · Oi Nora</div>
+      </div>
+      <div class="pessoa-papeis">
+        <span class="papel-tag pt-oinora" style="background:var(--laranja);color:white;border-color:var(--laranja)">👑 oinora_super_admin</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="rodape">
+    Oi Nora · Hierarquia de Papéis · v1.0<br>
+    Documento de referência para implementação no Sprint 0
+  </div>
+
+</div>
+
+</body>
+</html>

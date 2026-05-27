@@ -1,0 +1,2291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora — Gestão de Pessoas · HRIS</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+  .logo-wrap{display:inline-flex;flex-direction:column;align-items:center}
+
+  .filete{display:flex;align-items:center;gap:10px;font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--marinho-med);text-transform:uppercase}
+  .filete::before,.filete::after{content:"";flex:1;height:1px;background:var(--cinza-cl)}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc);transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,99,58,.25)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-verde{background:var(--verde);color:white}
+  .btn-vermelho{background:transparent;color:var(--vermelho);border:1px solid var(--vermelho)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  .app-shell{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:28px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:26px;padding:0 28px 8px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar .empresa-marca{padding:14px 28px 20px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px}
+  .sidebar .empresa-marca .selo{font-family:var(--ui);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(250,247,242,.45);font-weight:600;margin-bottom:6px}
+  .sidebar .empresa-marca .nome{font-family:var(--serif);font-size:17px;color:var(--papel)}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:24px 28px 8px;font-weight:600}
+  .sidebar-item{padding:11px 28px;font-size:14px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item .ic{font-size:16px;width:20px;text-align:center;opacity:.85}
+  .sidebar-item .badge{margin-left:auto;background:var(--laranja);color:white;font-family:var(--ui);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.5px}
+  .sidebar-perfil{margin-top:auto;padding:18px 28px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;background:var(--marinho-esc)}
+  .sidebar-perfil .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:16px}
+  .sidebar-perfil .nome{font-size:13px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:10px;opacity:.6;margin-top:2px}
+
+  .app-main{padding:32px 44px 60px;background:var(--papel);min-height:100vh}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;gap:24px}
+  .topbar h1{font-size:34px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .topbar h1 em{color:var(--laranja);font-style:italic}
+  .topbar .topbar-meta{font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px}
+  .topbar-acoes{display:flex;gap:10px;align-items:center}
+
+  .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px}
+  .card{background:var(--branco);border:1px solid var(--cinza-cl);padding:22px;border-radius:2px;transition:all .2s}
+  .card:hover{border-color:var(--laranja);box-shadow:0 4px 20px rgba(31,42,68,.06)}
+  .card-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:14px}
+  .card-valor{font-size:38px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.5px}
+  .card-valor em{color:var(--laranja);font-style:italic}
+  .card-valor span{font-size:18px;color:var(--cinza)}
+  .card-delta{font-family:var(--ui);font-size:12px;color:var(--verde);margin-top:10px;letter-spacing:.3px}
+  .card-delta.neg{color:var(--vermelho)}
+  .card-delta.neutro{color:var(--cinza)}
+
+  .grid-2{display:grid;grid-template-columns:2fr 1fr;gap:24px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:20px}
+  .painel h3{font-size:21px;font-weight:400;margin-bottom:4px}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:22px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px}
+
+  .tag{font-family:var(--ui);font-size:11px;padding:4px 10px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  /* TABELA DE EMPREGADOS */
+  .empregados-tabela{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden}
+  .emp-linha{display:grid;grid-template-columns:2.2fr 1.4fr 1fr 1fr .8fr 60px;gap:14px;padding:16px 24px;border-bottom:1px solid var(--cinza-cl);align-items:center;cursor:pointer;transition:background .15s}
+  .emp-linha:hover{background:var(--cinza-fundo)}
+  .emp-linha:last-child{border-bottom:none}
+  .emp-linha.head{background:var(--cinza-fundo);font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;cursor:default;padding:14px 24px}
+  .emp-linha.head:hover{background:var(--cinza-fundo)}
+  .emp-pessoa{display:flex;align-items:center;gap:12px}
+  .emp-av{width:38px;height:38px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:15px;flex-shrink:0}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .emp-nome{font-size:15px;font-weight:500;line-height:1.2}
+  .emp-cargo{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .emp-meta{font-family:var(--ui);font-size:13px;color:var(--marinho)}
+  .emp-meta-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px}
+
+  /* PROGRESS BAR */
+  .barra-progresso{height:6px;background:var(--cinza-fundo);border-radius:3px;overflow:hidden}
+  .barra-progresso .preenchimento{height:100%;background:linear-gradient(90deg,var(--laranja),var(--laranja-esc));transition:width .6s}
+
+  /* CAMPOS / FORM */
+  .campo{margin-bottom:16px}
+  .campo label{display:block;font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--marinho-med);margin-bottom:6px;font-weight:600}
+  .campo input,.campo select,.campo textarea{width:100%;padding:10px 12px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;color:var(--marinho);border-radius:2px}
+  .campo input:focus{outline:none;border-color:var(--laranja)}
+  .campos-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .campos-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+  /* INFO LINHA */
+  .info-linha{display:grid;grid-template-columns:160px 1fr;gap:14px;padding:11px 0;border-bottom:1px solid var(--cinza-cl);font-size:14px}
+  .info-linha:last-child{border:none}
+  .info-linha .rotulo{color:var(--cinza);font-family:var(--ui);font-size:12px;letter-spacing:.3px}
+  .info-linha .valor{color:var(--marinho)}
+
+  /* ABAS */
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;overflow-x:auto}
+  .aba{padding:12px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+
+  /* PERFIL DO EMPREGADO HEADER */
+  .perfil-emp-header{background:var(--branco);border:1px solid var(--cinza-cl);padding:32px;border-radius:2px;margin-bottom:24px;display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center}
+  .perfil-emp-foto{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:42px}
+  .perfil-emp-info h2{font-size:30px;font-weight:400;margin-bottom:4px}
+  .perfil-emp-info .cargo{font-family:var(--ui);font-size:13px;color:var(--cinza);letter-spacing:.5px;margin-bottom:12px}
+  .perfil-emp-tags{display:flex;gap:6px;flex-wrap:wrap}
+  .perfil-emp-acoes{display:flex;flex-direction:column;gap:8px}
+
+  /* DOCUMENTOS */
+  .doc-item{display:flex;align-items:center;gap:14px;padding:14px;background:var(--cinza-fundo);border-radius:2px;margin-bottom:8px;border:1px solid transparent;transition:all .15s;cursor:pointer}
+  .doc-item:hover{border-color:var(--laranja);background:var(--laranja-cl)}
+  .doc-icone{width:38px;height:38px;background:var(--marinho);color:var(--papel);display:flex;align-items:center;justify-content:center;font-family:var(--ui);font-size:10px;font-weight:700;border-radius:2px}
+  .doc-icone.atencao{background:var(--amarelo);color:white}
+  .doc-icone.vencido{background:var(--vermelho);color:white}
+  .doc-info{flex:1}
+  .doc-nome{font-size:14px;font-weight:500}
+  .doc-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px}
+  .doc-acoes{display:flex;gap:6px}
+  .doc-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:var(--branco);color:var(--cinza)}
+  .doc-btn:hover{color:var(--marinho)}
+
+  /* PONTO ELETRÔNICO - CALENDÁRIO */
+  .cal-mes{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:20px;margin-bottom:20px}
+  .cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-dia-head{padding:8px;text-align:center;font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+  .cal-dia{aspect-ratio:1;padding:6px;background:var(--cinza-fundo);border-radius:2px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;font-family:var(--ui);font-size:12px;cursor:pointer;transition:all .15s;position:relative}
+  .cal-dia:hover{background:var(--laranja-cl)}
+  .cal-dia.fim-semana{opacity:.4;cursor:default}
+  .cal-dia.fim-semana:hover{background:var(--cinza-fundo)}
+  .cal-dia.ok{background:var(--verde-cl);color:var(--verde)}
+  .cal-dia.atencao{background:var(--amarelo-cl);color:#876715}
+  .cal-dia.falta{background:var(--vermelho-cl);color:var(--vermelho)}
+  .cal-dia.ferias{background:var(--roxo-cl);color:var(--roxo)}
+  .cal-dia.hoje{border:2px solid var(--laranja);font-weight:700}
+  .cal-dia .data{font-weight:600;font-size:13px}
+  .cal-dia .info{font-size:9px;letter-spacing:.3px;opacity:.85}
+
+  /* TIMELINE PONTO HOJE */
+  .ponto-timeline{display:flex;justify-content:space-between;align-items:center;padding:24px 0;position:relative;margin-bottom:14px}
+  .ponto-timeline::before{content:"";position:absolute;top:50%;left:5%;right:5%;height:2px;background:var(--cinza-cl);transform:translateY(-50%)}
+  .ponto-pt{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .ponto-pt .bolinha{width:18px;height:18px;border-radius:50%;background:var(--branco);border:3px solid var(--cinza-cl)}
+  .ponto-pt.feito .bolinha{background:var(--verde);border-color:var(--verde)}
+  .ponto-pt.atual .bolinha{background:var(--laranja);border-color:var(--laranja);animation:pulso 1.5s infinite}
+  .ponto-pt .label{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+  .ponto-pt .hora{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--marinho)}
+  .ponto-pt.pendente .hora{color:var(--cinza);opacity:.5}
+  @keyframes pulso{0%,100%{box-shadow:0 0 0 0 rgba(232,99,58,.4)}50%{box-shadow:0 0 0 8px rgba(232,99,58,0)}}
+
+  /* ORGANOGRAMA */
+  .org-tree{padding:30px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow-x:auto}
+  .org-nivel{display:flex;justify-content:center;gap:24px;margin-bottom:60px;position:relative;flex-wrap:wrap}
+  .org-nivel:last-child{margin-bottom:0}
+  .org-card{background:var(--cinza-fundo);border:1px solid var(--cinza-cl);border-top:3px solid var(--marinho);border-radius:2px;padding:14px 18px;text-align:center;min-width:170px;cursor:pointer;transition:all .15s;position:relative}
+  .org-card:hover{border-color:var(--laranja);transform:translateY(-2px);box-shadow:0 6px 16px rgba(31,42,68,.08)}
+  .org-card.ceo{border-top-color:var(--laranja);background:var(--laranja-cl)}
+  .org-card.diretor{border-top-color:var(--marinho)}
+  .org-card .av-mini{width:42px;height:42px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:16px;margin:0 auto 8px}
+  .org-card .nome{font-size:13px;font-weight:500;line-height:1.2}
+  .org-card .cargo{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+  .org-card .time{font-family:var(--ui);font-size:9px;color:var(--marinho-med);margin-top:6px;padding-top:6px;border-top:1px solid var(--cinza-cl);letter-spacing:.5px;font-weight:600}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:260px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  /* AVALIAÇÃO 9-BOX */
+  .matriz9{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--cinza-cl);border:1px solid var(--cinza-cl);aspect-ratio:1;max-width:480px;margin:0 auto}
+  .box9{background:var(--branco);padding:14px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:background .15s;position:relative;min-height:120px}
+  .box9:hover{background:var(--cinza-fundo)}
+  .box9 .titulo{font-family:var(--ui);font-size:10px;letter-spacing:.5px;color:var(--cinza);text-transform:uppercase;font-weight:600;line-height:1.3}
+  .box9 .pessoas{display:flex;gap:-4px;flex-wrap:wrap}
+  .box9 .pessoa-mini{width:24px;height:24px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:11px;border:2px solid var(--branco);margin-left:-6px}
+  .box9 .pessoa-mini:first-child{margin-left:0}
+  .box9.estrela{background:var(--verde-cl)}
+  .box9.alto-potencial{background:#F0F8EF}
+  .box9.mantenedor{background:var(--cinza-fundo)}
+  .box9.risco{background:var(--vermelho-cl)}
+
+  /* BARRAS HORIZONTAIS */
+  .barras-h{display:flex;flex-direction:column;gap:10px}
+  .barra-h-item{display:grid;grid-template-columns:160px 1fr 50px;gap:12px;align-items:center;font-family:var(--ui);font-size:12px}
+  .barra-h-item .barra{height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden}
+  .barra-h-item .barra .preenchimento{height:100%;background:var(--marinho)}
+  .barra-h-item .barra .preenchimento.laranja{background:var(--laranja)}
+  .barra-h-item .barra .preenchimento.verde{background:var(--verde)}
+  .barra-h-item .valor{text-align:right;color:var(--marinho);font-weight:600}
+
+  /* PESQUISA / SURVEY */
+  .pesquisa-card{background:var(--branco);border:1px solid var(--cinza-cl);padding:24px;border-radius:2px;margin-bottom:14px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+  .pesquisa-icone{width:54px;height:54px;background:var(--marinho);color:var(--papel);display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:50%}
+  .pesquisa-status{font-family:var(--ui);font-size:10px;padding:5px 10px;border-radius:2px;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+
+  /* FOLHA / HOLERITES */
+  .folha-card{background:var(--branco);border:1px solid var(--cinza-cl);padding:20px;border-radius:2px;display:flex;align-items:center;gap:16px}
+  .folha-mes{font-family:var(--ui);font-size:11px;letter-spacing:2px;color:var(--cinza);text-transform:uppercase;font-weight:700}
+  .folha-valor{font-family:var(--serif);font-size:22px;color:var(--marinho);margin-top:3px}
+
+  /* DONUT */
+  .donut-wrap{position:relative;width:140px;height:140px;margin:0 auto}
+  .donut-wrap svg{transform:rotate(-90deg)}
+  .donut-bg{fill:none;stroke:var(--cinza-cl);stroke-width:14}
+  .donut-fg{fill:none;stroke:var(--laranja);stroke-width:14;stroke-linecap:round}
+  .donut-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .donut-num .valor{font-size:32px;font-style:italic;color:var(--marinho)}
+  .donut-num .label{font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:1px;text-transform:uppercase}
+
+  @media (max-width:1100px){
+    .cards-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2{grid-template-columns:1fr}
+    .grid-3{grid-template-columns:1fr}
+    .emp-linha{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- COMPONENTE SIDEBAR (replicado em cada tela) -->
+<!-- ============================================== -->
+
+<!-- ============================================== -->
+<!-- TELA 1: DASHBOARD GESTÃO DE PESSOAS -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-dash">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca">
+        <div class="selo">— Sua Empresa —</div>
+        <div class="nome">Construtora Aurora</div>
+      </div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item ativo" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil">
+        <div class="av">RA</div>
+        <div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Gestão de <em>Pessoas</em></h1>
+          <p class="topbar-meta">128 empregados ativos · 5 admissões no mês · turnover anualizado 8,2%</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📅 Maio 2026 ▾</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar</button>
+          <button class="btn btn-primario btn-sm">+ Nova ação</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Quadro Atual</div>
+          <div class="card-valor"><em>128</em></div>
+          <div class="card-delta">+5 este mês</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Turnover Anualizado</div>
+          <div class="card-valor"><em>8,2</em><span>%</span></div>
+          <div class="card-delta">-1,4pp vs ano passado</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Ausências hoje</div>
+          <div class="card-valor"><em>4</em></div>
+          <div class="card-delta neutro">2 atestados · 2 férias</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Aniversariantes da semana</div>
+          <div class="card-valor"><em>3</em></div>
+          <div class="card-delta neutro">Próximo: Camila R.</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div>
+                <h3>Quadro por área</h3>
+                <div class="sub-titulo">Distribuição de pessoas</div>
+              </div>
+            </div>
+            <div class="barras-h">
+              <div class="barra-h-item">
+                <span>Obras</span>
+                <div class="barra"><div class="preenchimento" style="width:100%"></div></div>
+                <span class="valor">62</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Administrativo</span>
+                <div class="barra"><div class="preenchimento laranja" style="width:43%"></div></div>
+                <span class="valor">22</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Engenharia</span>
+                <div class="barra"><div class="preenchimento" style="width:30%"></div></div>
+                <span class="valor">15</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Financeiro</span>
+                <div class="barra"><div class="preenchimento" style="width:22%"></div></div>
+                <span class="valor">11</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Comercial</span>
+                <div class="barra"><div class="preenchimento" style="width:18%"></div></div>
+                <span class="valor">9</span>
+              </div>
+              <div class="barra-h-item">
+                <span>RH &amp; Suporte</span>
+                <div class="barra"><div class="preenchimento" style="width:18%"></div></div>
+                <span class="valor">9</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Próximas admissões</h3><div class="sub-titulo">Quem chega ao time</div></div>
+              <button class="btn btn-fantasma btn-sm">Ver onboarding →</button>
+            </div>
+
+            <div class="emp-linha" style="background:var(--verde-cl);padding:14px 18px;border-radius:2px;border:1px solid var(--verde-cl);margin-bottom:8px">
+              <div class="emp-pessoa">
+                <div class="emp-av av-a">C</div>
+                <div><div class="emp-nome">Camila Reis</div><div class="emp-cargo">Asst. Administrativo Jr</div></div>
+              </div>
+              <div><div class="emp-meta">01/06/2026</div><div class="emp-meta-sub">em 7 dias</div></div>
+              <div><span class="tag verde">Pré-onboarding</span></div>
+              <div><div class="emp-meta">R$ 2.800</div></div>
+              <div></div>
+              <div><button class="doc-btn">⋮</button></div>
+            </div>
+            <div class="emp-linha" style="padding:14px 18px;border:1px solid var(--cinza-cl);border-radius:2px;margin-bottom:8px">
+              <div class="emp-pessoa">
+                <div class="emp-av av-b">T</div>
+                <div><div class="emp-nome">Thiago Resende</div><div class="emp-cargo">Analista Financeiro Sr</div></div>
+              </div>
+              <div><div class="emp-meta">17/06/2026</div><div class="emp-meta-sub">em 23 dias</div></div>
+              <div><span class="tag amarelo">Aguardando docs</span></div>
+              <div><div class="emp-meta">R$ 11.500</div></div>
+              <div></div>
+              <div><button class="doc-btn">⋮</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Atenções do dia</h3>
+            <div class="sub-titulo">O que precisa da sua ação</div>
+
+            <div style="padding:14px;background:var(--vermelho-cl);border-left:3px solid var(--vermelho);border-radius:2px;margin-bottom:10px;cursor:pointer">
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;letter-spacing:1px;color:var(--vermelho);font-weight:700;margin-bottom:6px">
+                <span>URGENTE</span><span>2 itens</span>
+              </div>
+              <div style="font-size:14px;font-weight:500">2 ASOs vencendo em 7 dias</div>
+              <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px">Fernando Lacerda, José Pereira</div>
+            </div>
+
+            <div style="padding:14px;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px;margin-bottom:10px;cursor:pointer">
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;letter-spacing:1px;color:#876715;font-weight:700;margin-bottom:6px">
+                <span>ATENÇÃO</span><span>4 itens</span>
+              </div>
+              <div style="font-size:14px;font-weight:500">Férias vencidas (período aquisitivo)</div>
+              <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px">Empregados com mais de 12 meses sem férias</div>
+            </div>
+
+            <div style="padding:14px;background:var(--laranja-cl);border-left:3px solid var(--laranja);border-radius:2px;margin-bottom:10px;cursor:pointer">
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;letter-spacing:1px;color:var(--laranja);font-weight:700;margin-bottom:6px">
+                <span>SOLICITAÇÕES</span><span>7 pendentes</span>
+              </div>
+              <div style="font-size:14px;font-weight:500">Pedidos no chat do RH</div>
+              <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px">3 férias, 2 declarações, 2 reembolsos</div>
+            </div>
+
+            <div style="padding:14px;background:var(--cinza-fundo);border-left:3px solid var(--marinho);border-radius:2px;cursor:pointer">
+              <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;letter-spacing:1px;color:var(--marinho);font-weight:700;margin-bottom:6px">
+                <span>INFORMATIVO</span><span>1 item</span>
+              </div>
+              <div style="font-size:14px;font-weight:500">Avaliação semestral começa em 15 dias</div>
+              <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px">Ciclo 2026-S1 · 128 empregados</div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Clima organizacional</h3>
+            <div class="sub-titulo">eNPS último trimestre</div>
+            <div class="donut-wrap" style="margin:14px auto">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle class="donut-bg" cx="70" cy="70" r="58"></circle>
+                <circle class="donut-fg" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="80"></circle>
+              </svg>
+              <div class="donut-num">
+                <div class="valor">+62</div>
+                <div class="label">eNPS</div>
+              </div>
+            </div>
+            <div style="text-align:center;font-family:var(--ui);font-size:12px;color:var(--cinza)">98 respondentes · taxa 77%</div>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--cinza-cl);display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+              <div><div style="color:var(--verde);font-size:18px;font-style:italic">71</div><div style="font-family:var(--ui);font-size:10px;color:var(--cinza)">PROMOT.</div></div>
+              <div><div style="color:var(--amarelo);font-size:18px;font-style:italic">19</div><div style="font-family:var(--ui);font-size:10px;color:var(--cinza)">NEUTROS</div></div>
+              <div><div style="color:var(--vermelho);font-size:18px;font-style:italic">8</div><div style="font-family:var(--ui);font-size:10px;color:var(--cinza)">DETRAT.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: LISTA DE EMPREGADOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-empregados">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca">
+        <div class="selo">— Sua Empresa —</div>
+        <div class="nome">Construtora Aurora</div>
+      </div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Quadro de <em>Empregados</em></h1>
+          <p class="topbar-meta">128 ativos · 2 afastados · 5 admissões pendentes</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar</button>
+          <button class="btn btn-fantasma btn-sm">📥 Importar</button>
+          <button class="btn btn-primario btn-sm">+ Admitir</button>
+        </div>
+      </div>
+
+      <div style="background:var(--branco);border:1px solid var(--cinza-cl);padding:16px 20px;border-radius:2px;display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:240px;position:relative">
+          <input style="width:100%;padding:10px 14px 10px 38px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:14px;border-radius:2px" placeholder="Buscar por nome, CPF, cargo ou matrícula..."/>
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza)">⌕</span>
+        </div>
+        <select style="padding:10px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;border-radius:2px"><option>Toda área</option><option>Obras</option><option>Administrativo</option><option>Financeiro</option></select>
+        <select style="padding:10px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;border-radius:2px"><option>Todo status</option><option>Ativos</option><option>Afastados</option><option>Em férias</option></select>
+        <select style="padding:10px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;border-radius:2px"><option>Todo contrato</option><option>CLT</option><option>PJ</option><option>Estágio</option></select>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">Ativos (128)</div>
+        <div class="aba">Em férias (4)</div>
+        <div class="aba">Afastados (2)</div>
+        <div class="aba">Admissões pendentes (5)</div>
+        <div class="aba">Desligados</div>
+      </div>
+
+      <div class="empregados-tabela">
+        <div class="emp-linha head">
+          <div>Empregado</div>
+          <div>Cargo / Área</div>
+          <div>Admissão</div>
+          <div>Salário</div>
+          <div>Status</div>
+          <div></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-a">L</div>
+            <div><div class="emp-nome">Luísa Mendonça</div><div class="emp-cargo">MAT 0042 · LMENDONCA@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Diretora de Engenharia</div><div class="emp-meta-sub">Engenharia</div></div>
+          <div><div class="emp-meta">15/03/2017</div><div class="emp-meta-sub">9 anos · CLT</div></div>
+          <div><div class="emp-meta">R$ 22.500</div></div>
+          <div><span class="tag verde">Ativa</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-b">E</div>
+            <div><div class="emp-nome">Eduardo Santos</div><div class="emp-cargo">MAT 0058 · ESANTOS@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Diretor Financeiro</div><div class="emp-meta-sub">Financeiro</div></div>
+          <div><div class="emp-meta">08/06/2018</div><div class="emp-meta-sub">7 anos · CLT</div></div>
+          <div><div class="emp-meta">R$ 24.000</div></div>
+          <div><span class="tag verde">Ativo</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-c">P</div>
+            <div><div class="emp-nome">Patrícia Aguiar</div><div class="emp-cargo">MAT 0089 · PAGUIAR@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Gerente Comercial</div><div class="emp-meta-sub">Comercial</div></div>
+          <div><div class="emp-meta">22/01/2020</div><div class="emp-meta-sub">5 anos · CLT</div></div>
+          <div><div class="emp-meta">R$ 16.000</div></div>
+          <div><span class="tag verde">Ativa</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-d">F</div>
+            <div><div class="emp-nome">Fernando Lacerda</div><div class="emp-cargo">MAT 0112 · FLACERDA@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Engenheiro Civil Sr</div><div class="emp-meta-sub">Engenharia</div></div>
+          <div><div class="emp-meta">05/09/2021</div><div class="emp-meta-sub">4 anos · CLT</div></div>
+          <div><div class="emp-meta">R$ 12.500</div></div>
+          <div><span class="tag amarelo">ASO vence 02/06</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-e">G</div>
+            <div><div class="emp-nome">Gabriela Tavares</div><div class="emp-cargo">MAT 0124 · GTAVARES@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Analista Financeira Pl</div><div class="emp-meta-sub">Financeiro</div></div>
+          <div><div class="emp-meta">13/04/2022</div><div class="emp-meta-sub">3 anos · CLT</div></div>
+          <div><div class="emp-meta">R$ 6.800</div></div>
+          <div><span class="tag roxo">Em férias</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-f">J</div>
+            <div><div class="emp-nome">José Pereira</div><div class="emp-cargo">MAT 0148 · JPEREIRA@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Pedreiro</div><div class="emp-meta-sub">Obras · Sítio I</div></div>
+          <div><div class="emp-meta">19/11/2022</div><div class="emp-meta-sub">2 anos · CLT</div></div>
+          <div><div class="emp-meta">R$ 3.200</div></div>
+          <div><span class="tag amarelo">ASO vence 05/06</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-a">R</div>
+            <div><div class="emp-nome">Renata Macedo</div><div class="emp-cargo">MAT 0167 · RMACEDO@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Analista de RH Pl</div><div class="emp-meta-sub">RH</div></div>
+          <div><div class="emp-meta">07/02/2023</div><div class="emp-meta-sub">2 anos · CLT</div></div>
+          <div><div class="emp-meta">R$ 7.200</div></div>
+          <div><span class="tag verde">Ativa</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-b">M</div>
+            <div><div class="emp-nome">Marcelo Andrade</div><div class="emp-cargo">MAT 0189 · MANDRADE@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Comprador Pl</div><div class="emp-meta-sub">Suprimentos</div></div>
+          <div><div class="emp-meta">28/08/2023</div><div class="emp-meta-sub">1 ano · CLT</div></div>
+          <div><div class="emp-meta">R$ 5.400</div></div>
+          <div><span class="tag verde">Ativo</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+
+        <div class="emp-linha" onclick="irPara('t-perfil-emp')">
+          <div class="emp-pessoa">
+            <div class="emp-av av-c">S</div>
+            <div><div class="emp-nome">Sandra Oliveira</div><div class="emp-cargo">MAT 0211 · SOLIVEIRA@AURORA.COM.BR</div></div>
+          </div>
+          <div><div class="emp-meta">Auxiliar Administrativa</div><div class="emp-meta-sub">Administrativo</div></div>
+          <div><div class="emp-meta">17/01/2024</div><div class="emp-meta-sub">1 ano · CLT</div></div>
+          <div><div class="emp-meta">R$ 2.600</div></div>
+          <div><span class="tag vermelho">Afastada · INSS</span></div>
+          <div><button class="doc-btn">⋮</button></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:30px;padding:14px;font-family:var(--ui);font-size:12px;color:var(--cinza)">Mostrando 9 de 128 · <a style="color:var(--laranja)">Carregar mais</a></div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: PERFIL/FICHA INDIVIDUAL DO EMPREGADO -->
+<!-- ============================================== -->
+<div class="tela" id="t-perfil-emp">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item ativo"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <button class="btn btn-fantasma btn-xs" onclick="irPara('t-empregados')" style="margin-bottom:14px">← Quadro de empregados</button>
+
+      <div class="perfil-emp-header">
+        <div class="perfil-emp-foto">F</div>
+        <div class="perfil-emp-info">
+          <h2>Fernando Lacerda Costa</h2>
+          <div class="cargo">ENGENHEIRO CIVIL SÊNIOR · MATRÍCULA 0112 · CLT</div>
+          <div class="perfil-emp-tags">
+            <span class="tag verde">Ativo</span>
+            <span class="tag amarelo">⚠ ASO vence 02/06</span>
+            <span class="tag marinho">4 anos de casa</span>
+            <span class="tag">Time da Diretora Luísa</span>
+          </div>
+        </div>
+        <div class="perfil-emp-acoes">
+          <button class="btn btn-primario btn-sm">✏ Editar</button>
+          <button class="btn btn-fantasma btn-sm">💬 Mensagem</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar ficha</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">Dados gerais</div>
+        <div class="aba">Contrato</div>
+        <div class="aba">Documentos</div>
+        <div class="aba">Ponto</div>
+        <div class="aba">Férias</div>
+        <div class="aba">Folha</div>
+        <div class="aba">Treinamentos</div>
+        <div class="aba">Avaliações</div>
+        <div class="aba">Histórico</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <h3>Dados pessoais</h3>
+            <div class="sub-titulo">Informações de identificação</div>
+            <div class="info-linha"><span class="rotulo">Nome completo</span><span class="valor">Fernando Lacerda Costa</span></div>
+            <div class="info-linha"><span class="rotulo">Nome social</span><span class="valor">—</span></div>
+            <div class="info-linha"><span class="rotulo">Data de nascimento</span><span class="valor">22 de agosto de 1988 · 36 anos</span></div>
+            <div class="info-linha"><span class="rotulo">CPF</span><span class="valor">***.234.567-**</span></div>
+            <div class="info-linha"><span class="rotulo">RG</span><span class="valor">MG-12.***.789</span></div>
+            <div class="info-linha"><span class="rotulo">CTPS</span><span class="valor">3456789 / 0023-MG</span></div>
+            <div class="info-linha"><span class="rotulo">PIS / NIS</span><span class="valor">123.45678.90-1</span></div>
+            <div class="info-linha"><span class="rotulo">Estado civil</span><span class="valor">Casado</span></div>
+            <div class="info-linha"><span class="rotulo">Dependentes</span><span class="valor">2 (Laura · 8 anos, Pedro · 5 anos)</span></div>
+            <div class="info-linha"><span class="rotulo">Gênero</span><span class="valor">Masculino</span></div>
+            <div class="info-linha"><span class="rotulo">Raça/cor (autodeclarada)</span><span class="valor">Branca</span></div>
+          </div>
+
+          <div class="painel">
+            <h3>Contato &amp; endereço</h3>
+            <div class="sub-titulo">Para comunicação corporativa</div>
+            <div class="info-linha"><span class="rotulo">E-mail corporativo</span><span class="valor">flacerda@aurora.com.br</span></div>
+            <div class="info-linha"><span class="rotulo">E-mail pessoal</span><span class="valor">fernando.lacerda@email.com</span></div>
+            <div class="info-linha"><span class="rotulo">Celular</span><span class="valor">(31) 99654-3210</span></div>
+            <div class="info-linha"><span class="rotulo">Telefone fixo</span><span class="valor">(31) 3324-5678</span></div>
+            <div class="info-linha"><span class="rotulo">Endereço</span><span class="valor">Rua das Acácias, 245 — Bairro Anchieta<br>Belo Horizonte/MG · CEP 30310-110</span></div>
+            <div class="info-linha"><span class="rotulo">Emergência</span><span class="valor">Camila Lacerda (esposa) · (31) 99876-5432</span></div>
+          </div>
+
+          <div class="painel">
+            <h3>Dados bancários</h3>
+            <div class="sub-titulo">Para pagamento da folha</div>
+            <div class="info-linha"><span class="rotulo">Banco</span><span class="valor">Itaú Unibanco (341)</span></div>
+            <div class="info-linha"><span class="rotulo">Agência</span><span class="valor">2456</span></div>
+            <div class="info-linha"><span class="rotulo">Conta corrente</span><span class="valor">38912-3</span></div>
+            <div class="info-linha"><span class="rotulo">PIX</span><span class="valor">flacerda@aurora.com.br</span></div>
+          </div>
+
+          <div class="painel">
+            <h3>Documentação digital</h3>
+            <div class="sub-titulo">Pasta do empregado · 14 arquivos</div>
+            <div class="doc-item">
+              <div class="doc-icone">PDF</div>
+              <div class="doc-info"><div class="doc-nome">Contrato de Trabalho assinado</div><div class="doc-meta">Enviado 05/09/2021 · 412 KB</div></div>
+              <div class="doc-acoes"><button class="doc-btn">↓</button></div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icone atencao">ASO</div>
+              <div class="doc-info"><div class="doc-nome">ASO Periódico</div><div class="doc-meta">⚠ Vence em 8 dias · Renovar até 02/06</div></div>
+              <div class="doc-acoes"><button class="doc-btn">↓</button><button class="doc-btn" style="background:var(--laranja);color:white">⟳</button></div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icone">PDF</div>
+              <div class="doc-info"><div class="doc-nome">Diploma — Engenharia Civil UFMG</div><div class="doc-meta">Enviado 05/09/2021</div></div>
+              <div class="doc-acoes"><button class="doc-btn">↓</button></div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icone">PDF</div>
+              <div class="doc-info"><div class="doc-nome">CREA-MG ativo · validade 2027</div><div class="doc-meta">Enviado 12/03/2024</div></div>
+              <div class="doc-acoes"><button class="doc-btn">↓</button></div>
+            </div>
+            <div class="doc-item">
+              <div class="doc-icone">PDF</div>
+              <div class="doc-info"><div class="doc-nome">RG, CPF, CTPS, Comprovantes</div><div class="doc-meta">Pasta inicial · 6 documentos</div></div>
+              <div class="doc-acoes"><button class="doc-btn">↓</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Resumo contratual</h3>
+            <div class="sub-titulo">Vínculo atual</div>
+            <div class="info-linha"><span class="rotulo">Tipo de contrato</span><span class="valor">CLT</span></div>
+            <div class="info-linha"><span class="rotulo">Admissão</span><span class="valor">05/09/2021</span></div>
+            <div class="info-linha"><span class="rotulo">Tempo de casa</span><span class="valor">4 anos, 8 meses</span></div>
+            <div class="info-linha"><span class="rotulo">Cargo</span><span class="valor">Engenheiro Civil Sênior</span></div>
+            <div class="info-linha"><span class="rotulo">Departamento</span><span class="valor">Engenharia</span></div>
+            <div class="info-linha"><span class="rotulo">Centro de custo</span><span class="valor">CC-203 · Obras BH</span></div>
+            <div class="info-linha"><span class="rotulo">Gestor direto</span><span class="valor">Luísa Mendonça</span></div>
+            <div class="info-linha"><span class="rotulo">Jornada</span><span class="valor">44h semanais · 8h às 17h48</span></div>
+            <div class="info-linha"><span class="rotulo">Salário atual</span><span class="valor">R$ 12.500</span></div>
+            <div class="info-linha"><span class="rotulo">Próxima revisão</span><span class="valor">Setembro/2026</span></div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Benefícios</h3>
+            <div class="sub-titulo">Pacote atual</div>
+            <div class="info-linha"><span class="rotulo">Plano de saúde</span><span class="valor">Unimed Master · titular + 2 dep.</span></div>
+            <div class="info-linha"><span class="rotulo">Odontológico</span><span class="valor">OdontoPrev · titular + 2 dep.</span></div>
+            <div class="info-linha"><span class="rotulo">Vale-refeição</span><span class="valor">R$ 50/dia · cartão Flash</span></div>
+            <div class="info-linha"><span class="rotulo">Vale-alimentação</span><span class="valor">R$ 700/mês</span></div>
+            <div class="info-linha"><span class="rotulo">Auxílio combustível</span><span class="valor">R$ 600/mês</span></div>
+            <div class="info-linha"><span class="rotulo">Plano de carreira</span><span class="valor">Eng. Pleno → Sênior (2023)</span></div>
+            <div class="info-linha"><span class="rotulo">PLR</span><span class="valor">Sim · semestral</span></div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Saldo de férias</h3>
+            <div class="sub-titulo">Atual + futuro</div>
+            <div style="background:var(--cinza-fundo);padding:20px;border-radius:2px;margin-bottom:14px;text-align:center">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:2px;font-weight:700">DISPONÍVEL AGORA</div>
+              <div style="font-size:42px;color:var(--laranja);font-style:italic;line-height:1;margin:8px 0">22<span style="font-size:14px;color:var(--cinza);font-style:normal">dias</span></div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Período aquisitivo 09/2024 a 09/2025</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--vermelho);margin-top:4px">⚠ Vence em 5 meses</div>
+            </div>
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center">📅 Programar férias</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: PONTO ELETRÔNICO -->
+<!-- ============================================== -->
+<div class="tela" id="t-ponto">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item ativo"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Ponto <em>Eletrônico</em></h1>
+          <p class="topbar-meta">Controle de jornada conforme Portaria 671/2021 · 128 empregados ativos</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📅 Maio 2026</button>
+          <button class="btn btn-fantasma btn-sm">⤓ AFD/AEJ</button>
+          <button class="btn btn-primario btn-sm">⟳ Sincronizar</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Bateram hoje</div>
+          <div class="card-valor"><em>124</em><span>/128</span></div>
+          <div class="card-delta">97% de presença</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Atrasos hoje</div>
+          <div class="card-valor"><em>3</em></div>
+          <div class="card-delta neutro">média 12 min</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Banco de horas (média)</div>
+          <div class="card-valor"><em>+8</em><span>h</span></div>
+          <div class="card-delta">14% reduziu o saldo</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Justificativas pendentes</div>
+          <div class="card-valor"><em>5</em></div>
+          <div class="card-delta neg">Aguardando aprovação</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Espelho de ponto · Fernando Lacerda</h3><div class="sub-titulo">Maio 2026 · MAT 0112</div></div>
+              <select style="padding:8px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:13px;border-radius:2px"><option>Fernando Lacerda</option><option>Luísa Mendonça</option><option>Eduardo Santos</option></select>
+            </div>
+
+            <div class="cal-mes" style="border:none;padding:0;margin:0">
+              <div class="cal-grid">
+                <div class="cal-dia-head">Dom</div>
+                <div class="cal-dia-head">Seg</div>
+                <div class="cal-dia-head">Ter</div>
+                <div class="cal-dia-head">Qua</div>
+                <div class="cal-dia-head">Qui</div>
+                <div class="cal-dia-head">Sex</div>
+                <div class="cal-dia-head">Sáb</div>
+
+                <div class="cal-dia fim-semana"><div class="data">26</div></div>
+                <div class="cal-dia fim-semana"><div class="data">27</div></div>
+                <div class="cal-dia fim-semana"><div class="data">28</div></div>
+                <div class="cal-dia fim-semana"><div class="data">29</div></div>
+                <div class="cal-dia fim-semana"><div class="data">30</div></div>
+                <div class="cal-dia ok"><div class="data">01</div><div class="info">Feriado</div></div>
+                <div class="cal-dia fim-semana"><div class="data">02</div></div>
+
+                <div class="cal-dia fim-semana"><div class="data">03</div></div>
+                <div class="cal-dia ok"><div class="data">04</div><div class="info">8h00 ✓</div></div>
+                <div class="cal-dia ok"><div class="data">05</div><div class="info">8h05 ✓</div></div>
+                <div class="cal-dia ok"><div class="data">06</div><div class="info">7h58 ✓</div></div>
+                <div class="cal-dia atencao"><div class="data">07</div><div class="info">atraso 22'</div></div>
+                <div class="cal-dia ok"><div class="data">08</div><div class="info">8h00 ✓</div></div>
+                <div class="cal-dia fim-semana"><div class="data">09</div></div>
+
+                <div class="cal-dia fim-semana"><div class="data">10</div></div>
+                <div class="cal-dia ok"><div class="data">11</div><div class="info">8h00 ✓</div></div>
+                <div class="cal-dia ok"><div class="data">12</div><div class="info">7h55 ✓</div></div>
+                <div class="cal-dia ok"><div class="data">13</div><div class="info">8h02 ✓</div></div>
+                <div class="cal-dia falta"><div class="data">14</div><div class="info">atestado</div></div>
+                <div class="cal-dia ok"><div class="data">15</div><div class="info">8h00 ✓</div></div>
+                <div class="cal-dia fim-semana"><div class="data">16</div></div>
+
+                <div class="cal-dia fim-semana"><div class="data">17</div></div>
+                <div class="cal-dia ok"><div class="data">18</div><div class="info">8h00 ✓</div></div>
+                <div class="cal-dia ok"><div class="data">19</div><div class="info">8h05 ✓</div></div>
+                <div class="cal-dia ok"><div class="data">20</div><div class="info">7h58 ✓</div></div>
+                <div class="cal-dia ok"><div class="data">21</div><div class="info">8h00 ✓</div></div>
+                <div class="cal-dia ok"><div class="data">22</div><div class="info">7h52 ✓</div></div>
+                <div class="cal-dia fim-semana"><div class="data">23</div></div>
+
+                <div class="cal-dia fim-semana"><div class="data">24</div></div>
+                <div class="cal-dia hoje"><div class="data">25</div><div class="info">hoje</div></div>
+                <div class="cal-dia"><div class="data">26</div></div>
+                <div class="cal-dia"><div class="data">27</div></div>
+                <div class="cal-dia"><div class="data">28</div></div>
+                <div class="cal-dia"><div class="data">29</div></div>
+                <div class="cal-dia fim-semana"><div class="data">30</div></div>
+
+                <div class="cal-dia fim-semana"><div class="data">31</div></div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:14px;flex-wrap:wrap;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:14px;padding-top:14px;border-top:1px solid var(--cinza-cl);justify-content:center">
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;background:var(--verde-cl);border-radius:2px"></span> No horário</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;background:var(--amarelo-cl);border-radius:2px"></span> Atraso</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;background:var(--vermelho-cl);border-radius:2px"></span> Atestado/Falta</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;background:var(--roxo-cl);border-radius:2px"></span> Férias</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Hoje · 25/05</h3>
+            <div class="sub-titulo">Marcações em tempo real</div>
+
+            <div class="ponto-timeline">
+              <div class="ponto-pt feito">
+                <div class="bolinha"></div>
+                <div class="label">Entrada</div>
+                <div class="hora">08:00</div>
+              </div>
+              <div class="ponto-pt feito">
+                <div class="bolinha"></div>
+                <div class="label">Saída almoço</div>
+                <div class="hora">12:00</div>
+              </div>
+              <div class="ponto-pt feito">
+                <div class="bolinha"></div>
+                <div class="label">Retorno</div>
+                <div class="hora">13:02</div>
+              </div>
+              <div class="ponto-pt atual pendente">
+                <div class="bolinha"></div>
+                <div class="label">Saída</div>
+                <div class="hora">--:--</div>
+              </div>
+            </div>
+
+            <div style="background:var(--cinza-fundo);padding:14px;border-radius:2px;display:flex;justify-content:space-between;font-family:var(--ui);font-size:12px">
+              <div><span style="color:var(--cinza)">Horas trabalhadas hoje</span><div style="font-family:var(--serif);font-size:20px;color:var(--marinho);margin-top:2px">7h 58min</div></div>
+              <div style="text-align:right"><span style="color:var(--cinza)">Banco de horas</span><div style="font-family:var(--serif);font-size:20px;color:var(--verde);margin-top:2px">+12h</div></div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Justificativas pendentes</h3>
+            <div class="sub-titulo">Aguardando aprovação</div>
+
+            <div style="padding:14px;border:1px solid var(--cinza-cl);border-radius:2px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;align-items:center">
+              <div>
+                <div style="font-size:14px;font-weight:500">Sandra Oliveira</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">14/05 · esqueceu de bater · 1h atraso</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-verde btn-xs">✓</button>
+                <button class="btn btn-vermelho btn-xs">✕</button>
+              </div>
+            </div>
+
+            <div style="padding:14px;border:1px solid var(--cinza-cl);border-radius:2px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;align-items:center">
+              <div>
+                <div style="font-size:14px;font-weight:500">Marcelo Andrade</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">22/05 · consulta médica · 2h</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-verde btn-xs">✓</button>
+                <button class="btn btn-vermelho btn-xs">✕</button>
+              </div>
+            </div>
+
+            <div style="padding:14px;border:1px solid var(--cinza-cl);border-radius:2px;display:flex;justify-content:space-between;gap:10px;align-items:center">
+              <div>
+                <div style="font-size:14px;font-weight:500">Gabriela Tavares</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">23/05 · trânsito · 35 min</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-verde btn-xs">✓</button>
+                <button class="btn btn-vermelho btn-xs">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: FÉRIAS E AUSÊNCIAS -->
+<!-- ============================================== -->
+<div class="tela" id="t-ferias">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item ativo"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Férias &amp; <em>Ausências</em></h1>
+          <p class="topbar-meta">4 empregados em férias agora · 7 solicitações pendentes · 4 com saldo vencendo</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📅 Calendário anual</button>
+          <button class="btn btn-primario btn-sm">+ Programar férias</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Em férias hoje</div>
+          <div class="card-valor"><em>4</em></div>
+          <div class="card-delta neutro">3% do quadro</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Pendentes aprovação</div>
+          <div class="card-valor"><em>7</em></div>
+          <div class="card-delta neg">2 urgentes</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Saldo vencendo</div>
+          <div class="card-valor"><em>4</em></div>
+          <div class="card-delta neg">Período aquisitivo &gt; 11 meses</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Provisão de férias (mês)</div>
+          <div class="card-valor"><em>R$ 42</em><span>k</span></div>
+          <div class="card-delta">Lançada na folha</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Solicitações pendentes</h3><div class="sub-titulo">Para sua aprovação</div></div>
+            </div>
+
+            <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div class="emp-av av-a">L</div>
+                  <div>
+                    <div class="emp-nome">Letícia Ferraz</div>
+                    <div class="emp-cargo">SOLICITAÇÃO · 22/05</div>
+                  </div>
+                </div>
+                <span class="tag laranja">Urgente</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:14px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;margin-bottom:14px">
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">PERÍODO</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">15/07 — 03/08</div></div>
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">DIAS</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">20 dias</div></div>
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">DIVISÃO</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">Integral</div></div>
+              </div>
+              <div style="font-family:var(--ui);font-size:13px;color:var(--cinza);font-style:italic;margin-bottom:14px">"Tenho uma viagem em família planejada para esse período. Saldo disponível: 30 dias."</div>
+              <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-fantasma btn-sm">Pedir ajuste</button>
+                <button class="btn btn-vermelho btn-sm">Reprovar</button>
+                <button class="btn btn-verde btn-sm">✓ Aprovar</button>
+              </div>
+            </div>
+
+            <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div class="emp-av av-d">F</div>
+                  <div>
+                    <div class="emp-nome">Fernando Lacerda</div>
+                    <div class="emp-cargo">SOLICITAÇÃO · 21/05</div>
+                  </div>
+                </div>
+                <span class="tag">Normal</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:14px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;margin-bottom:14px">
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">PERÍODO</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">01/09 — 20/09</div></div>
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">DIAS</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">20 dias</div></div>
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">DIVISÃO</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">Integral</div></div>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn btn-vermelho btn-sm">Reprovar</button>
+                <button class="btn btn-verde btn-sm">✓ Aprovar</button>
+              </div>
+            </div>
+
+            <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div class="emp-av av-c">M</div>
+                  <div>
+                    <div class="emp-nome">Marcelo Andrade</div>
+                    <div class="emp-cargo">ATESTADO · 23/05</div>
+                  </div>
+                </div>
+                <span class="tag amarelo">Médico</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:14px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;margin-bottom:14px">
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">DATA</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">23/05/2026</div></div>
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">DIAS</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">3 dias</div></div>
+                <div><span style="color:var(--cinza);text-transform:uppercase;font-size:10px;letter-spacing:1px">CID</span><div style="font-family:var(--serif);font-size:14px;margin-top:3px">J11 — Gripe</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <button class="btn btn-fantasma btn-xs">📎 Ver atestado anexado</button>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-vermelho btn-sm">Reprovar</button>
+                  <button class="btn btn-verde btn-sm">✓ Aprovar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel" style="background:var(--vermelho-cl);border-color:var(--vermelho)">
+            <h3 style="font-size:18px;color:var(--vermelho)">⚠ Vencimento de períodos aquisitivos</h3>
+            <div class="sub-titulo">Empregados com mais de 11 meses sem férias</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:white;border-radius:2px">
+                <div style="display:flex;gap:10px;align-items:center"><div class="emp-av av-b" style="width:32px;height:32px;font-size:13px">E</div><div><div style="font-size:13px;font-weight:500">Eduardo Santos</div><div style="font-family:var(--ui);font-size:10px;color:var(--cinza)">Vence em 8 dias</div></div></div>
+                <button class="btn btn-fantasma btn-xs">Programar</button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:white;border-radius:2px">
+                <div style="display:flex;gap:10px;align-items:center"><div class="emp-av av-c" style="width:32px;height:32px;font-size:13px">P</div><div><div style="font-size:13px;font-weight:500">Patrícia Aguiar</div><div style="font-family:var(--ui);font-size:10px;color:var(--cinza)">Vence em 23 dias</div></div></div>
+                <button class="btn btn-fantasma btn-xs">Programar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Calendário do mês</h3>
+            <div class="sub-titulo">Quem está fora em maio</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+              <div style="display:flex;gap:10px;align-items:center;padding:10px;background:var(--roxo-cl);border-radius:2px">
+                <div class="emp-av av-e" style="width:34px;height:34px;font-size:14px">G</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Gabriela Tavares</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Férias · 12/05 a 31/05 · 20 dias</div>
+                </div>
+                <span class="tag roxo" style="font-size:10px">Férias</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <div class="emp-av av-a" style="width:34px;height:34px;font-size:14px">A</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Ana Carolina Souza</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Licença maternidade · até 14/09</div>
+                </div>
+                <span class="tag" style="font-size:10px">Licença</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;padding:10px;background:var(--vermelho-cl);border-radius:2px">
+                <div class="emp-av av-c" style="width:34px;height:34px;font-size:14px">S</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Sandra Oliveira</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Afastamento INSS · desde 03/04</div>
+                </div>
+                <span class="tag vermelho" style="font-size:10px">INSS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 6: FOLHA E BENEFÍCIOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-folha">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item ativo"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Folha &amp; <em>Benefícios</em></h1>
+          <p class="topbar-meta">Maio 2026 · Folha fechada em 25/05 · 128 colaboradores</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Gerar holerites</button>
+          <button class="btn btn-fantasma btn-sm">↻ Reabrir folha</button>
+          <button class="btn btn-primario btn-sm">✓ Fechar &amp; assinar</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Folha bruta</div>
+          <div class="card-valor"><em>R$ 1,28</em><span>M</span></div>
+          <div class="card-delta">+ 3,2% vs abril</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Encargos &amp; tributos</div>
+          <div class="card-valor"><em>R$ 487</em><span>k</span></div>
+          <div class="card-delta neutro">38% sobre bruto</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Benefícios</div>
+          <div class="card-valor"><em>R$ 198</em><span>k</span></div>
+          <div class="card-delta">VR, VA, Saúde, Combustível</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Custo total mensal</div>
+          <div class="card-valor"><em>R$ 1,96</em><span>M</span></div>
+          <div class="card-delta neutro">Média/cab: R$ 15.3k</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Composição da folha · maio</h3><div class="sub-titulo">Distribuição</div></div>
+            </div>
+            <div class="barras-h">
+              <div class="barra-h-item">
+                <span>Salário base</span>
+                <div class="barra"><div class="preenchimento" style="width:100%"></div></div>
+                <span class="valor">R$ 942k</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Horas extras</span>
+                <div class="barra"><div class="preenchimento laranja" style="width:18%"></div></div>
+                <span class="valor">R$ 168k</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Adic. periculosidade</span>
+                <div class="barra"><div class="preenchimento" style="width:9%"></div></div>
+                <span class="valor">R$ 86k</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Comissões</span>
+                <div class="barra"><div class="preenchimento" style="width:4%"></div></div>
+                <span class="valor">R$ 42k</span>
+              </div>
+              <div class="barra-h-item">
+                <span>13º proporcional</span>
+                <div class="barra"><div class="preenchimento" style="width:5%"></div></div>
+                <span class="valor">R$ 45k</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>Histórico de folhas</h3>
+            <div class="sub-titulo">Últimos 6 meses</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+              <div class="folha-card">
+                <div style="flex:1"><div class="folha-mes">MAIO 2026 · Atual</div><div class="folha-valor">R$ 1.282.450,00</div></div>
+                <span class="tag amarelo">Fechando</span>
+                <button class="btn btn-fantasma btn-xs">Ver</button>
+              </div>
+              <div class="folha-card">
+                <div style="flex:1"><div class="folha-mes">ABRIL 2026</div><div class="folha-valor">R$ 1.241.890,00</div></div>
+                <span class="tag verde">Pago</span>
+                <button class="btn btn-fantasma btn-xs">Ver</button>
+              </div>
+              <div class="folha-card">
+                <div style="flex:1"><div class="folha-mes">MARÇO 2026</div><div class="folha-valor">R$ 1.198.340,00</div></div>
+                <span class="tag verde">Pago</span>
+                <button class="btn btn-fantasma btn-xs">Ver</button>
+              </div>
+              <div class="folha-card">
+                <div style="flex:1"><div class="folha-mes">FEVEREIRO 2026</div><div class="folha-valor">R$ 1.205.670,00</div></div>
+                <span class="tag verde">Pago</span>
+                <button class="btn btn-fantasma btn-xs">Ver</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Benefícios contratados</h3>
+            <div class="sub-titulo">Custo mensal</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+              <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Plano de Saúde · Unimed</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">128 titulares + 184 dependentes</div>
+                </div>
+                <div style="text-align:right;font-family:var(--ui)"><div style="font-family:var(--serif);font-size:16px">R$ 89.640</div><div style="font-size:11px;color:var(--cinza)">/mês</div></div>
+              </div>
+              <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Vale-refeição · Flash</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">R$ 50/dia útil · 128 empregados</div>
+                </div>
+                <div style="text-align:right;font-family:var(--ui)"><div style="font-family:var(--serif);font-size:16px">R$ 134.400</div><div style="font-size:11px;color:var(--cinza)">/mês</div></div>
+              </div>
+              <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Vale-alimentação · Flash</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">R$ 700/mês fixo</div>
+                </div>
+                <div style="text-align:right;font-family:var(--ui)"><div style="font-family:var(--serif);font-size:16px">R$ 89.600</div><div style="font-size:11px;color:var(--cinza)">/mês</div></div>
+              </div>
+              <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Odontológico · OdontoPrev</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Opcional · 96 aderentes</div>
+                </div>
+                <div style="text-align:right;font-family:var(--ui)"><div style="font-family:var(--serif);font-size:16px">R$ 8.640</div><div style="font-size:11px;color:var(--cinza)">/mês</div></div>
+              </div>
+              <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:14px;font-weight:500">Auxílio combustível</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Cargos de campo · 38 elegíveis</div>
+                </div>
+                <div style="text-align:right;font-family:var(--ui)"><div style="font-family:var(--serif);font-size:16px">R$ 22.800</div><div style="font-size:11px;color:var(--cinza)">/mês</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 7: TREINAMENTOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-treinamentos">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item ativo"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Treinamentos &amp; <em>Certificações</em></h1>
+          <p class="topbar-meta">12 trilhas ativas · 78% taxa de conclusão · 4 treinamentos obrigatórios pendentes</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📚 Biblioteca</button>
+          <button class="btn btn-primario btn-sm">+ Criar trilha</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Trilhas ativas</div>
+          <div class="card-valor"><em>12</em></div>
+          <div class="card-delta">3 novas em 2026</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Conclusão média</div>
+          <div class="card-valor"><em>78</em><span>%</span></div>
+          <div class="card-delta">+ 12pp vs 2025</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Horas/empregado</div>
+          <div class="card-valor"><em>24</em><span>h/ano</span></div>
+          <div class="card-delta neutro">Meta: 32h</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Investimento ano</div>
+          <div class="card-valor"><em>R$ 86</em><span>k</span></div>
+          <div class="card-delta">R$ 672/cabeça</div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>Trilhas obrigatórias</h3><div class="sub-titulo">NR e compliance</div></div>
+          <span class="tag amarelo">4 com pendência</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+          <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;border-left:3px solid var(--laranja);cursor:pointer">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1px;font-weight:700">NR-35 · TRABALHO EM ALTURA</div>
+            </div>
+            <h4 style="font-size:16px;font-weight:500;margin-bottom:8px">Trabalho em Altura</h4>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:10px">Obrigatório para 38 empregados de obra</div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:6px"><span>Conclusão</span><span>34/38 · 89%</span></div>
+            <div class="barra-progresso"><div class="preenchimento" style="width:89%"></div></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--vermelho);margin-top:8px">⚠ 4 pendentes · validade 1 ano</div>
+          </div>
+
+          <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;border-left:3px solid var(--verde);cursor:pointer">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--verde);letter-spacing:1px;font-weight:700">NR-10 · ELÉTRICA</div>
+            </div>
+            <h4 style="font-size:16px;font-weight:500;margin-bottom:8px">Segurança em Instalações Elétricas</h4>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:10px">Obrigatório para 14 eletricistas e técnicos</div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:6px"><span>Conclusão</span><span>14/14 · 100%</span></div>
+            <div class="barra-progresso"><div class="preenchimento" style="width:100%"></div></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--verde);margin-top:8px">✓ Tudo em dia · validade 2 anos</div>
+          </div>
+
+          <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;border-left:3px solid var(--marinho);cursor:pointer">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--marinho);letter-spacing:1px;font-weight:700">LGPD · COMPLIANCE</div>
+            </div>
+            <h4 style="font-size:16px;font-weight:500;margin-bottom:8px">LGPD para todos</h4>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:10px">Treinamento anual obrigatório</div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:6px"><span>Conclusão</span><span>118/128 · 92%</span></div>
+            <div class="barra-progresso"><div class="preenchimento" style="width:92%"></div></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:8px">10 pendentes · prazo 30/06</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>Trilhas de desenvolvimento</h3>
+        <div class="sub-titulo">Desenvolvimento profissional voluntário</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+          <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;cursor:pointer">
+            <span class="tag laranja">Liderança</span>
+            <h4 style="font-size:16px;font-weight:500;margin:10px 0 4px">Liderança Servidora</h4>
+            <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5">8 módulos · ~16h · certificado FDC</p>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:14px">
+              <span>22 inscritos · 14 concluíram</span>
+              <span style="color:var(--laranja);font-weight:700">63%</span>
+            </div>
+          </div>
+          <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;cursor:pointer">
+            <span class="tag marinho">Técnico</span>
+            <h4 style="font-size:16px;font-weight:500;margin:10px 0 4px">Power BI Avançado</h4>
+            <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5">12 aulas · ~24h · DAX e Power Query</p>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:14px">
+              <span>18 inscritos · 11 concluíram</span>
+              <span style="color:var(--laranja);font-weight:700">61%</span>
+            </div>
+          </div>
+          <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;cursor:pointer">
+            <span class="tag verde">Comportamental</span>
+            <h4 style="font-size:16px;font-weight:500;margin:10px 0 4px">Comunicação Não-Violenta</h4>
+            <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5">4 módulos · ~8h · com prática</p>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:14px">
+              <span>45 inscritos · 38 concluíram</span>
+              <span style="color:var(--laranja);font-weight:700">84%</span>
+            </div>
+          </div>
+          <div style="padding:18px;border:1px solid var(--cinza-cl);border-radius:2px;cursor:pointer">
+            <span class="tag roxo">Idiomas</span>
+            <h4 style="font-size:16px;font-weight:500;margin:10px 0 4px">Inglês Corporativo</h4>
+            <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5">3 níveis · parceria Cultura Inglesa</p>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:14px">
+              <span>16 ativos</span>
+              <span style="color:var(--laranja);font-weight:700">em curso</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 8: ORGANOGRAMA -->
+<!-- ============================================== -->
+<div class="tela" id="t-organograma">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item ativo"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Organograma <em>dinâmico</em></h1>
+          <p class="topbar-meta">128 pessoas · 6 diretorias · estrutura atualizada em tempo real</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">🔍 Buscar pessoa</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar PDF</button>
+          <button class="btn btn-primario btn-sm">✏ Editar estrutura</button>
+        </div>
+      </div>
+
+      <div class="org-tree">
+        <!-- Nível 1: CEO -->
+        <div class="org-nivel">
+          <div class="org-card ceo">
+            <div class="av-mini av-a">A</div>
+            <div class="nome">Alfredo Aurora</div>
+            <div class="cargo">CEO &amp; Fundador</div>
+            <div class="time">128 PESSOAS</div>
+          </div>
+        </div>
+
+        <!-- Nível 2: Diretorias -->
+        <div class="org-nivel">
+          <div class="org-card diretor">
+            <div class="av-mini av-b">L</div>
+            <div class="nome">Luísa Mendonça</div>
+            <div class="cargo">Diretora Engenharia</div>
+            <div class="time">62 PESSOAS</div>
+          </div>
+          <div class="org-card diretor">
+            <div class="av-mini av-c">E</div>
+            <div class="nome">Eduardo Santos</div>
+            <div class="cargo">Diretor Financeiro</div>
+            <div class="time">11 PESSOAS</div>
+          </div>
+          <div class="org-card diretor" style="border-top-color:var(--laranja);background:var(--laranja-cl)">
+            <div class="av-mini av-a">R</div>
+            <div class="nome">Roberto Aurora</div>
+            <div class="cargo">Diretor de RH</div>
+            <div class="time">9 PESSOAS</div>
+          </div>
+          <div class="org-card diretor">
+            <div class="av-mini av-d">P</div>
+            <div class="nome">Patrícia Aguiar</div>
+            <div class="cargo">Gerente Comercial</div>
+            <div class="time">9 PESSOAS</div>
+          </div>
+          <div class="org-card diretor">
+            <div class="av-mini av-e">N</div>
+            <div class="nome">Nelson Vilela</div>
+            <div class="cargo">Gerente Suprimentos</div>
+            <div class="time">22 PESSOAS</div>
+          </div>
+        </div>
+
+        <!-- Nível 3: Subordinados (mostra apenas alguns) -->
+        <div class="org-nivel">
+          <div class="org-card">
+            <div class="av-mini av-d">F</div>
+            <div class="nome">Fernando Lacerda</div>
+            <div class="cargo">Engenheiro Civil Sr</div>
+            <div class="time">5 PESSOAS</div>
+          </div>
+          <div class="org-card">
+            <div class="av-mini av-e">A</div>
+            <div class="nome">Ana Carolina Souza</div>
+            <div class="cargo">Engenheira Pl</div>
+            <div class="time">3 PESSOAS</div>
+          </div>
+          <div class="org-card">
+            <div class="av-mini av-b">G</div>
+            <div class="nome">Gabriela Tavares</div>
+            <div class="cargo">Analista Financeira Pl</div>
+            <div class="time">—</div>
+          </div>
+          <div class="org-card">
+            <div class="av-mini av-a">R</div>
+            <div class="nome">Renata Macedo</div>
+            <div class="cargo">Analista de RH Pl</div>
+            <div class="time">—</div>
+          </div>
+          <div class="org-card">
+            <div class="av-mini av-c">M</div>
+            <div class="nome">Marcelo Andrade</div>
+            <div class="cargo">Comprador Pl</div>
+            <div class="time">—</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:30px;padding:20px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza)">
+          + 109 colaboradores em níveis operacionais · <a style="color:var(--laranja);cursor:pointer">Expandir todos</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 9: AVALIAÇÃO DE DESEMPENHO -->
+<!-- ============================================== -->
+<div class="tela" id="t-desempenho">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item ativo"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Avaliação de <em>Desempenho</em></h1>
+          <p class="topbar-meta">Ciclo 2025-S2 finalizado · Ciclo 2026-S1 inicia em 15 dias</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">Histórico de ciclos</button>
+          <button class="btn btn-primario btn-sm">+ Novo ciclo</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">9-Box · Matriz de Talentos</div>
+        <div class="aba">Por avaliado</div>
+        <div class="aba">Calibração</div>
+        <div class="aba">Metas / OKRs</div>
+        <div class="aba">PDIs ativos</div>
+        <div class="aba">Configurar ciclo</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="painel">
+          <h3>Matriz 9-Box · Ciclo 2025-S2</h3>
+          <div class="sub-titulo">Performance (X) × Potencial (Y) · 128 avaliados</div>
+
+          <div style="display:grid;grid-template-columns:24px 1fr;gap:14px;margin-top:18px">
+            <div style="display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--cinza);text-transform:uppercase;font-weight:700">↑ Potencial</div>
+
+            <div>
+              <div class="matriz9">
+                <div class="box9 alto-potencial" title="Diamante bruto">
+                  <div class="titulo">Diamante bruto<br><span style="font-style:italic;color:var(--marinho)">8 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-a">L</div><div class="pessoa-mini av-b">R</div><div class="pessoa-mini av-c">+6</div>
+                  </div>
+                </div>
+                <div class="box9 estrela" title="Futuro líder">
+                  <div class="titulo">Futuro líder<br><span style="font-style:italic;color:var(--marinho)">14 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-d">F</div><div class="pessoa-mini av-a">L</div><div class="pessoa-mini av-c">+12</div>
+                  </div>
+                </div>
+                <div class="box9 estrela" title="Estrela">
+                  <div class="titulo">★ Estrela<br><span style="font-style:italic;color:var(--marinho)">11 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-a">L</div><div class="pessoa-mini av-b">E</div><div class="pessoa-mini av-c">+9</div>
+                  </div>
+                </div>
+
+                <div class="box9 risco" title="Risco">
+                  <div class="titulo">Em observação<br><span style="font-style:italic;color:var(--marinho)">6 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-e">M</div><div class="pessoa-mini av-f">S</div><div class="pessoa-mini av-c">+4</div>
+                  </div>
+                </div>
+                <div class="box9 mantenedor" title="Sólido">
+                  <div class="titulo">Sólido contribuidor<br><span style="font-style:italic;color:var(--marinho)">38 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-b">G</div><div class="pessoa-mini av-c">M</div><div class="pessoa-mini av-d">+36</div>
+                  </div>
+                </div>
+                <div class="box9 alto-potencial" title="Alto desempenho">
+                  <div class="titulo">Alto desempenho<br><span style="font-style:italic;color:var(--marinho)">22 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-a">F</div><div class="pessoa-mini av-b">A</div><div class="pessoa-mini av-c">+20</div>
+                  </div>
+                </div>
+
+                <div class="box9 risco" title="Crítico">
+                  <div class="titulo">Crítico<br><span style="font-style:italic;color:var(--marinho)">3 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-f">X</div><div class="pessoa-mini av-e">Y</div><div class="pessoa-mini av-d">Z</div>
+                  </div>
+                </div>
+                <div class="box9 mantenedor" title="Especialista">
+                  <div class="titulo">Especialista<br><span style="font-style:italic;color:var(--marinho)">18 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-b">N</div><div class="pessoa-mini av-c">P</div><div class="pessoa-mini av-a">+16</div>
+                  </div>
+                </div>
+                <div class="box9 mantenedor" title="Indispensável">
+                  <div class="titulo">Indispensável<br><span style="font-style:italic;color:var(--marinho)">8 pessoas</span></div>
+                  <div class="pessoas">
+                    <div class="pessoa-mini av-d">D</div><div class="pessoa-mini av-c">E</div><div class="pessoa-mini av-b">+6</div>
+                  </div>
+                </div>
+              </div>
+              <div style="text-align:center;font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--cinza);text-transform:uppercase;font-weight:700;margin-top:12px">→ Performance</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:18px">Resumo do ciclo</h3>
+            <div class="sub-titulo">2025-S2 · finalizado em abril</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+              <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--cinza-fundo);border-radius:2px;font-size:13px">
+                <span>Avaliações concluídas</span><strong style="color:var(--verde)">128/128 · 100%</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--cinza-fundo);border-radius:2px;font-size:13px">
+                <span>Tipo aplicado</span><strong>180° (gestor + auto)</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--cinza-fundo);border-radius:2px;font-size:13px">
+                <span>Nota média geral</span><strong style="color:var(--laranja);font-style:italic">7,8 / 10</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--cinza-fundo);border-radius:2px;font-size:13px">
+                <span>Calibração realizada</span><strong>Sim · 3 sessões</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--cinza-fundo);border-radius:2px;font-size:13px">
+                <span>PDIs gerados</span><strong>89 ativos</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--cinza-fundo);border-radius:2px;font-size:13px">
+                <span>Promoções aplicadas</span><strong style="color:var(--verde)">14 pessoas</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Próximo ciclo · 2026-S1</h3>
+            <div class="sub-titulo">Inicia 09/06/2026</div>
+            <div style="padding:14px;background:var(--laranja-cl);border-left:3px solid var(--laranja);border-radius:2px;margin-bottom:14px">
+              <div style="font-family:var(--ui);font-size:11px;color:var(--laranja);letter-spacing:1px;font-weight:700">EM 15 DIAS</div>
+              <div style="font-size:15px;font-weight:500;margin-top:4px">Convocação automática para 128 empregados</div>
+            </div>
+
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase;font-weight:600">Cronograma</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;align-items:center;font-size:13px"><span style="color:var(--cinza);font-family:var(--ui);font-size:11px">09/06</span><span>Abertura · autoavaliação</span></div>
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;align-items:center;font-size:13px"><span style="color:var(--cinza);font-family:var(--ui);font-size:11px">23/06</span><span>Avaliação do gestor</span></div>
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;align-items:center;font-size:13px"><span style="color:var(--cinza);font-family:var(--ui);font-size:11px">07/07</span><span>Calibração diretoria</span></div>
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;align-items:center;font-size:13px"><span style="color:var(--cinza);font-family:var(--ui);font-size:11px">14/07</span><span>Feedback 1:1 com gestores</span></div>
+              <div style="display:grid;grid-template-columns:80px 1fr;gap:10px;align-items:center;font-size:13px"><span style="color:var(--cinza);font-family:var(--ui);font-size:11px">28/07</span><span>PDIs e fechamento</span></div>
+            </div>
+            <button class="btn btn-fantasma btn-sm" style="margin-top:14px;width:100%;justify-content:center">⚙ Configurar ciclo</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 10: PESQUISAS E CLIMA -->
+<!-- ============================================== -->
+<div class="tela" id="t-pesquisas">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item ativo"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Pesquisas &amp; <em>Clima</em></h1>
+          <p class="topbar-meta">3 pesquisas ativas · eNPS atual +62 · próximo pulse em 8 dias</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📚 Modelos</button>
+          <button class="btn btn-primario btn-sm">+ Nova pesquisa</button>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="painel" style="text-align:center;padding:36px 28px">
+          <div class="donut-wrap">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="donut-bg" cx="70" cy="70" r="58"></circle>
+              <circle class="donut-fg" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="80" style="stroke:var(--verde)"></circle>
+            </svg>
+            <div class="donut-num">
+              <div class="valor" style="color:var(--verde)">+62</div>
+              <div class="label">eNPS</div>
+            </div>
+          </div>
+          <h3 style="font-size:18px;margin-top:18px">eNPS Trimestral</h3>
+          <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px">Q1/2026 · 98 respondentes (77%)</div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--cinza-cl);display:flex;justify-content:space-between;font-family:var(--ui);font-size:12px">
+            <span style="color:var(--verde)">71 Promotores</span>
+            <span style="color:var(--amarelo)">19 Neutros</span>
+            <span style="color:var(--vermelho)">8 Detratores</span>
+          </div>
+        </div>
+
+        <div class="painel" style="text-align:center;padding:36px 28px">
+          <div class="donut-wrap">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="donut-bg" cx="70" cy="70" r="58"></circle>
+              <circle class="donut-fg" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="55"></circle>
+            </svg>
+            <div class="donut-num">
+              <div class="valor">8,1</div>
+              <div class="label">Clima geral</div>
+            </div>
+          </div>
+          <h3 style="font-size:18px;margin-top:18px">Clima Organizacional</h3>
+          <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px">Anual · 119 respondentes (93%)</div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--cinza-cl);text-align:left">
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:12px;margin-bottom:8px"><span>Liderança</span><strong style="color:var(--laranja)">8,4</strong></div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:12px;margin-bottom:8px"><span>Cultura</span><strong style="color:var(--laranja)">8,7</strong></div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:12px"><span>Reconhecimento</span><strong style="color:var(--amarelo)">7,2</strong></div>
+          </div>
+        </div>
+
+        <div class="painel" style="text-align:center;padding:36px 28px">
+          <div class="donut-wrap">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="donut-bg" cx="70" cy="70" r="58"></circle>
+              <circle class="donut-fg" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="115" style="stroke:var(--amarelo)"></circle>
+            </svg>
+            <div class="donut-num">
+              <div class="valor" style="color:var(--amarelo)">+38</div>
+              <div class="label">Pulse</div>
+            </div>
+          </div>
+          <h3 style="font-size:18px;margin-top:18px">Pulse Mensal</h3>
+          <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px">Última semana · taxa 71%</div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--cinza-cl);text-align:left;font-family:var(--ui);font-size:11px;color:var(--cinza)">
+            <div style="margin-bottom:6px">↓ <span style="color:var(--vermelho)">-8pts</span> vs mês anterior</div>
+            <div>Tema: Carga de trabalho percebida</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>Pesquisas em andamento</h3>
+        <div class="sub-titulo">Aplicadas atualmente</div>
+
+        <div class="pesquisa-card">
+          <div class="pesquisa-icone" style="background:var(--laranja)">📊</div>
+          <div style="flex:1">
+            <h4 style="font-size:17px;font-weight:500">Pulse Mensal · Maio</h4>
+            <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:4px">5 perguntas · anônima · enviada para 128 empregados</p>
+            <div style="display:flex;gap:14px;font-family:var(--ui);font-size:11px;margin-top:10px">
+              <span>📅 Aberta até 31/05</span>
+              <span>👥 91/128 respondentes (71%)</span>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <span class="pesquisa-status" style="background:var(--verde-cl);color:var(--verde)">Em curso</span>
+            <button class="btn btn-fantasma btn-sm" style="margin-top:10px;display:block">Ver respostas</button>
+          </div>
+        </div>
+
+        <div class="pesquisa-card">
+          <div class="pesquisa-icone" style="background:var(--roxo)">⭐</div>
+          <div style="flex:1">
+            <h4 style="font-size:17px;font-weight:500">Onboarding 30 dias · Camila Reis</h4>
+            <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:4px">Pesquisa de satisfação pós-onboarding · automática</p>
+            <div style="display:flex;gap:14px;font-family:var(--ui);font-size:11px;margin-top:10px">
+              <span>📅 Será enviada em 01/07</span>
+              <span>👥 1 destinatário</span>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <span class="pesquisa-status" style="background:var(--cinza-fundo);color:var(--cinza)">Agendada</span>
+          </div>
+        </div>
+
+        <div class="pesquisa-card">
+          <div class="pesquisa-icone" style="background:var(--marinho)">🚪</div>
+          <div style="flex:1">
+            <h4 style="font-size:17px;font-weight:500">Pesquisa de Saída · Tiago Reis (desligado)</h4>
+            <p style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:4px">Entrevista de desligamento · 12 perguntas</p>
+            <div style="display:flex;gap:14px;font-family:var(--ui);font-size:11px;margin-top:10px">
+              <span>📅 Enviada 18/05</span>
+              <span>✓ Respondida 22/05</span>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <span class="pesquisa-status" style="background:var(--verde-cl);color:var(--verde)">Concluída</span>
+            <button class="btn btn-fantasma btn-sm" style="margin-top:10px;display:block">Ver respostas</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 11: PEOPLE ANALYTICS -->
+<!-- ============================================== -->
+<div class="tela" id="t-analytics">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="empresa-marca"><div class="selo">— Sua Empresa —</div><div class="nome">Construtora Aurora</div></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">▤</span> Minhas Vagas</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">⟐</span> Pipeline</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">📊</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empregados')"><span class="ic">👥</span> Empregados <span class="badge">128</span></div>
+      <div class="sidebar-item" onclick="irPara('t-perfil-emp')"><span class="ic">◉</span> Ficha Individual</div>
+      <div class="sidebar-item" onclick="irPara('t-ponto')"><span class="ic">⏱</span> Ponto Eletrônico</div>
+      <div class="sidebar-item" onclick="irPara('t-ferias')"><span class="ic">🌴</span> Férias & Ausências</div>
+      <div class="sidebar-item" onclick="irPara('t-folha')"><span class="ic">💰</span> Folha & Benefícios</div>
+      <div class="sidebar-item" onclick="irPara('t-treinamentos')"><span class="ic">🎓</span> Treinamentos</div>
+      <div class="sidebar-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item" onclick="irPara('t-desempenho')"><span class="ic">⭐</span> Avaliação de Desempenho</div>
+      <div class="sidebar-item" onclick="irPara('t-pesquisas')"><span class="ic">📋</span> Pesquisas & Clima</div>
+      <div class="sidebar-item ativo"><span class="ic">📈</span> People Analytics</div>
+      <div class="sidebar-secao">Comunicação</div>
+      <div class="sidebar-item" style="opacity:.5"><span class="ic">✉</span> Falar c/ Oi Nora</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Diretor de RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>People <em>Analytics</em></h1>
+          <p class="topbar-meta">Indicadores estratégicos · 12 meses · atualizado em tempo real</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📅 Período ▾</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar BI</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Headcount</div>
+          <div class="card-valor"><em>128</em></div>
+          <div class="card-delta">+ 18 em 12 meses</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Turnover anualizado</div>
+          <div class="card-valor"><em>8,2</em><span>%</span></div>
+          <div class="card-delta">- 1,4pp YoY</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Tenure médio</div>
+          <div class="card-valor"><em>3,4</em><span>anos</span></div>
+          <div class="card-delta neutro">Estável</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Custo médio/empregado</div>
+          <div class="card-valor"><em>R$ 15,3</em><span>k</span></div>
+          <div class="card-delta neg">+ 4,8% YoY</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Turnover por área · últimos 12 meses</h3><div class="sub-titulo">% médio anualizado</div></div>
+            </div>
+            <div class="barras-h">
+              <div class="barra-h-item">
+                <span>Obras (operacional)</span>
+                <div class="barra"><div class="preenchimento laranja" style="width:88%"></div></div>
+                <span class="valor">13,2%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Comercial</span>
+                <div class="barra"><div class="preenchimento" style="width:62%"></div></div>
+                <span class="valor">9,1%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Administrativo</span>
+                <div class="barra"><div class="preenchimento" style="width:48%"></div></div>
+                <span class="valor">7,3%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Engenharia</span>
+                <div class="barra"><div class="preenchimento" style="width:38%"></div></div>
+                <span class="valor">5,8%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Financeiro</span>
+                <div class="barra"><div class="preenchimento" style="width:28%"></div></div>
+                <span class="valor">4,2%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>RH</span>
+                <div class="barra"><div class="preenchimento verde" style="width:14%"></div></div>
+                <span class="valor">2,1%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>Distribuição salarial · Construção Civil</h3>
+            <div class="sub-titulo">Benchmark vs Mercado · maio 2026</div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:14px">
+              <div style="display:grid;grid-template-columns:160px 1fr 1fr;gap:14px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Eng. Civil Sr</span>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--cinza)"><span>Aurora</span><span style="color:var(--marinho);font-weight:600">R$ 12.5k</span></div>
+                  <div class="barra-progresso" style="margin-top:3px"><div class="preenchimento" style="width:72%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--cinza)"><span>Mercado P75</span><span style="color:var(--marinho);font-weight:600">R$ 13.8k</span></div>
+                  <div class="barra-progresso" style="margin-top:3px"><div class="preenchimento" style="width:79%"></div></div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:160px 1fr 1fr;gap:14px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Analista Fin. Pl</span>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--cinza)"><span>Aurora</span><span style="color:var(--marinho);font-weight:600">R$ 6.8k</span></div>
+                  <div class="barra-progresso" style="margin-top:3px"><div class="preenchimento" style="width:64%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--cinza)"><span>Mercado P75</span><span style="color:var(--marinho);font-weight:600">R$ 7.2k</span></div>
+                  <div class="barra-progresso" style="margin-top:3px"><div class="preenchimento" style="width:67%"></div></div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:160px 1fr 1fr;gap:14px;align-items:center;font-family:var(--ui);font-size:12px">
+                <span>Auxiliar Adm.</span>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--cinza)"><span>Aurora</span><span style="color:var(--marinho);font-weight:600">R$ 2.6k</span></div>
+                  <div class="barra-progresso" style="margin-top:3px"><div class="preenchimento" style="width:38%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--cinza)"><span>Mercado P75</span><span style="color:var(--marinho);font-weight:600">R$ 2.5k</span></div>
+                  <div class="barra-progresso" style="margin-top:3px"><div class="preenchimento" style="width:36%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel" style="background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);border:none">
+            <h3 style="color:var(--papel);font-size:18px">🤖 Predição de risco de saída</h3>
+            <div class="sub-titulo" style="color:rgba(255,255,255,.6)">IA · próximos 6 meses</div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;margin-bottom:10px;border-left:3px solid var(--vermelho)">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;gap:10px;align-items:center"><div class="emp-av av-d" style="width:32px;height:32px;font-size:13px">F</div><div><div style="font-size:13px">Fernando Lacerda</div><div style="font-family:var(--ui);font-size:11px;opacity:.6">Engenheiro Civil Sr</div></div></div>
+                <span style="color:var(--vermelho);font-style:italic;font-size:22px">82%</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;opacity:.7;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">Sinais: redução de pulse, candidato passivo no LinkedIn</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;margin-bottom:10px;border-left:3px solid var(--amarelo)">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;gap:10px;align-items:center"><div class="emp-av av-e" style="width:32px;height:32px;font-size:13px">G</div><div><div style="font-size:13px">Gabriela Tavares</div><div style="font-family:var(--ui);font-size:11px;opacity:.6">Analista Fin. Pl</div></div></div>
+                <span style="color:var(--amarelo);font-style:italic;font-size:22px">61%</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;opacity:.7;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">Sinais: salário abaixo do mercado, tempo sem promoção</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;border-left:3px solid var(--laranja)">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;gap:10px;align-items:center"><div class="emp-av av-c" style="width:32px;height:32px;font-size:13px">M</div><div><div style="font-size:13px">Marcelo Andrade</div><div style="font-family:var(--ui);font-size:11px;opacity:.6">Comprador Pl</div></div></div>
+                <span style="color:var(--laranja);font-style:italic;font-size:22px">47%</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;opacity:.7;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">Sinais: pulse baixo, ausências recentes</div>
+            </div>
+
+            <button class="btn btn-primario btn-sm" style="width:100%;justify-content:center;margin-top:14px">Ver plano de retenção</button>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:18px">Diversidade &amp; Inclusão</h3>
+            <div class="sub-titulo">Snapshot maio 2026</div>
+            <div class="barras-h" style="margin-top:14px">
+              <div class="barra-h-item">
+                <span>Mulheres</span>
+                <div class="barra"><div class="preenchimento" style="width:38%"></div></div>
+                <span class="valor">38%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Mulheres em liderança</span>
+                <div class="barra"><div class="preenchimento" style="width:42%"></div></div>
+                <span class="valor">2/5</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Negros (autodecl.)</span>
+                <div class="barra"><div class="preenchimento" style="width:48%"></div></div>
+                <span class="valor">48%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>PCD</span>
+                <div class="barra"><div class="preenchimento" style="width:5%"></div></div>
+                <span class="valor">5%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>50+ anos</span>
+                <div class="barra"><div class="preenchimento" style="width:14%"></div></div>
+                <span class="valor">14%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Fase 3 — Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-dash">📊 Dashboard RH</option>
+    <option value="t-empregados">👥 Lista de Empregados</option>
+    <option value="t-perfil-emp">◉ Ficha Individual</option>
+    <option value="t-ponto">⏱ Ponto Eletrônico</option>
+    <option value="t-ferias">🌴 Férias & Ausências</option>
+    <option value="t-folha">💰 Folha & Benefícios</option>
+    <option value="t-treinamentos">🎓 Treinamentos</option>
+    <option value="t-organograma">🌳 Organograma</option>
+    <option value="t-desempenho">⭐ Avaliação Desempenho</option>
+    <option value="t-pesquisas">📋 Pesquisas & Clima</option>
+    <option value="t-analytics">📈 People Analytics</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · App do Empregado · Mobile</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--ui);background:linear-gradient(135deg,#2A3654 0%,#1F2A44 100%);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+  /* CENA · página com 3 mockups lado a lado */
+  .palco{min-height:100vh;padding:40px 20px 60px;position:relative}
+
+  /* HEADER DA CENA */
+  .palco-header{text-align:center;color:var(--papel);margin-bottom:48px;max-width:1100px;margin-left:auto;margin-right:auto}
+  .palco-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--laranja);font-weight:700;margin-bottom:10px}
+  .palco-title{font-family:var(--serif);font-size:30px;font-weight:400;color:var(--papel);line-height:1.2;margin-bottom:10px;letter-spacing:-.3px}
+  .palco-title em{color:var(--laranja);font-style:italic}
+  .palco-sub{font-size:13px;color:rgba(250,247,242,.65);max-width:680px;margin:0 auto;line-height:1.55}
+  .palco-sub strong{color:var(--papel)}
+
+  /* GRID DE 3 MOCKUPS */
+  .mockups-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:1280px;margin:0 auto;align-items:start}
+
+  /* MOLDURA DO CELULAR */
+  .device{position:relative;width:100%;max-width:340px;margin:0 auto}
+  .device-frame{background:#0D0D0F;border-radius:38px;padding:10px;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.1)}
+  .device-screen{background:var(--papel);border-radius:30px;overflow:hidden;height:680px;position:relative;display:flex;flex-direction:column}
+  .device-notch{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:90px;height:24px;background:#0D0D0F;border-radius:14px;z-index:100;display:flex;align-items:center;justify-content:flex-end;padding-right:18px}
+  .device-notch::after{content:"";width:8px;height:8px;background:#1A1A1F;border-radius:50%;margin-right:2px}
+  .device-label{text-align:center;font-family:var(--serif);font-size:15px;color:var(--papel);margin-top:14px;font-style:italic;font-weight:500;opacity:.95}
+  .device-label-meta{text-align:center;font-size:11px;color:rgba(250,247,242,.5);margin-top:4px;letter-spacing:.5px}
+
+  /* STATUS BAR · iOS-like */
+  .status-bar{background:transparent;color:var(--marinho);padding:14px 22px 4px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;font-family:var(--ui);font-variant-numeric:tabular-nums;height:32px}
+  .status-bar.dark{color:var(--papel)}
+  .status-ic{display:flex;gap:5px;font-size:11px}
+
+  /* TOPBAR DO APP */
+  .app-topbar{background:var(--marinho);color:var(--papel);padding:8px 18px 14px;position:relative}
+  .app-topbar-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .app-logo{font-family:var(--serif);font-size:18px;display:inline-flex;align-items:flex-end;line-height:1}
+  .app-logo .oi{color:var(--laranja);font-style:italic}
+  .app-logo .nora{color:var(--papel);margin-left:4px}
+  .app-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#E8633A,#C94E28);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:13px;font-weight:600;flex-shrink:0}
+  .app-saudacao{font-family:var(--serif);font-size:16px;color:var(--papel);margin-top:14px;font-weight:400}
+  .app-saudacao em{color:var(--laranja);font-style:italic}
+  .app-saudacao-meta{font-size:10.5px;color:rgba(250,247,242,.6);margin-top:3px;letter-spacing:.3px}
+
+  /* CONTEÚDO ROLÁVEL */
+  .app-content{flex:1;overflow-y:auto;padding:16px 16px 90px;background:var(--papel)}
+
+  /* CARD DE PONTO · grande central */
+  .ponto-card{background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:6px;padding:18px;margin-bottom:14px;border-left:3px solid var(--laranja);text-align:center}
+  .ponto-card .eyebrow-mini{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:6px}
+  .ponto-relogio{font-family:var(--serif);font-style:italic;font-size:42px;color:var(--marinho);line-height:1;font-weight:500;font-variant-numeric:tabular-nums;margin-bottom:6px}
+  .ponto-relogio em{color:var(--laranja)}
+  .ponto-data{font-size:11px;color:var(--cinza);font-weight:500;letter-spacing:.3px;margin-bottom:14px}
+
+  /* GEOFENCE · localização atual */
+  .geofence{background:rgba(255,255,255,.6);padding:10px 12px;border-radius:4px;text-align:left;display:flex;align-items:center;gap:10px;margin-bottom:12px;border:1px solid rgba(232,99,58,.2)}
+  .geofence-pin{font-size:18px;color:var(--laranja);flex-shrink:0}
+  .geofence-info{flex:1;min-width:0}
+  .geofence-local{font-size:11.5px;color:var(--marinho);font-weight:600;line-height:1.2}
+  .geofence-meta{font-size:9.5px;color:var(--cinza);margin-top:2px;letter-spacing:.2px}
+  .geofence-status{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700;letter-spacing:.3px;background:var(--verde);color:white;flex-shrink:0}
+
+  /* BOTÃO GRANDE DE PONTO */
+  .btn-ponto{width:100%;padding:16px;font-family:var(--serif);font-size:17px;background:var(--laranja);color:white;border:none;border-radius:4px;font-weight:500;letter-spacing:.3px;cursor:pointer;box-shadow:0 4px 12px rgba(232,99,58,.25);display:flex;align-items:center;justify-content:center;gap:10px;transition:all .15s}
+  .btn-ponto:hover{background:var(--laranja-esc);transform:translateY(-1px)}
+  .btn-ponto.almoco{background:var(--amarelo);color:#5A4500;box-shadow:0 4px 12px rgba(212,160,44,.25)}
+  .btn-ponto.saida{background:var(--marinho)}
+  .btn-ponto.disabled{background:var(--cinza-cl);color:var(--cinza);box-shadow:none;cursor:not-allowed}
+  .btn-ponto-ic{font-size:20px}
+
+  /* TIPO DE BATIDA · mini info */
+  .tipo-batida{font-size:10.5px;color:var(--cinza);margin-top:8px;font-weight:500;letter-spacing:.3px}
+
+  /* BATIDAS DO DIA */
+  .batidas-dia{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:4px;padding:14px;margin-bottom:14px}
+  .batidas-titulo{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+  .batidas-titulo strong{color:var(--marinho)}
+  .batida-linha{display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:8px 0;border-bottom:1px dashed var(--cinza-cl);align-items:center;font-size:12px}
+  .batida-linha:last-child{border:none;padding-bottom:0}
+  .batida-tipo{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--marinho);font-weight:500}
+  .batida-tipo span{display:block;font-size:9.5px;color:var(--cinza);font-style:normal;font-family:var(--ui);letter-spacing:.3px;margin-top:2px;font-weight:600;text-transform:uppercase}
+  .batida-hora{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--marinho);font-weight:500;font-variant-numeric:tabular-nums}
+  .batida-hora.atual{color:var(--laranja)}
+  .batida-checkbox{font-size:14px;color:var(--verde)}
+  .batida-checkbox.pendente{color:var(--cinza-cl)}
+
+  /* CARD DE ATALHOS · home */
+  .atalhos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+  .atalho{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:4px;padding:14px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+  .atalho:hover{transform:translateY(-2px);border-color:var(--marinho);box-shadow:0 4px 12px rgba(31,42,68,.06)}
+  .atalho.alerta{background:linear-gradient(135deg,var(--branco) 60%,var(--vermelho-cl));border-color:var(--vermelho)}
+  .atalho-ic{font-size:22px;margin-bottom:6px;display:block}
+  .atalho-nome{font-size:12px;font-weight:500;color:var(--marinho);font-family:var(--serif);line-height:1.2}
+  .atalho-info{font-size:10px;color:var(--cinza);margin-top:4px;font-weight:600;letter-spacing:.3px}
+  .atalho-badge{position:absolute;top:8px;right:8px;background:var(--vermelho);color:white;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700;letter-spacing:.3px}
+
+  /* INFO NR · alerta vermelho */
+  .alerta-nr{background:linear-gradient(135deg,var(--vermelho) 0%,#8E2B2B 100%);color:white;border-radius:4px;padding:14px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden}
+  .alerta-nr::before{content:"";position:absolute;top:-50%;right:-30%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 65%);pointer-events:none}
+  .alerta-nr > *{position:relative}
+  .alerta-nr-ic{font-size:28px;margin-bottom:6px}
+  .alerta-nr-titulo{font-family:var(--serif);font-size:15px;font-weight:500;margin-bottom:4px}
+  .alerta-nr-msg{font-size:11px;opacity:.95;line-height:1.5;letter-spacing:.2px;margin-bottom:10px}
+  .alerta-nr-msg strong{color:#FFE5E0}
+  .alerta-nr-btn{background:white;color:var(--vermelho);font-size:11px;padding:8px 16px;border-radius:3px;font-weight:700;letter-spacing:.5px;border:none;cursor:pointer;text-transform:uppercase}
+
+  /* HOLERITE DE MAIO · destaque */
+  .holerite-card{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);border-radius:6px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;cursor:pointer}
+  .holerite-card::before{content:"";position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .holerite-card > *{position:relative}
+  .holerite-eyebrow{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,99,58,.85);font-weight:700;margin-bottom:6px}
+  .holerite-valor{font-family:var(--serif);font-style:italic;font-size:32px;color:var(--laranja);line-height:1;margin-bottom:4px;font-weight:400}
+  .holerite-meta{font-size:11px;color:rgba(250,247,242,.7);letter-spacing:.3px;line-height:1.5}
+  .holerite-meta strong{color:var(--papel)}
+  .holerite-link{margin-top:10px;font-size:11px;color:var(--laranja);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+
+  /* CARD DE TRILHA · BIM */
+  .trilha-card{background:linear-gradient(135deg,var(--branco) 60%,#F5EDFD);border:1px solid var(--cinza-cl);border-radius:4px;padding:14px;margin-bottom:14px;border-left:3px solid var(--roxo);cursor:pointer}
+  .trilha-titulo{font-family:var(--serif);font-size:14px;color:var(--marinho);line-height:1.2;font-weight:500;margin-bottom:3px}
+  .trilha-titulo em{color:var(--roxo);font-style:italic}
+  .trilha-sub{font-size:10.5px;color:var(--cinza);margin-bottom:8px;letter-spacing:.2px}
+  .trilha-prog{height:6px;background:var(--cinza-fundo);border-radius:3px;overflow:hidden;margin-bottom:6px}
+  .trilha-prog-fill{height:100%;background:linear-gradient(90deg,var(--roxo),#5B3FA0);border-radius:3px}
+  .trilha-prog-info{font-size:10px;color:var(--cinza);font-weight:600;letter-spacing:.3px;display:flex;justify-content:space-between}
+  .trilha-prog-info strong{color:var(--roxo)}
+
+  /* BOTTOM TAB BAR */
+  .bottom-tabs{position:absolute;bottom:0;left:0;right:0;background:var(--branco);border-top:1px solid var(--cinza-cl);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 4px 14px;z-index:50}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;color:var(--cinza);padding:4px 2px;cursor:pointer;letter-spacing:.2px;font-weight:600;position:relative}
+  .tab.ativa{color:var(--laranja)}
+  .tab.ativa::before{content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--laranja);border-radius:2px}
+  .tab-ic{font-size:18px;margin-bottom:1px}
+  .tab-badge{position:absolute;top:-2px;right:50%;margin-right:-22px;background:var(--vermelho);color:white;font-size:8px;padding:1px 4px;border-radius:6px;font-weight:700;min-width:14px;text-align:center}
+
+  /* TELA 2 · BATER PONTO COM FOTO */
+  .ponto-bater{background:var(--marinho);color:var(--papel);padding:14px 16px;text-align:center;position:relative}
+  .ponto-bater-close{position:absolute;left:14px;top:16px;color:rgba(250,247,242,.8);font-size:16px;cursor:pointer}
+  .ponto-bater-titulo{font-family:var(--serif);font-size:18px;font-weight:500}
+  .ponto-bater-titulo em{color:var(--laranja);font-style:italic}
+  .ponto-bater-sub{font-size:10.5px;color:rgba(250,247,242,.6);margin-top:3px;letter-spacing:.3px}
+
+  /* CÂMERA SIMULADA */
+  .camera-area{background:#000;height:240px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .camera-area::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0) 30%,rgba(0,0,0,.5) 100%)}
+  .camera-rosto{width:120px;height:140px;border-radius:50% 50% 45% 45%;background:radial-gradient(ellipse at 50% 40%,#C8A07D 0%,#A0794F 100%);position:relative;z-index:2;display:flex;align-items:center;justify-content:center;font-size:48px}
+  .camera-frame-detect{position:absolute;width:170px;height:200px;border:3px solid var(--laranja);border-radius:8px;z-index:3;animation:pulse-frame 2s infinite}
+  @keyframes pulse-frame{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.02)}}
+  .camera-canto{position:absolute;width:18px;height:18px;border:3px solid var(--laranja);z-index:4}
+  .camera-canto.tl{top:20px;left:30px;border-right:0;border-bottom:0}
+  .camera-canto.tr{top:20px;right:30px;border-left:0;border-bottom:0}
+  .camera-canto.bl{bottom:60px;left:30px;border-right:0;border-top:0}
+  .camera-canto.br{bottom:60px;right:30px;border-left:0;border-top:0}
+  .camera-info{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);color:white;padding:5px 12px;border-radius:14px;font-size:10.5px;font-weight:600;letter-spacing:.3px;z-index:5;display:flex;align-items:center;gap:5px}
+  .camera-info-dot{width:6px;height:6px;background:var(--verde);border-radius:50%;animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.3}}
+
+  .bater-info{padding:14px 16px;background:var(--cinza-fundo);font-size:11px;color:var(--cinza);text-align:left;line-height:1.5}
+  .bater-info strong{color:var(--marinho)}
+  .bater-info .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--cinza-cl)}
+  .bater-info .row:last-child{border:none}
+
+  .bater-acoes{padding:14px 16px 18px;background:var(--branco)}
+  .btn-confirmar{width:100%;padding:16px;font-family:var(--serif);font-size:17px;background:var(--laranja);color:white;border:none;border-radius:4px;font-weight:500;letter-spacing:.3px;cursor:pointer;box-shadow:0 4px 12px rgba(232,99,58,.25);display:flex;align-items:center;justify-content:center;gap:10px}
+  .btn-cancelar{width:100%;padding:14px;font-family:var(--serif);font-size:14px;background:transparent;color:var(--cinza);border:1px solid var(--cinza-cl);border-radius:4px;font-weight:500;letter-spacing:.3px;margin-top:8px}
+
+  /* TELA 3 · BLOQUEIO POR NR */
+  .bloqueio-bg{background:linear-gradient(180deg,var(--vermelho) 0%,#6B1F1F 100%);height:100%;color:white;display:flex;flex-direction:column;justify-content:space-between;padding:30px 24px 100px;text-align:center;position:relative;overflow:hidden}
+  .bloqueio-bg::before{content:"";position:absolute;top:-30%;left:-30%;width:400px;height:400px;background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 65%);pointer-events:none}
+  .bloqueio-bg > *{position:relative}
+  .bloqueio-back{position:absolute;top:16px;left:14px;color:rgba(255,255,255,.8);font-size:20px;cursor:pointer}
+  .bloqueio-ic-gigante{font-size:64px;margin-bottom:20px;margin-top:30px}
+  .bloqueio-titulo{font-family:var(--serif);font-size:26px;font-weight:400;line-height:1.2;margin-bottom:14px}
+  .bloqueio-titulo em{color:#FFE5E0;font-style:italic}
+  .bloqueio-msg{font-size:13px;color:rgba(255,255,255,.85);line-height:1.55;margin-bottom:20px;letter-spacing:.2px}
+  .bloqueio-msg strong{color:white}
+  .bloqueio-detalhes{background:rgba(0,0,0,.25);border-radius:4px;padding:14px;margin-bottom:20px;text-align:left;font-size:11px;line-height:1.6;letter-spacing:.2px;border:1px solid rgba(255,255,255,.1)}
+  .bloqueio-detalhes .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.15)}
+  .bloqueio-detalhes .row:last-child{border:none}
+  .bloqueio-detalhes .row span{opacity:.75}
+  .bloqueio-detalhes .row strong{color:#FFE5E0;font-weight:600}
+  .bloqueio-btn-grande{width:100%;padding:16px;background:white;color:var(--vermelho);border-radius:4px;font-family:var(--serif);font-size:16px;font-weight:500;letter-spacing:.3px;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+  .bloqueio-btn-secund{width:100%;padding:12px;background:transparent;color:rgba(255,255,255,.85);font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,.25);border-radius:4px;margin-top:10px;cursor:pointer}
+
+  @media (max-width:1100px){
+    .mockups-grid{grid-template-columns:1fr;gap:60px}
+    .device{max-width:380px}
+  }
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-label{opacity:.7;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+</style>
+</head>
+<body>
+
+<div class="palco">
+  <div class="palco-header">
+    <div class="palco-eyebrow">★ NOVO · ajuste a partir da análise</div>
+    <h1 class="palco-title">App <em>mobile</em> do empregado</h1>
+    <p class="palco-sub">80% dos empregados Aurora acessam pelo celular. PWA com offline support para canteiros com sinal fraco. <strong>Fernando Lacerda</strong> (Eng. Civil Sr) usando 3 fluxos: home com bater ponto, captura com foto + geofence e bloqueio por NR vencida.</p>
+  </div>
+
+  <div class="mockups-grid">
+
+    <!-- ============================= -->
+    <!-- MOCKUP 1 · HOME DO EMPREGADO -->
+    <!-- ============================= -->
+    <div>
+      <div class="device">
+        <div class="device-frame">
+          <div class="device-screen">
+            <div class="device-notch"></div>
+
+            <!-- Status bar e Topbar -->
+            <div class="status-bar dark" style="background:var(--marinho)">
+              <span style="opacity:0;visibility:hidden">.</span>
+              <span style="font-size:0">.</span>
+            </div>
+            <div class="app-topbar">
+              <div class="status-bar dark" style="padding:0;margin-top:-8px;height:22px;color:rgba(250,247,242,.95)">
+                <span style="font-weight:700">06:42</span>
+                <div class="status-ic">
+                  <span>📶</span>
+                  <span>📡</span>
+                  <span>🔋</span>
+                </div>
+              </div>
+              <div class="app-topbar-row" style="margin-top:8px">
+                <div class="app-logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+                <div class="app-av">F</div>
+              </div>
+              <div class="app-saudacao">Bom dia, <em>Fernando</em></div>
+              <div class="app-saudacao-meta">Terça, 26 de maio de 2026 · Aurora</div>
+            </div>
+
+            <!-- Conteúdo -->
+            <div class="app-content">
+
+              <!-- Card de ponto -->
+              <div class="ponto-card">
+                <div class="eyebrow-mini">Bater ponto</div>
+                <div class="ponto-relogio" id="relogio">07:<em>14</em>:38</div>
+                <div class="ponto-data">terça, 26 de maio</div>
+
+                <div class="geofence">
+                  <div class="geofence-pin">📍</div>
+                  <div class="geofence-info">
+                    <div class="geofence-local">Canteiro Sítio II</div>
+                    <div class="geofence-meta">Av. Cristiano Machado · BH/MG · ±12m</div>
+                  </div>
+                  <span class="geofence-status">✓ NO LOCAL</span>
+                </div>
+
+                <button class="btn-ponto">
+                  <span class="btn-ponto-ic">⏱</span>
+                  Bater entrada
+                </button>
+                <div class="tipo-batida">Próxima batida: <strong style="color:var(--marinho)">ENTRADA</strong> · jornada 44h/sem</div>
+              </div>
+
+              <!-- Batidas do dia -->
+              <div class="batidas-dia">
+                <div class="batidas-titulo">
+                  <span>Hoje · <strong>Sítio II</strong></span>
+                  <span style="color:var(--cinza)">0/4 batidas</span>
+                </div>
+                <div class="batida-linha">
+                  <div class="batida-tipo">Entrada<span>prevista</span></div>
+                  <div class="batida-hora">07:00</div>
+                  <div class="batida-checkbox pendente">○</div>
+                </div>
+                <div class="batida-linha">
+                  <div class="batida-tipo">Almoço · saída<span>prevista</span></div>
+                  <div class="batida-hora">12:00</div>
+                  <div class="batida-checkbox pendente">○</div>
+                </div>
+                <div class="batida-linha">
+                  <div class="batida-tipo">Almoço · volta<span>prevista</span></div>
+                  <div class="batida-hora">13:00</div>
+                  <div class="batida-checkbox pendente">○</div>
+                </div>
+                <div class="batida-linha">
+                  <div class="batida-tipo">Saída<span>prevista</span></div>
+                  <div class="batida-hora">17:00</div>
+                  <div class="batida-checkbox pendente">○</div>
+                </div>
+              </div>
+
+              <!-- Atalhos -->
+              <div class="atalhos-grid">
+                <div class="atalho">
+                  <span class="atalho-ic">💰</span>
+                  <div class="atalho-nome">Holerites</div>
+                  <div class="atalho-info">Maio em breve</div>
+                  <span class="atalho-badge">NOVO</span>
+                </div>
+                <div class="atalho">
+                  <span class="atalho-ic">🌴</span>
+                  <div class="atalho-nome">Férias</div>
+                  <div class="atalho-info">22 dias disp.</div>
+                </div>
+                <div class="atalho">
+                  <span class="atalho-ic">📚</span>
+                  <div class="atalho-nome">Trilha BIM</div>
+                  <div class="atalho-info">65% · Mód. 6</div>
+                </div>
+                <div class="atalho alerta">
+                  <span class="atalho-ic">⚠</span>
+                  <div class="atalho-nome">ASO periódico</div>
+                  <div class="atalho-info" style="color:var(--vermelho);font-weight:700">vence em 47d</div>
+                </div>
+              </div>
+
+              <!-- Card holerite previsto -->
+              <div class="holerite-card">
+                <div class="holerite-eyebrow">📄 Holerite maio</div>
+                <div class="holerite-valor">R$ 8.658</div>
+                <div class="holerite-meta">líquido previsto · <strong>liberação em 02/06</strong></div>
+                <div class="holerite-link">Ver preview →</div>
+              </div>
+
+              <!-- Trilha BIM -->
+              <div class="trilha-card">
+                <div class="trilha-titulo">Trilha <em>BIM · Modelagem em Revit</em></div>
+                <div class="trilha-sub">Módulo 6 de 8 · 4h 32min restantes</div>
+                <div class="trilha-prog"><div class="trilha-prog-fill" style="width:65%"></div></div>
+                <div class="trilha-prog-info">
+                  <span>Eng. Civil Sr → Especialista</span>
+                  <strong>65%</strong>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Bottom tabs -->
+            <div class="bottom-tabs">
+              <div class="tab ativa">
+                <div class="tab-ic">🏠</div>
+                <span>Início</span>
+              </div>
+              <div class="tab">
+                <div class="tab-ic">⏱</div>
+                <span>Ponto</span>
+              </div>
+              <div class="tab">
+                <div class="tab-ic">💬</div>
+                <span>Conversas</span>
+                <span class="tab-badge">3</span>
+              </div>
+              <div class="tab">
+                <div class="tab-ic">📚</div>
+                <span>Trilhas</span>
+              </div>
+              <div class="tab">
+                <div class="tab-ic">👤</div>
+                <span>Eu</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="device-label">1 · Home do empregado</div>
+      <div class="device-label-meta">Fernando às 07:14 · prestes a bater ponto</div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- MOCKUP 2 · BATER PONTO COM FOTO + GEOFENCE -->
+    <!-- ============================= -->
+    <div>
+      <div class="device">
+        <div class="device-frame">
+          <div class="device-screen">
+            <div class="device-notch"></div>
+
+            <!-- Status bar -->
+            <div class="status-bar dark" style="background:var(--marinho)">
+              <span style="opacity:0">.</span>
+            </div>
+
+            <!-- Topbar do bater ponto -->
+            <div class="ponto-bater">
+              <div class="status-bar dark" style="padding:0;margin-top:-8px;height:22px;color:rgba(250,247,242,.95)">
+                <span style="font-weight:700">07:14</span>
+                <div class="status-ic">
+                  <span>📶</span>
+                  <span>🔋</span>
+                </div>
+              </div>
+              <button class="ponto-bater-close">✕</button>
+              <div class="ponto-bater-titulo">Bater <em>entrada</em></div>
+              <div class="ponto-bater-sub">Posicione o rosto no quadro · será capturada uma foto</div>
+            </div>
+
+            <!-- Câmera simulada -->
+            <div class="camera-area">
+              <div class="camera-canto tl"></div>
+              <div class="camera-canto tr"></div>
+              <div class="camera-canto bl"></div>
+              <div class="camera-canto br"></div>
+              <div class="camera-frame-detect"></div>
+              <div class="camera-rosto">👷‍♂️</div>
+              <div class="camera-info">
+                <div class="camera-info-dot"></div>
+                <span>Rosto detectado · Fernando Lacerda</span>
+              </div>
+            </div>
+
+            <!-- Info da batida -->
+            <div class="bater-info">
+              <div class="row">
+                <span>📍 Local</span>
+                <strong>Canteiro Sítio II</strong>
+              </div>
+              <div class="row">
+                <span>🗺 Coordenadas</span>
+                <strong style="font-family:monospace;font-size:10.5px">-19.8581, -43.9483</strong>
+              </div>
+              <div class="row">
+                <span>📡 Precisão GPS</span>
+                <strong>±12 metros</strong>
+              </div>
+              <div class="row">
+                <span>🕐 Horário</span>
+                <strong>07:14:38 · BRT</strong>
+              </div>
+              <div class="row">
+                <span>📋 Tipo</span>
+                <strong>Entrada · regular</strong>
+              </div>
+              <div class="row">
+                <span>📜 NR-18 / NR-35</span>
+                <strong style="color:var(--verde)">✓ válidas</strong>
+              </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="bater-acoes">
+              <button class="btn-confirmar">
+                <span style="font-size:20px">✓</span>
+                Confirmar entrada
+              </button>
+              <button class="btn-cancelar">Cancelar</button>
+              <div style="text-align:center;font-size:9.5px;color:var(--cinza);margin-top:10px;line-height:1.4;letter-spacing:.2px">
+                Esta batida será registrada e enviada ao eSocial. Não pode ser editada sem solicitação ao RH.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="device-label">2 · Bater ponto · foto + geofence</div>
+      <div class="device-label-meta">Captura · LGPD consentida · NRs validadas</div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- MOCKUP 3 · BLOQUEIO POR NR (BRUNO) -->
+    <!-- ============================= -->
+    <div>
+      <div class="device">
+        <div class="device-frame">
+          <div class="device-screen">
+            <div class="device-notch"></div>
+
+            <div class="bloqueio-bg">
+              <button class="bloqueio-back">←</button>
+
+              <div>
+                <div class="bloqueio-ic-gigante">🚫</div>
+                <div class="bloqueio-titulo">Acesso ao canteiro <em>bloqueado</em></div>
+                <div class="bloqueio-msg">
+                  <strong>Marcelo</strong>, sua NR-18 venceu há <strong>14 dias</strong>. Para sua segurança e da equipe, você não pode bater ponto em obra até renovar o treinamento.
+                </div>
+
+                <div class="bloqueio-detalhes">
+                  <div class="row">
+                    <span>📜 Norma</span>
+                    <strong>NR-18 · Construção</strong>
+                  </div>
+                  <div class="row">
+                    <span>📅 Vencida em</span>
+                    <strong>12/05/2026</strong>
+                  </div>
+                  <div class="row">
+                    <span>⏰ Há</span>
+                    <strong>14 dias</strong>
+                  </div>
+                  <div class="row">
+                    <span>📍 Local</span>
+                    <strong>Sítio II · BH</strong>
+                  </div>
+                  <div class="row">
+                    <span>⏱ Carga horária</span>
+                    <strong>40h presencial</strong>
+                  </div>
+                  <div class="row">
+                    <span>📲 Próxima turma</span>
+                    <strong>28/05 · Centro Tr.</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <button class="bloqueio-btn-grande">
+                  📅 Inscrever-se no curso · 28/05
+                </button>
+                <button class="bloqueio-btn-secund">
+                  💬 Falar com o RH
+                </button>
+                <div style="text-align:center;font-size:9.5px;margin-top:14px;opacity:.7;letter-spacing:.3px;line-height:1.5">
+                  Bruna Lima · RH foi notificada · contato: bruna@aurora.com.br
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="device-label">3 · Bloqueio por NR vencida</div>
+      <div class="device-label-meta">Marcelo Andrade · NR-18 vencida há 14 dias</div>
+    </div>
+
+  </div>
+
+  <!-- Nota técnica -->
+  <div style="max-width:880px;margin:60px auto 0;background:rgba(255,255,255,.05);color:rgba(250,247,242,.7);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:24px;font-size:12.5px;line-height:1.65">
+    <div style="font-family:var(--serif);font-size:14px;color:var(--laranja);margin-bottom:10px;letter-spacing:.5px;font-weight:600">📲 Notas técnicas para o Codex</div>
+    <ul style="margin-left:18px;color:rgba(250,247,242,.75)">
+      <li><strong style="color:#fff">PWA</strong> com Service Worker para funcionar offline (canteiros têm sinal fraco/intermitente)</li>
+      <li><strong style="color:#fff">Geolocation API</strong> com geofence configurado em <code>locais_trabalho</code> (centro + raio)</li>
+      <li><strong style="color:#fff">Camera API</strong> para captura de foto · armazenamento em Supabase Storage</li>
+      <li><strong style="color:#fff">LGPD</strong>: termo de consentimento separado para coleta de foto e localização</li>
+      <li><strong style="color:#fff">Bloqueio NR</strong>: middleware no servidor valida treinamentos válidos antes de aceitar batida</li>
+      <li><strong style="color:#fff">Modo offline</strong>: batidas vão para IndexedDB e sincronizam ao recuperar conexão</li>
+      <li><strong style="color:#fff">Notificação push</strong>: 5min antes da batida prevista (configurável)</li>
+      <li><strong style="color:#fff">Acessibilidade</strong>: VoiceOver/TalkBack · botões grandes (44pt mínimo) · alto contraste opcional</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="proto-bar">
+  <span class="proto-label">Mobile · 3 mockups · Fernando + Marcelo</span>
+</div>
+
+<script>
+// Relógio dinâmico no Mockup 1
+function tick(){
+  const el = document.getElementById('relogio');
+  if(!el) return;
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2,'0');
+  const m = String(d.getMinutes()).padStart(2,'0');
+  const s = String(d.getSeconds()).padStart(2,'0');
+  el.innerHTML = h + ':<em>' + m + '</em>:' + s;
+}
+tick();
+setInterval(tick,1000);
+</script>
+
+</body>
+</html>

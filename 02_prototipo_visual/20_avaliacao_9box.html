@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Avaliação 9-Box &amp; PDI</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --juridico:#5B3FA0;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:14px;padding:9px 20px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:6px 14px;font-size:12px}
+
+  /* APP SHELL · sidebar marinho */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+
+  /* HEADER */
+  .page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:18px;flex-wrap:wrap;border-bottom:1px solid var(--cinza-cl);padding-bottom:18px}
+  .page-header h1{font-size:28px;font-weight:400;letter-spacing:-.3px;line-height:1.2}
+  .page-header h1 em{color:var(--laranja);font-style:italic}
+  .page-header-sub{font-family:var(--ui);font-size:12.5px;color:var(--cinza);margin-top:4px;letter-spacing:.3px;line-height:1.5}
+  .page-header-sub strong{color:var(--marinho)}
+
+  /* FILTROS */
+  .filtros{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;align-items:center}
+  .filtro-chip{padding:6px 14px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;font-family:var(--ui);font-size:11.5px;color:var(--cinza);cursor:pointer;letter-spacing:.3px;font-weight:600}
+  .filtro-chip:hover{border-color:var(--marinho);color:var(--marinho)}
+  .filtro-chip.ativo{background:var(--marinho);color:var(--papel);border-color:var(--marinho)}
+  .filtros-meta{margin-left:auto;font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px}
+  .filtros-meta strong{color:var(--marinho)}
+
+  /* GRID PRINCIPAL · 2 COLUNAS · 9-Box + PDI */
+  .grid-9box{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;margin-bottom:22px}
+
+  /* PAINEL · base */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px}
+  .painel-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--cinza-cl);gap:12px;flex-wrap:wrap}
+  .painel-titulo{font-size:18px;font-weight:400;line-height:1.2;letter-spacing:-.2px}
+  .painel-titulo em{color:var(--laranja);font-style:italic}
+  .painel-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .painel-eyebrow{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:3px}
+
+  /* 9-BOX GRID */
+  .ninebox-wrap{display:grid;grid-template-columns:30px 1fr;grid-template-rows:1fr 30px;gap:8px}
+
+  /* eixo Y · potencial */
+  .eixo-y{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--cinza);font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;grid-row:1;grid-column:1}
+  .eixo-y span{padding:0 12px}
+
+  /* eixo X · desempenho */
+  .eixo-x{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--cinza);font-weight:700;text-align:center;grid-row:2;grid-column:2;display:flex;align-items:center;justify-content:center}
+
+  /* 9-Box · matriz 3x3 */
+  .ninebox{grid-row:1;grid-column:2;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px;aspect-ratio:1.1}
+  .ninebox-celula{background:var(--cinza-fundo);border:1px dashed var(--cinza-cl);border-radius:3px;padding:10px 8px;position:relative;display:flex;flex-direction:column;min-height:130px}
+  .celula-rotulo{font-family:var(--ui);font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:6px;line-height:1.2}
+  .celula-rotulo strong{color:var(--marinho);display:block;font-family:var(--serif);font-style:italic;font-size:11px;font-weight:500;text-transform:none;letter-spacing:0;margin-bottom:2px}
+  .celula-contagem{position:absolute;top:8px;right:8px;font-family:var(--serif);font-style:italic;font-size:13px;color:var(--cinza);font-weight:500}
+  .celula-pessoas{display:flex;flex-wrap:wrap;gap:3px;margin-top:auto;min-height:32px;align-content:flex-end}
+
+  /* COR POR CELULA */
+  .ninebox-celula.alto-alto{background:linear-gradient(135deg,#FDF1EC,#FBE6DC);border-color:var(--laranja);border-style:solid}
+  .ninebox-celula.alto-alto .celula-rotulo strong{color:var(--laranja)}
+  .ninebox-celula.alto-medio{background:linear-gradient(135deg,#FBE6DC,#F5DCC9);border-color:var(--laranja);border-style:solid}
+  .ninebox-celula.medio-alto{background:linear-gradient(135deg,#EAF5EE,#D8EBDF);border-color:var(--verde);border-style:solid}
+  .ninebox-celula.medio-medio{background:linear-gradient(135deg,#FAF7F2,#F2EEE6);border-style:solid;border-color:var(--cinza-cl)}
+  .ninebox-celula.alto-baixo,.ninebox-celula.medio-baixo{background:var(--branco);border-style:solid;border-color:var(--cinza-cl)}
+  .ninebox-celula.baixo-alto{background:linear-gradient(135deg,#FAF1DA,#F2E5BD);border-color:var(--amarelo);border-style:solid}
+  .ninebox-celula.baixo-baixo,.ninebox-celula.baixo-medio{background:linear-gradient(135deg,#FBEAEA,#F5D8D8);border-color:var(--vermelho);border-style:solid}
+
+  /* AVATAR DA PESSOA · plotado */
+  .pessoa-dot{width:30px;height:30px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:11px;font-weight:600;cursor:grab;position:relative;transition:all .15s;border:2px solid var(--branco);box-shadow:0 2px 4px rgba(0,0,0,.1);flex-shrink:0}
+  .pessoa-dot:hover{transform:scale(1.3) translateY(-4px);z-index:10;box-shadow:0 6px 14px rgba(0,0,0,.2)}
+  .pessoa-dot.estrela{background:linear-gradient(135deg,#E8633A,#C94E28);border-color:#FFD700;box-shadow:0 0 0 2px rgba(255,215,0,.5),0 2px 6px rgba(232,99,58,.4)}
+  .pessoa-dot.estrela::after{content:"★";position:absolute;top:-7px;right:-5px;background:#FFD700;color:#8B6914;font-size:9px;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:bold}
+  .pessoa-dot.laranja{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .pessoa-dot.verde{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .pessoa-dot.marinho{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .pessoa-dot.amarelo{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .pessoa-dot.vermelho{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .pessoa-dot.roxo{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+
+  /* LEGENDA 9-Box */
+  .ninebox-legenda{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap;padding:14px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:11px}
+  .legenda-item{display:flex;align-items:center;gap:6px;color:var(--cinza)}
+  .legenda-dot{width:12px;height:12px;border-radius:50%}
+  .legenda-dot.estrela{background:#E8633A;box-shadow:0 0 0 1.5px #FFD700}
+  .legenda-dot.altopot{background:#D4A02C}
+  .legenda-dot.fortes{background:#2D7D5A}
+  .legenda-dot.medio{background:#5C6478}
+  .legenda-dot.baixo{background:#C44545}
+
+  /* PDI · PAINEL DIREITO */
+  .pdi-perfil{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);border-radius:4px;padding:22px;margin-bottom:18px;position:relative;overflow:hidden}
+  .pdi-perfil::before{content:"";position:absolute;top:-30%;right:-15%;width:280px;height:280px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .pdi-perfil > *{position:relative}
+  .pdi-perfil-top{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+  .pdi-foto{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#E8633A,#C94E28);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:26px;color:white;font-weight:600;border:3px solid #FFD700;flex-shrink:0;box-shadow:0 0 0 1px rgba(255,215,0,.5)}
+  .pdi-nome{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--papel);line-height:1.2}
+  .pdi-cargo{font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.7);margin-top:3px;letter-spacing:.3px}
+  .pdi-cargo strong{color:var(--laranja);font-family:var(--serif);font-style:italic;font-size:12px;font-weight:500}
+  .pdi-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
+  .pdi-stat{text-align:center}
+  .pdi-stat-num{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--laranja);font-weight:400;line-height:1}
+  .pdi-stat-lbl{font-family:var(--ui);font-size:9px;color:rgba(250,247,242,.6);letter-spacing:.8px;text-transform:uppercase;font-weight:600;margin-top:5px}
+
+  /* PDI · objetivos & ações */
+  .pdi-bloco{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;margin-bottom:14px}
+  .pdi-bloco-titulo{font-size:14px;font-weight:500;color:var(--marinho);margin-bottom:10px;display:flex;align-items:center;gap:8px;font-family:var(--serif)}
+  .pdi-bloco-titulo em{color:var(--laranja);font-style:italic}
+  .pdi-bloco-titulo .ic{font-size:16px}
+
+  .pdi-objetivo{padding:12px;background:var(--cinza-fundo);border-left:3px solid var(--laranja);border-radius:0 2px 2px 0;margin-bottom:10px;font-size:12.5px;line-height:1.55;font-family:var(--ui);color:var(--marinho)}
+  .pdi-objetivo strong{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--laranja);font-size:13.5px;display:block;margin-bottom:4px}
+  .pdi-objetivo .meta{font-size:10px;color:var(--cinza);margin-top:6px;letter-spacing:.3px;font-weight:600}
+
+  .pdi-acao{display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:11px 0;border-bottom:1px dashed var(--cinza-cl);align-items:center}
+  .pdi-acao:last-child{border:none}
+  .acao-status{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;flex-shrink:0;font-weight:bold}
+  .acao-status.feito{background:var(--verde)}
+  .acao-status.curso{background:var(--amarelo);color:#5A4500}
+  .acao-status.pendente{background:var(--cinza-cl);color:var(--cinza)}
+  .acao-info .nome{font-family:var(--serif);font-size:13px;color:var(--marinho);font-weight:500;line-height:1.2}
+  .acao-info .nome em{color:var(--roxo);font-style:italic}
+  .acao-info .meta{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:3px;letter-spacing:.2px}
+  .acao-tag{font-family:var(--ui);font-size:9.5px;padding:3px 8px;border-radius:2px;font-weight:700;letter-spacing:.5px;border:1px solid}
+  .acao-tag.verde{background:var(--verde-cl);color:var(--verde);border-color:var(--verde)}
+  .acao-tag.amarelo{background:var(--amarelo-cl);color:#876715;border-color:var(--amarelo)}
+  .acao-tag.cinza{background:var(--cinza-fundo);color:var(--cinza);border-color:var(--cinza-cl)}
+  .acao-tag.roxo{background:#EFE9FB;color:var(--roxo);border-color:var(--roxo)}
+
+  /* SUGESTÃO IA NORA */
+  .nora-sugere{background:linear-gradient(135deg,#3F2C7A,#5B3FA0);color:white;border-radius:4px;padding:18px;margin-top:14px;position:relative;overflow:hidden}
+  .nora-sugere::before{content:"";position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .nora-sugere > *{position:relative}
+  .nora-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .nora-av-mini{width:34px;height:34px;border-radius:50%;background:rgba(232,99,58,.25);border:1px solid var(--laranja);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .nora-eyebrow{font-family:var(--ui);font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,99,58,.9);font-weight:700;margin-bottom:2px}
+  .nora-titulo{font-family:var(--serif);font-size:15px;color:white;font-weight:500}
+  .nora-titulo em{color:var(--laranja);font-style:italic}
+  .nora-msg{font-family:var(--ui);font-size:12px;color:rgba(255,255,255,.9);line-height:1.55;letter-spacing:.2px;margin-top:6px}
+  .nora-msg strong{color:white}
+  .nora-acoes{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .nora-btn{padding:6px 12px;font-size:11px;background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.2);border-radius:2px;cursor:pointer;font-family:var(--ui);font-weight:600;letter-spacing:.3px}
+  .nora-btn.primario{background:var(--laranja);border-color:var(--laranja)}
+  .nora-btn:hover{background:rgba(255,255,255,.2)}
+  .nora-btn.primario:hover{background:var(--laranja-esc)}
+
+  /* DISTRIBUIÇÃO POR CÉLULA · barra horizontal */
+  .distribuicao{background:var(--cinza-fundo);border-radius:2px;padding:16px;margin-bottom:18px}
+  .distribuicao-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:10px}
+  .distrib-linha{display:grid;grid-template-columns:120px 1fr 50px;gap:10px;align-items:center;padding:5px 0;font-family:var(--ui);font-size:11px}
+  .distrib-cat{color:var(--marinho);font-weight:600}
+  .distrib-bar{height:8px;background:var(--branco);border-radius:4px;overflow:hidden}
+  .distrib-fill{height:100%;border-radius:4px}
+  .distrib-fill.laranja{background:linear-gradient(90deg,var(--laranja),var(--laranja-esc))}
+  .distrib-fill.verde{background:linear-gradient(90deg,var(--verde),#1F5740)}
+  .distrib-fill.amarelo{background:linear-gradient(90deg,var(--amarelo),#A37614)}
+  .distrib-fill.cinza{background:linear-gradient(90deg,#9DA3B0,#5C6478)}
+  .distrib-fill.vermelho{background:linear-gradient(90deg,var(--vermelho),#8E2B2B)}
+  .distrib-val{text-align:right;font-family:var(--serif);font-style:italic;font-size:13px;color:var(--marinho);font-weight:500}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1200px){
+    .grid-9box{grid-template-columns:1fr}
+  }
+  @media (max-width:700px){
+    .ninebox{aspect-ratio:auto}
+    .ninebox-celula{min-height:90px}
+  }
+</style>
+</head>
+<body>
+
+<div class="tela ativa" id="t-9box">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Dashboard Executivo</div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Headcount</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">🎓</span> Onboarding</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">📚</span> Treinamentos</div>
+      <div class="sidebar-item ativo"><span class="ic">⭐</span> Avaliação &amp; 9-Box</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Jurídico</div>
+      <div class="sidebar-item outro"><span class="ic">⚖</span> Processos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil">
+        <div class="av">RA</div>
+        <div>
+          <div class="nome">Roberto Aurora</div>
+          <div class="cargo">⭐ Owner · Dir. RH</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+
+      <!-- HEADER -->
+      <div class="page-header">
+        <div>
+          <h1>Avaliação <em>9-Box</em> &amp; PDI</h1>
+          <div class="page-header-sub">Ciclo <strong>Q1/2026</strong> · 87% concluído · calibração até <strong>31/05</strong> · 128 empregados avaliados</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-fantasma btn-sm">📊 Exportar</button>
+          <button class="btn btn-fantasma btn-sm">📅 Histórico ciclos</button>
+          <button class="btn btn-primario btn-sm">Encerrar calibração</button>
+        </div>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="filtros">
+        <span style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-right:5px">Departamento:</span>
+        <button class="filtro-chip ativo">Todos</button>
+        <button class="filtro-chip">Operações (78)</button>
+        <button class="filtro-chip">Engenharia (22)</button>
+        <button class="filtro-chip">Financeiro (12)</button>
+        <button class="filtro-chip">Comercial (8)</button>
+        <button class="filtro-chip">Suprimentos (5)</button>
+        <button class="filtro-chip">RH (3)</button>
+        <div class="filtros-meta"><strong>128</strong> empregados · <strong>112</strong> calibrados · <strong>16</strong> pendentes</div>
+      </div>
+
+      <!-- GRID 9-BOX + PDI -->
+      <div class="grid-9box">
+
+        <!-- COLUNA ESQUERDA · 9-BOX -->
+        <div>
+          <div class="painel">
+            <div class="painel-head">
+              <div>
+                <div class="painel-eyebrow">Calibração visual</div>
+                <h2 class="painel-titulo">Matriz <em>9-Box</em></h2>
+                <div class="painel-sub">Desempenho × Potencial · arraste e solte para recalibrar</div>
+              </div>
+              <button class="btn btn-fantasma btn-sm">🔄 Resetar</button>
+            </div>
+
+            <!-- 9-Box matriz -->
+            <div class="ninebox-wrap">
+              <div class="eixo-y"><span>Potencial →</span></div>
+
+              <div class="ninebox">
+                <!-- Linha 1 (potencial alto) -->
+                <div class="ninebox-celula baixo-alto">
+                  <div class="celula-rotulo">Enigma<strong>Pot ↑ · Des ↓</strong></div>
+                  <div class="celula-contagem">3</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot amarelo" title="Bruno Santos · Eng. Civil Jr">BS</div>
+                    <div class="pessoa-dot amarelo" title="Carla Vieira · Aux. Adm">CV</div>
+                    <div class="pessoa-dot amarelo" title="Pedro Lima · Carpinteiro">PL</div>
+                  </div>
+                </div>
+                <div class="ninebox-celula medio-alto">
+                  <div class="celula-rotulo">Forte crescimento<strong>Pot ↑ · Des →</strong></div>
+                  <div class="celula-contagem">12</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot verde" title="Daniel Pereira · Eng. Pleno">DP</div>
+                    <div class="pessoa-dot verde" title="Ana Souza · Coord. Sup">AS</div>
+                    <div class="pessoa-dot verde" title="Lucas Mendes · Mestre">LM</div>
+                    <div class="pessoa-dot verde" title="Júlia Pinto · Analista R&amp;S">JP</div>
+                    <div class="pessoa-dot verde" title="Mais 8 pessoas">+8</div>
+                  </div>
+                </div>
+                <div class="ninebox-celula alto-alto">
+                  <div class="celula-rotulo">Estrelas<strong>Pot ↑ · Des ↑</strong></div>
+                  <div class="celula-contagem">8</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot estrela laranja" title="★ Fernando Lacerda · Eng. Civil Sr">F</div>
+                    <div class="pessoa-dot laranja" title="Luísa Mendonça · Dir. Eng">LM</div>
+                    <div class="pessoa-dot laranja" title="Carla Aurora · Coord. RH">CA</div>
+                    <div class="pessoa-dot laranja" title="Eduardo Santos · Dir. Fin">ES</div>
+                    <div class="pessoa-dot laranja" title="Bruna Lima · HR Ops">BL</div>
+                    <div class="pessoa-dot laranja" title="Mais 3 pessoas">+3</div>
+                  </div>
+                </div>
+
+                <!-- Linha 2 (potencial médio) -->
+                <div class="ninebox-celula baixo-medio">
+                  <div class="celula-rotulo">Dilema<strong>Pot → · Des ↓</strong></div>
+                  <div class="celula-contagem">6</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot vermelho" title="Roberto Almeida · Pedreiro">RA</div>
+                    <div class="pessoa-dot vermelho" title="José Lima · Servente">JL</div>
+                    <div class="pessoa-dot vermelho" title="Mais 4 pessoas">+4</div>
+                  </div>
+                </div>
+                <div class="ninebox-celula medio-medio">
+                  <div class="celula-rotulo">Mantenedor<strong>Pot → · Des →</strong></div>
+                  <div class="celula-contagem">42</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot marinho" title="42 mantenedores · clique para ver">42</div>
+                  </div>
+                </div>
+                <div class="ninebox-celula alto-medio">
+                  <div class="celula-rotulo">Alta performance<strong>Pot → · Des ↑</strong></div>
+                  <div class="celula-contagem">18</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot laranja" title="Carlos Aurora · Dir. Ops">CO</div>
+                    <div class="pessoa-dot laranja" title="Gabriela Tavares · Coord. Sup">GT</div>
+                    <div class="pessoa-dot laranja" title="Henrique Lopes · Mestre">HL</div>
+                    <div class="pessoa-dot laranja" title="Mais 15 pessoas">+15</div>
+                  </div>
+                </div>
+
+                <!-- Linha 3 (potencial baixo) -->
+                <div class="ninebox-celula baixo-baixo">
+                  <div class="celula-rotulo">Inadequado<strong>Pot ↓ · Des ↓</strong></div>
+                  <div class="celula-contagem">4</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot vermelho" title="Marcelo Andrade · NR-18 vencida">MA</div>
+                    <div class="pessoa-dot vermelho" title="Mais 3 pessoas">+3</div>
+                  </div>
+                </div>
+                <div class="ninebox-celula medio-baixo">
+                  <div class="celula-rotulo">Mantenedor especialista<strong>Pot ↓ · Des →</strong></div>
+                  <div class="celula-contagem">21</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot marinho" title="21 especialistas estáveis">21</div>
+                  </div>
+                </div>
+                <div class="ninebox-celula alto-baixo">
+                  <div class="celula-rotulo">Especialista chave<strong>Pot ↓ · Des ↑</strong></div>
+                  <div class="celula-contagem">14</div>
+                  <div class="celula-pessoas">
+                    <div class="pessoa-dot marinho" title="Marcos Ferreira · Soldador Sr">MF</div>
+                    <div class="pessoa-dot marinho" title="Pedro Castro · Eletricista">PC</div>
+                    <div class="pessoa-dot marinho" title="Mais 12 pessoas">+12</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="eixo-x"><span>Desempenho →</span></div>
+            </div>
+
+            <!-- LEGENDA -->
+            <div class="ninebox-legenda">
+              <div class="legenda-item"><span class="legenda-dot estrela"></span> Estrelas (8) · sucessores prioritários</div>
+              <div class="legenda-item"><span class="legenda-dot altopot"></span> Alto potencial (15) · investir</div>
+              <div class="legenda-item"><span class="legenda-dot fortes"></span> Fortes (12) · acelerar</div>
+              <div class="legenda-item"><span class="legenda-dot medio"></span> Estáveis (77) · manter</div>
+              <div class="legenda-item"><span class="legenda-dot baixo"></span> Atenção (10) · plano de ação</div>
+            </div>
+          </div>
+
+          <!-- DISTRIBUIÇÃO -->
+          <div class="painel" style="margin-top:18px">
+            <div class="painel-head">
+              <div>
+                <div class="painel-eyebrow">Distribuição</div>
+                <h2 class="painel-titulo">Visão <em>consolidada</em></h2>
+                <div class="painel-sub">112 calibradas · 16 pendentes · saúde geral 81%</div>
+              </div>
+            </div>
+
+            <div class="distribuicao">
+              <div class="distribuicao-titulo">Por classificação</div>
+              <div class="distrib-linha">
+                <div class="distrib-cat">★ Estrelas</div>
+                <div class="distrib-bar"><div class="distrib-fill laranja" style="width:7%"></div></div>
+                <div class="distrib-val">8 · 7%</div>
+              </div>
+              <div class="distrib-linha">
+                <div class="distrib-cat">Alto potencial</div>
+                <div class="distrib-bar"><div class="distrib-fill amarelo" style="width:12%"></div></div>
+                <div class="distrib-val">15 · 12%</div>
+              </div>
+              <div class="distrib-linha">
+                <div class="distrib-cat">Alta performance</div>
+                <div class="distrib-bar"><div class="distrib-fill verde" style="width:14%"></div></div>
+                <div class="distrib-val">18 · 14%</div>
+              </div>
+              <div class="distrib-linha">
+                <div class="distrib-cat">Forte crescimento</div>
+                <div class="distrib-bar"><div class="distrib-fill verde" style="width:9.5%"></div></div>
+                <div class="distrib-val">12 · 10%</div>
+              </div>
+              <div class="distrib-linha">
+                <div class="distrib-cat">Especialista chave</div>
+                <div class="distrib-bar"><div class="distrib-fill cinza" style="width:11%"></div></div>
+                <div class="distrib-val">14 · 11%</div>
+              </div>
+              <div class="distrib-linha">
+                <div class="distrib-cat">Mantenedores</div>
+                <div class="distrib-bar"><div class="distrib-fill cinza" style="width:49%"></div></div>
+                <div class="distrib-val">63 · 49%</div>
+              </div>
+              <div class="distrib-linha">
+                <div class="distrib-cat">Atenção</div>
+                <div class="distrib-bar"><div class="distrib-fill vermelho" style="width:8%"></div></div>
+                <div class="distrib-val">10 · 8%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUNA DIREITA · PDI do Fernando -->
+        <div>
+          <!-- Header do PDI · Fernando -->
+          <div class="pdi-perfil">
+            <div class="pdi-perfil-top">
+              <div class="pdi-foto">F</div>
+              <div>
+                <div class="pdi-nome">Fernando Lacerda</div>
+                <div class="pdi-cargo">Eng. Civil Sr · MAT 0112 · 4 anos · <strong>★ Estrela</strong></div>
+              </div>
+            </div>
+            <div class="pdi-stats">
+              <div class="pdi-stat">
+                <div class="pdi-stat-num">9.4</div>
+                <div class="pdi-stat-lbl">Desempenho</div>
+              </div>
+              <div class="pdi-stat">
+                <div class="pdi-stat-num">9.1</div>
+                <div class="pdi-stat-lbl">Potencial</div>
+              </div>
+              <div class="pdi-stat">
+                <div class="pdi-stat-num">96%</div>
+                <div class="pdi-stat-lbl">Meta cumprida</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objetivo do PDI -->
+          <div class="pdi-bloco">
+            <div class="pdi-bloco-titulo"><span class="ic">🎯</span> Objetivo do <em>PDI</em></div>
+            <div class="pdi-objetivo">
+              <strong>Preparar para Especialista em Engenharia BIM</strong>
+              Desenvolver competências em BIM Avançado e gestão de equipes para assumir liderança técnica do escritório de projetos da Vila Aurora a partir de outubro/2026.
+              <div class="meta">Horizonte: 12 meses · Próxima revisão: 02/08/2026</div>
+            </div>
+          </div>
+
+          <!-- Ações do PDI -->
+          <div class="pdi-bloco">
+            <div class="pdi-bloco-titulo"><span class="ic">📚</span> Ações <em>vinculadas</em></div>
+
+            <div class="pdi-acao">
+              <div class="acao-status feito">✓</div>
+              <div class="acao-info">
+                <div class="nome">Curso <em>BIM · Modelagem Revit</em> · Alura</div>
+                <div class="meta">40h · concluído em 12/05/2026</div>
+              </div>
+              <span class="acao-tag verde">CONCLUÍDO</span>
+            </div>
+
+            <div class="pdi-acao">
+              <div class="acao-status curso">⌛</div>
+              <div class="acao-info">
+                <div class="nome">Trilha <em>BIM Avançado · Coordenação</em></div>
+                <div class="meta">120h · 65% concluído · módulo 6/8</div>
+              </div>
+              <span class="acao-tag amarelo">65%</span>
+            </div>
+
+            <div class="pdi-acao">
+              <div class="acao-status pendente">○</div>
+              <div class="acao-info">
+                <div class="nome">Curso <em>Liderança Técnica</em> · FDC</div>
+                <div class="meta">32h · sugestão IA · início 15/07</div>
+              </div>
+              <span class="acao-tag roxo">IA SUG.</span>
+            </div>
+
+            <div class="pdi-acao">
+              <div class="acao-status pendente">○</div>
+              <div class="acao-info">
+                <div class="nome">Projeto-piloto Vila Aurora · BIM</div>
+                <div class="meta">mentoria com Luísa · iniciar 01/09</div>
+              </div>
+              <span class="acao-tag cinza">PENDENTE</span>
+            </div>
+
+            <div class="pdi-acao">
+              <div class="acao-status pendente">○</div>
+              <div class="acao-info">
+                <div class="nome">Certificação <em>Autodesk BIM Manager</em></div>
+                <div class="meta">prova 28/02/2027</div>
+              </div>
+              <span class="acao-tag cinza">PENDENTE</span>
+            </div>
+          </div>
+
+          <!-- Sugestão da Nora·IA -->
+          <div class="nora-sugere">
+            <div class="nora-head">
+              <div class="nora-av-mini">🤖</div>
+              <div>
+                <div class="nora-eyebrow">Análise da Nora·IA</div>
+                <div class="nora-titulo">Sugestão para o <em>PDI do Fernando</em></div>
+              </div>
+            </div>
+            <div class="nora-msg">
+              Fernando está em <strong>★ Estrela</strong> e a Aurora precisa de um <strong>líder técnico para Vila Aurora</strong> (início outubro). Sugiro:
+              <ul style="margin:8px 0 8px 18px;font-size:11.5px;line-height:1.7;color:rgba(255,255,255,.85)">
+                <li><strong>Adicionar curso Liderança Técnica</strong> (FDC · 32h) — gap no perfil dele</li>
+                <li><strong>Mentoria reversa com Luísa</strong> (3 sessões em 60 dias)</li>
+                <li><strong>Antecipar promoção</strong> para Eng. Especialista em 02/08 (R$ 12.500 → R$ 16.500)</li>
+                <li><strong>Atribuir piloto da Vila Aurora</strong> como projeto líder em set/out</li>
+              </ul>
+              ROI estimado: economia de <strong>R$ 280K</strong> em contratação externa de Eng. Especialista.
+            </div>
+            <div class="nora-acoes">
+              <button class="nora-btn primario">✓ Aplicar sugestões</button>
+              <button class="nora-btn">Editar</button>
+              <button class="nora-btn">Discutir com Fernando</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="proto-bar">
+  <span class="proto-label">Tela 20 · Avaliação 9-Box + PDI Fernando · Roberto calibrando</span>
+</div>
+
+<script>
+function irPara(idTela){
+  alert('Em produção navega para: ' + idTela);
+}
+</script>
+</body>
+</html>

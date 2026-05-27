@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Entrar</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  /* === LAYOUT GERAL === */
+  .auth-shell{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+
+  /* LADO ESQUERDO: Brand panel */
+  .brand-panel{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);padding:60px 70px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+  .brand-panel::before{content:"";position:absolute;top:-30%;right:-25%;width:600px;height:600px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 60%);pointer-events:none}
+  .brand-panel::after{content:"";position:absolute;bottom:-20%;left:-15%;width:480px;height:480px;background:radial-gradient(circle,rgba(232,99,58,.08) 0%,transparent 65%);pointer-events:none}
+
+  .brand-top{position:relative}
+  .logo-grande{display:inline-flex;align-items:flex-end;font-size:48px;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo-grande .oi{color:var(--laranja);font-style:italic}
+  .logo-grande .nora{color:var(--papel);margin-left:8px}
+  .brand-tag{font-family:var(--ui);font-size:10px;letter-spacing:3px;color:rgba(250,247,242,.5);text-transform:uppercase;margin-top:8px;font-weight:600}
+
+  .brand-titulo{position:relative;margin-top:40px}
+  .brand-titulo h2{font-size:42px;font-weight:400;letter-spacing:-.5px;line-height:1.15;max-width:480px}
+  .brand-titulo h2 em{color:var(--laranja);font-style:italic}
+  .brand-titulo p{font-family:var(--ui);font-size:14px;line-height:1.7;opacity:.7;margin-top:18px;max-width:440px}
+
+  .brand-mid{position:relative;margin-top:40px}
+  .brand-features{display:grid;gap:14px;max-width:420px}
+  .bf-item{display:flex;gap:14px;align-items:flex-start}
+  .bf-ic{width:36px;height:36px;border-radius:2px;background:rgba(232,99,58,.12);border:1px solid rgba(232,99,58,.3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:var(--laranja)}
+  .bf-texto{font-family:var(--ui);font-size:13px;line-height:1.5}
+  .bf-texto strong{color:var(--papel);font-weight:600;display:block;margin-bottom:2px}
+  .bf-texto span{opacity:.6}
+
+  .brand-bottom{position:relative;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--ui);font-size:11px;opacity:.5;letter-spacing:.3px}
+  .brand-bottom a{transition:opacity .2s}
+  .brand-bottom a:hover{opacity:1;color:var(--laranja)}
+
+  /* LADO DIREITO: Form panel */
+  .form-panel{background:var(--papel);padding:60px 70px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow-y:auto}
+  .form-wrap{max-width:420px;width:100%;margin:0 auto}
+
+  /* Filete */
+  .filete{display:flex;align-items:center;gap:14px;font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--marinho-med);text-transform:uppercase;font-weight:600;margin-bottom:24px}
+  .filete::before,.filete::after{content:"";flex:1;height:1px;background:var(--cinza-cl)}
+
+  .form-titulo{font-size:36px;font-weight:400;letter-spacing:-.3px;line-height:1.1;margin-bottom:8px}
+  .form-titulo em{color:var(--laranja);font-style:italic}
+  .form-sub{font-family:var(--ui);font-size:13px;color:var(--cinza);line-height:1.6;margin-bottom:32px}
+
+  /* CAMPOS */
+  .campo{margin-bottom:18px;position:relative}
+  .campo label{display:block;font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--marinho-med);margin-bottom:8px;font-weight:600}
+  .campo input{width:100%;padding:13px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:15px;color:var(--marinho);border-radius:2px;transition:all .15s}
+  .campo input:focus{outline:none;border-color:var(--laranja);box-shadow:0 0 0 3px rgba(232,99,58,.08)}
+  .campo input::placeholder{color:var(--cinza-cl);font-style:italic}
+  .campo .pwd-wrap{position:relative}
+  .campo .pwd-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--cinza);cursor:pointer;font-family:var(--ui);font-size:11px;letter-spacing:.5px;font-weight:600}
+
+  .form-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;font-family:var(--ui);font-size:12px}
+  .form-row label{display:flex;align-items:center;gap:8px;color:var(--cinza);cursor:pointer}
+  .form-row label input{width:14px;height:14px;accent-color:var(--laranja)}
+  .form-row a{color:var(--laranja);font-weight:600;letter-spacing:.3px}
+  .form-row a:hover{text-decoration:underline}
+
+  /* BOTÕES */
+  .btn{font-family:var(--serif);font-size:15px;padding:13px 28px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px;width:100%;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc);transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,99,58,.25)}
+  .btn-fantasma{background:var(--branco);color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-sm{padding:9px 18px;font-size:13px}
+  .btn-google{background:var(--branco);color:var(--marinho);border:1px solid var(--cinza-cl);font-family:var(--ui);font-size:14px;font-weight:500;letter-spacing:.3px}
+  .btn-google:hover{border-color:var(--marinho);background:var(--cinza-fundo)}
+  .g-logo{display:inline-block;width:18px;height:18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%234285F4' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%2334A853' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%23EA4335' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E") center/contain no-repeat}
+
+  .divider{display:flex;align-items:center;gap:14px;margin:24px 0;font-family:var(--ui);font-size:11px;letter-spacing:1.5px;color:var(--cinza);text-transform:uppercase}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--cinza-cl)}
+
+  .form-footer{margin-top:32px;padding-top:24px;border-top:1px solid var(--cinza-cl);text-align:center;font-family:var(--ui);font-size:13px;color:var(--cinza)}
+  .form-footer a{color:var(--laranja);font-weight:600}
+  .form-footer a:hover{text-decoration:underline}
+
+  /* TAGS / TAB DETECTOR */
+  .persona-detectada{padding:14px;background:var(--laranja-cl);border:1px solid var(--laranja);border-radius:2px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+  .pd-ic{width:38px;height:38px;border-radius:50%;background:var(--laranja);color:white;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .pd-texto{font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.5}
+  .pd-texto strong{color:var(--marinho);display:block;font-size:13px;margin-bottom:1px}
+
+  /* PERSONAS PARA DEMO */
+  .demo-personas{margin-top:18px;padding-top:18px;border-top:1px dashed var(--cinza-cl)}
+  .demo-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;color:var(--cinza);text-transform:uppercase;text-align:center;margin-bottom:12px;font-weight:600}
+  .demo-grade{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .demo-card{padding:10px 12px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;cursor:pointer;transition:all .15s;display:flex;gap:10px;align-items:center}
+  .demo-card:hover{border-color:var(--laranja);background:var(--laranja-cl)}
+  .demo-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:12px;flex-shrink:0;font-weight:600}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .demo-info{flex:1;min-width:0}
+  .demo-nome{font-size:12px;font-weight:500;line-height:1.2;color:var(--marinho)}
+  .demo-cargo{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.3px;line-height:1.2}
+
+  /* TABS PARA LOGIN VS CADASTRO */
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:32px}
+  .tab{padding:12px 0;flex:1;text-align:center;font-family:var(--ui);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:700;transition:all .15s}
+  .tab:hover{color:var(--marinho)}
+  .tab.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+
+  /* STATE: força senha */
+  .pwd-strength{display:flex;gap:4px;margin-top:8px}
+  .pwd-strength div{flex:1;height:3px;background:var(--cinza-cl);border-radius:2px}
+  .pwd-strength.fraca div:nth-child(1){background:var(--vermelho)}
+  .pwd-strength.media div:nth-child(1),.pwd-strength.media div:nth-child(2){background:var(--amarelo)}
+  .pwd-strength.forte div{background:var(--verde)}
+  .pwd-help{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px}
+
+  /* MAGIC LINK enviado */
+  .ml-card{background:var(--branco);border:1px solid var(--cinza-cl);border-left:4px solid var(--verde);padding:20px;border-radius:2px;text-align:center}
+  .ml-card .ic-grande{font-size:48px;margin-bottom:14px}
+  .ml-card h4{font-size:20px;font-weight:400;margin-bottom:8px}
+  .ml-card p{font-family:var(--ui);font-size:13px;color:var(--cinza);line-height:1.6}
+  .ml-card .email-dest{color:var(--marinho);font-weight:600}
+  .ml-card .ml-action{margin-top:18px;font-family:var(--ui);font-size:12px;color:var(--cinza)}
+  .ml-card .ml-action a{color:var(--laranja);font-weight:600}
+
+  /* CADASTRO 2 etapas */
+  .step-indicator{display:flex;gap:8px;align-items:center;margin-bottom:24px;font-family:var(--ui);font-size:11px;letter-spacing:1px;color:var(--cinza);font-weight:600;text-transform:uppercase}
+  .step-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--cinza-fundo);color:var(--cinza)}
+  .step-dot.ativo{background:var(--laranja);color:white}
+  .step-dot.concluido{background:var(--verde);color:white}
+  .step-bar{flex:1;height:1px;background:var(--cinza-cl)}
+  .step-bar.concluido{background:var(--verde)}
+
+  /* RECUPERAR SENHA */
+  .alert-info{background:var(--marinho);color:var(--papel);padding:14px;border-radius:2px;font-family:var(--ui);font-size:12px;line-height:1.5;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+  .alert-info .ic{font-size:16px}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:260px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  /* TRÂNSITO POST-LOGIN */
+  .transito-tela{position:fixed;inset:0;background:var(--marinho);color:var(--papel);display:none;align-items:center;justify-content:center;z-index:300}
+  .transito-tela.ativa{display:flex}
+  .transito-conteudo{text-align:center}
+  .transito-logo{font-size:54px;font-family:var(--serif);line-height:1;margin-bottom:30px}
+  .transito-logo .oi{color:var(--laranja);font-style:italic}
+  .transito-msg{font-family:var(--ui);font-size:14px;opacity:.7;letter-spacing:.3px}
+  .transito-msg strong{color:var(--laranja);font-family:var(--serif);font-style:italic;font-weight:400;font-size:18px;display:block;margin-bottom:6px}
+  .transito-loader{width:40px;height:40px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--laranja);border-radius:50%;margin:30px auto 0;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  @media (max-width:960px){
+    .auth-shell{grid-template-columns:1fr}
+    .brand-panel{padding:40px 30px;min-height:auto}
+    .brand-titulo h2{font-size:28px}
+    .brand-features,.brand-bottom{display:none}
+    .form-panel{padding:40px 30px}
+    .form-titulo{font-size:28px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: LOGIN (default) -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-login">
+  <div class="auth-shell">
+
+    <!-- BRAND PANEL ESQUERDO -->
+    <aside class="brand-panel">
+      <div class="brand-top">
+        <div class="logo-grande"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+        <div class="brand-tag">Recrutamento, Seleção &amp; Gestão de Pessoas</div>
+      </div>
+
+      <div class="brand-titulo">
+        <h2>Uma plataforma para o <em>ciclo completo</em> da carreira.</h2>
+        <p>Do primeiro currículo no banco de talentos ao último PDI da promoção — tudo em um só lugar, com a sofisticação que a gente merece.</p>
+      </div>
+
+      <div class="brand-mid">
+        <div class="brand-features">
+          <div class="bf-item">
+            <div class="bf-ic">◆</div>
+            <div class="bf-texto"><strong>Banco compartilhado</strong><span>2.847 profissionais qualificados</span></div>
+          </div>
+          <div class="bf-item">
+            <div class="bf-ic">⭐</div>
+            <div class="bf-texto"><strong>Avaliação 360° + IA</strong><span>Análise de sentimento e clima organizacional</span></div>
+          </div>
+          <div class="bf-item">
+            <div class="bf-ic">🔒</div>
+            <div class="bf-texto"><strong>LGPD nativo</strong><span>Anonimato real em pesquisas, criptografia em repouso</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-bottom">
+        <span>© 2026 Oi Nora · v1.0</span>
+        <div style="display:flex;gap:18px"><a>Termos</a><a>Privacidade</a><a>Status</a></div>
+      </div>
+    </aside>
+
+    <!-- FORM PANEL DIREITO -->
+    <main class="form-panel">
+      <div class="form-wrap">
+
+        <div class="tabs">
+          <div class="tab ativa">Entrar</div>
+          <div class="tab" onclick="irPara('t-cadastro')">Cadastrar</div>
+        </div>
+
+        <div class="filete">acesso à plataforma</div>
+        <h1 class="form-titulo">Bem-vindo de <em>volta</em></h1>
+        <p class="form-sub">Entre com seu e-mail e senha. A Oi Nora detecta automaticamente sua área de acesso.</p>
+
+        <button class="btn btn-google" onclick="irPara('t-transito-empresa')">
+          <span class="g-logo"></span>
+          Entrar com Google
+        </button>
+
+        <div class="divider">ou com e-mail</div>
+
+        <div class="campo">
+          <label>E-mail corporativo ou pessoal</label>
+          <input type="email" placeholder="seu.email@exemplo.com" value="roberto@construtoraaurora.com.br" autocomplete="email"/>
+        </div>
+
+        <div class="campo">
+          <label>Senha</label>
+          <div class="pwd-wrap">
+            <input type="password" placeholder="••••••••" value="senha-demo-123" autocomplete="current-password"/>
+            <span class="pwd-toggle" onclick="togglePwd(this)">Mostrar</span>
+          </div>
+        </div>
+
+        <div class="persona-detectada">
+          <div class="pd-ic">🏢</div>
+          <div class="pd-texto">
+            <strong>Reconhecemos sua empresa: Construtora Aurora</strong>
+            Você será direcionado para o painel de RH após o login.
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>
+            <input type="checkbox" checked> Manter-me conectado
+          </label>
+          <a onclick="irPara('t-recuperar')">Esqueci minha senha</a>
+        </div>
+
+        <button class="btn btn-primario" onclick="irPara('t-transito-empresa')">Entrar →</button>
+
+        <div style="text-align:center;margin-top:18px">
+          <a onclick="irPara('t-magic-link')" style="font-family:var(--ui);font-size:12px;color:var(--cinza);letter-spacing:.3px">✦ Receber link mágico no e-mail</a>
+        </div>
+
+        <div class="demo-personas">
+          <div class="demo-titulo">🎭 Demo · Entre como uma das personas</div>
+          <div class="demo-grade">
+            <div class="demo-card" onclick="irPara('t-transito-candidato')">
+              <div class="demo-av av-a">L</div>
+              <div class="demo-info">
+                <div class="demo-nome">Letícia Ferraz</div>
+                <div class="demo-cargo">Candidata</div>
+              </div>
+            </div>
+            <div class="demo-card" onclick="irPara('t-transito-empresa')">
+              <div class="demo-av av-b">R</div>
+              <div class="demo-info">
+                <div class="demo-nome">Roberto Aurora</div>
+                <div class="demo-cargo">RH · Aurora</div>
+              </div>
+            </div>
+            <div class="demo-card" onclick="irPara('t-transito-empregado')">
+              <div class="demo-av av-d">F</div>
+              <div class="demo-info">
+                <div class="demo-nome">Fernando Lacerda</div>
+                <div class="demo-cargo">Empregado · Aurora</div>
+              </div>
+            </div>
+            <div class="demo-card" onclick="irPara('t-transito-oinora')">
+              <div class="demo-av av-c">C</div>
+              <div class="demo-info">
+                <div class="demo-nome">Cláudia Vasconcelos</div>
+                <div class="demo-cargo">CEO · Oi Nora</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          Não tem conta ainda? <a onclick="irPara('t-cadastro')">Cadastre-se como candidato</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: CADASTRO (apenas candidato) -->
+<!-- ============================================== -->
+<div class="tela" id="t-cadastro">
+  <div class="auth-shell">
+    <aside class="brand-panel">
+      <div class="brand-top">
+        <div class="logo-grande"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+        <div class="brand-tag">Recrutamento, Seleção &amp; Gestão de Pessoas</div>
+      </div>
+      <div class="brand-titulo">
+        <h2>O próximo passo da sua <em>carreira</em> começa aqui.</h2>
+        <p>Cadastre-se uma vez e candidate-se em vagas de dezenas de empresas. Acompanhe seus processos em um só lugar.</p>
+      </div>
+      <div class="brand-mid">
+        <div class="brand-features">
+          <div class="bf-item">
+            <div class="bf-ic">⚡</div>
+            <div class="bf-texto"><strong>Cadastro em 2 minutos</strong><span>Faça o upload do currículo e a IA preenche por você</span></div>
+          </div>
+          <div class="bf-item">
+            <div class="bf-ic">🎯</div>
+            <div class="bf-texto"><strong>Vagas que combinam</strong><span>Recomendações baseadas no seu perfil</span></div>
+          </div>
+          <div class="bf-item">
+            <div class="bf-ic">💬</div>
+            <div class="bf-texto"><strong>Comunicação direta</strong><span>Fale com recrutadoras humanas, sem robôs</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="brand-bottom">
+        <span>© 2026 Oi Nora · v1.0</span>
+        <div style="display:flex;gap:18px"><a>Termos</a><a>Privacidade</a><a>Status</a></div>
+      </div>
+    </aside>
+
+    <main class="form-panel">
+      <div class="form-wrap">
+        <div class="tabs">
+          <div class="tab" onclick="irPara('t-login')">Entrar</div>
+          <div class="tab ativa">Cadastrar</div>
+        </div>
+
+        <div class="step-indicator">
+          <div class="step-dot ativo">1</div>
+          <span>SEUS DADOS</span>
+          <div class="step-bar"></div>
+          <div class="step-dot">2</div>
+          <span>SENHA &amp; CONSENTIMENTO</span>
+        </div>
+
+        <div class="filete">novo na Oi Nora</div>
+        <h1 class="form-titulo">Crie sua <em>conta</em></h1>
+        <p class="form-sub">O cadastro é gratuito e só leva 2 minutos. Apenas <strong>candidatos</strong> podem se cadastrar aqui — empresas e empregados são convidados por sua organização.</p>
+
+        <button class="btn btn-google" onclick="irPara('t-cadastro-passo2')">
+          <span class="g-logo"></span>
+          Continuar com Google
+        </button>
+
+        <div class="divider">ou preencha</div>
+
+        <div class="campo">
+          <label>Nome completo</label>
+          <input type="text" placeholder="Maria Silva Santos"/>
+        </div>
+
+        <div class="campo">
+          <label>E-mail pessoal</label>
+          <input type="email" placeholder="maria@exemplo.com"/>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="campo">
+            <label>Celular</label>
+            <input type="tel" placeholder="(31) 9 9999-9999"/>
+          </div>
+          <div class="campo">
+            <label>Cidade</label>
+            <input type="text" placeholder="Belo Horizonte/MG"/>
+          </div>
+        </div>
+
+        <button class="btn btn-primario" onclick="irPara('t-cadastro-passo2')" style="margin-top:8px">Continuar →</button>
+
+        <div class="form-footer">
+          Já tem conta? <a onclick="irPara('t-login')">Entrar</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: CADASTRO PASSO 2 (senha + LGPD) -->
+<!-- ============================================== -->
+<div class="tela" id="t-cadastro-passo2">
+  <div class="auth-shell">
+    <aside class="brand-panel">
+      <div class="brand-top">
+        <div class="logo-grande"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+        <div class="brand-tag">Recrutamento, Seleção &amp; Gestão de Pessoas</div>
+      </div>
+      <div class="brand-titulo">
+        <h2>Sua privacidade é <em>pra valer</em>.</h2>
+        <p>Seguimos a LGPD com rigor. Você decide quais empresas podem ver seu perfil. Pode pedir exclusão a qualquer momento.</p>
+      </div>
+      <div class="brand-mid">
+        <div class="brand-features">
+          <div class="bf-item">
+            <div class="bf-ic">🔐</div>
+            <div class="bf-texto"><strong>Criptografia em repouso</strong><span>Seus dados sensíveis (CPF, currículo) ficam protegidos</span></div>
+          </div>
+          <div class="bf-item">
+            <div class="bf-ic">👁</div>
+            <div class="bf-texto"><strong>Você controla a visibilidade</strong><span>Perfil aberto ao público, restrito, ou invisível</span></div>
+          </div>
+          <div class="bf-item">
+            <div class="bf-ic">🗑</div>
+            <div class="bf-texto"><strong>Direito ao esquecimento</strong><span>Exclua sua conta com 1 clique, dados apagados em 72h</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="brand-bottom">
+        <span>© 2026 Oi Nora · v1.0</span>
+        <div style="display:flex;gap:18px"><a>Termos</a><a>Privacidade</a><a>Status</a></div>
+      </div>
+    </aside>
+
+    <main class="form-panel">
+      <div class="form-wrap">
+        <div class="step-indicator">
+          <div class="step-dot concluido">✓</div>
+          <span style="color:var(--verde)">SEUS DADOS</span>
+          <div class="step-bar concluido"></div>
+          <div class="step-dot ativo">2</div>
+          <span>SENHA &amp; CONSENTIMENTO</span>
+        </div>
+
+        <div class="filete">último passo</div>
+        <h1 class="form-titulo">Crie sua <em>senha</em></h1>
+        <p class="form-sub">Use no mínimo 8 caracteres, com pelo menos uma letra maiúscula e um número.</p>
+
+        <div class="campo">
+          <label>Senha</label>
+          <div class="pwd-wrap">
+            <input type="password" placeholder="••••••••" value="MinhaSenha2026"/>
+            <span class="pwd-toggle" onclick="togglePwd(this)">Mostrar</span>
+          </div>
+          <div class="pwd-strength forte"><div></div><div></div><div></div><div></div></div>
+          <div class="pwd-help" style="color:var(--verde)">✓ Senha forte — perfeito.</div>
+        </div>
+
+        <div class="campo">
+          <label>Confirme a senha</label>
+          <div class="pwd-wrap">
+            <input type="password" placeholder="••••••••" value="MinhaSenha2026"/>
+            <span class="pwd-toggle" onclick="togglePwd(this)">Mostrar</span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding:16px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px">
+          <label style="display:flex;gap:10px;align-items:flex-start;font-family:var(--ui);font-size:12.5px;color:var(--marinho);cursor:pointer;line-height:1.55">
+            <input type="checkbox" checked style="margin-top:3px;width:16px;height:16px;accent-color:var(--laranja);flex-shrink:0"/>
+            <span>Li e aceito os <a style="color:var(--laranja);font-weight:600">Termos de Uso</a> e a <a style="color:var(--laranja);font-weight:600">Política de Privacidade</a> da Oi Nora.</span>
+          </label>
+          <label style="display:flex;gap:10px;align-items:flex-start;font-family:var(--ui);font-size:12.5px;color:var(--marinho);cursor:pointer;margin-top:12px;line-height:1.55">
+            <input type="checkbox" checked style="margin-top:3px;width:16px;height:16px;accent-color:var(--laranja);flex-shrink:0"/>
+            <span>Autorizo o uso do meu perfil pela <strong>Oi Nora</strong> para recomendação em vagas. <span style="color:var(--cinza)">Você pode revogar isso a qualquer momento nas configurações.</span></span>
+          </label>
+          <label style="display:flex;gap:10px;align-items:flex-start;font-family:var(--ui);font-size:12.5px;color:var(--marinho);cursor:pointer;margin-top:12px;line-height:1.55">
+            <input type="checkbox" style="margin-top:3px;width:16px;height:16px;accent-color:var(--laranja);flex-shrink:0"/>
+            <span>Quero receber <strong>dicas de carreira e novas vagas</strong> por e-mail. <span style="color:var(--cinza)">(opcional, sem spam)</span></span>
+          </label>
+        </div>
+
+        <button class="btn btn-primario" onclick="irPara('t-transito-candidato')" style="margin-top:24px">✓ Criar minha conta</button>
+
+        <div style="text-align:center;margin-top:14px">
+          <a onclick="irPara('t-cadastro')" style="font-family:var(--ui);font-size:12px;color:var(--cinza)">← Voltar para dados básicos</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: RECUPERAR SENHA -->
+<!-- ============================================== -->
+<div class="tela" id="t-recuperar">
+  <div class="auth-shell">
+    <aside class="brand-panel">
+      <div class="brand-top">
+        <div class="logo-grande"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+        <div class="brand-tag">Recrutamento, Seleção &amp; Gestão de Pessoas</div>
+      </div>
+      <div class="brand-titulo">
+        <h2>Acontece com <em>todo mundo</em>.</h2>
+        <p>Vamos te enviar um link de recuperação no e-mail cadastrado. Em 5 minutos você está de volta.</p>
+      </div>
+      <div class="brand-mid"></div>
+      <div class="brand-bottom">
+        <span>© 2026 Oi Nora · v1.0</span>
+        <div style="display:flex;gap:18px"><a>Termos</a><a>Privacidade</a><a>Status</a></div>
+      </div>
+    </aside>
+
+    <main class="form-panel">
+      <div class="form-wrap">
+        <div class="filete">recuperação de acesso</div>
+        <h1 class="form-titulo">Esqueceu a <em>senha?</em></h1>
+        <p class="form-sub">Sem problemas. Digite o e-mail da sua conta e a gente te envia um link para criar uma nova senha.</p>
+
+        <div class="alert-info">
+          <div class="ic">🔒</div>
+          <div>Por segurança, o link expira em <strong>30 minutos</strong>. Se você não receber em 5 min, verifique seu spam.</div>
+        </div>
+
+        <div class="campo">
+          <label>E-mail da conta</label>
+          <input type="email" placeholder="seu.email@exemplo.com" autocomplete="email"/>
+        </div>
+
+        <button class="btn btn-primario" onclick="irPara('t-magic-link')" style="margin-top:8px">Enviar link de recuperação →</button>
+
+        <div style="text-align:center;margin-top:20px">
+          <a onclick="irPara('t-login')" style="font-family:var(--ui);font-size:12px;color:var(--cinza);letter-spacing:.3px">← Voltar para login</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: MAGIC LINK ENVIADO -->
+<!-- ============================================== -->
+<div class="tela" id="t-magic-link">
+  <div class="auth-shell">
+    <aside class="brand-panel">
+      <div class="brand-top">
+        <div class="logo-grande"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+        <div class="brand-tag">Recrutamento, Seleção &amp; Gestão de Pessoas</div>
+      </div>
+      <div class="brand-titulo">
+        <h2>Senha é coisa do <em>passado</em>.</h2>
+        <p>Com o link mágico você entra sem precisar lembrar de senha nenhuma. Mais rápido e mais seguro.</p>
+      </div>
+      <div class="brand-mid"></div>
+      <div class="brand-bottom">
+        <span>© 2026 Oi Nora · v1.0</span>
+        <div style="display:flex;gap:18px"><a>Termos</a><a>Privacidade</a><a>Status</a></div>
+      </div>
+    </aside>
+
+    <main class="form-panel">
+      <div class="form-wrap">
+        <div class="filete">verifique seu e-mail</div>
+
+        <div class="ml-card">
+          <div class="ic-grande">✉</div>
+          <h4>Confira seu e-mail</h4>
+          <p>Acabamos de enviar um link de acesso para<br><span class="email-dest">roberto@construtoraaurora.com.br</span></p>
+
+          <div style="margin:24px 0;padding:14px;background:var(--cinza-fundo);border-radius:2px;text-align:left;font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.6">
+            <strong style="color:var(--marinho)">Como funciona:</strong><br>
+            1. Abra o e-mail "Seu acesso à Oi Nora"<br>
+            2. Clique no botão <strong style="color:var(--laranja)">"Entrar com 1 clique"</strong><br>
+            3. Você cai direto no painel da sua empresa
+          </div>
+
+          <p style="margin-top:8px">⏱ O link expira em <strong>15 minutos</strong>.</p>
+
+          <div class="ml-action">
+            Não recebeu?
+            <a>Reenviar link</a> · <a onclick="irPara('t-login')">Voltar e tentar com senha</a>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:24px;font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px">
+          Demonstração: <a onclick="irPara('t-transito-empresa')" style="color:var(--laranja);font-weight:600">simular clique no link e logar →</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELAS DE TRANSIÇÃO (loading depois do login) -->
+<!-- ============================================== -->
+<div class="tela" id="t-transito-candidato">
+  <div style="min-height:100vh;background:var(--marinho);color:var(--papel);display:flex;align-items:center;justify-content:center">
+    <div class="transito-conteudo">
+      <div class="transito-logo"><span class="oi">Oi</span><span style="color:var(--papel)">Nora</span></div>
+      <div class="transito-msg">
+        <strong>Olá, Letícia! 👋</strong>
+        Carregando seus processos seletivos e vagas recomendadas...
+      </div>
+      <div class="transito-loader"></div>
+      <div style="margin-top:30px;font-family:var(--ui);font-size:11px;opacity:.5">Em produção, esta tela redireciona para <strong style="color:var(--laranja)">/candidato/dashboard</strong></div>
+      <button class="btn btn-fantasma" style="background:transparent;color:var(--papel);border-color:rgba(255,255,255,.2);width:auto;padding:8px 20px;font-size:12px;margin-top:24px" onclick="alert('Em produção isto abriria a Fase 1 (01_portal_candidato.html). Como estamos no protótipo, abra esse arquivo manualmente.')">Ir para painel do candidato →</button>
+    </div>
+  </div>
+</div>
+
+<div class="tela" id="t-transito-empresa">
+  <div style="min-height:100vh;background:var(--marinho);color:var(--papel);display:flex;align-items:center;justify-content:center">
+    <div class="transito-conteudo">
+      <div class="transito-logo"><span class="oi">Oi</span><span style="color:var(--papel)">Nora</span></div>
+      <div class="transito-msg">
+        <strong>Bem-vindo, Roberto! 🏢</strong>
+        Carregando dados da <em>Construtora Aurora</em>...
+      </div>
+      <div class="transito-loader"></div>
+      <div style="margin-top:30px;font-family:var(--ui);font-size:11px;opacity:.5">Em produção, esta tela redireciona para <strong style="color:var(--laranja)">/empresa/aurora/dashboard</strong></div>
+      <button class="btn btn-fantasma" style="background:transparent;color:var(--papel);border-color:rgba(255,255,255,.2);width:auto;padding:8px 20px;font-size:12px;margin-top:24px" onclick="alert('Em produção isto abriria a Fase 2 ou 3 (02_empresa_recrutamento.html / 03_empresa_gestao_pessoas.html). Como estamos no protótipo, abra esses arquivos manualmente.')">Ir para painel da empresa →</button>
+    </div>
+  </div>
+</div>
+
+<div class="tela" id="t-transito-empregado">
+  <div style="min-height:100vh;background:var(--marinho);color:var(--papel);display:flex;align-items:center;justify-content:center">
+    <div class="transito-conteudo">
+      <div class="transito-logo"><span class="oi">Oi</span><span style="color:var(--papel)">Nora</span></div>
+      <div class="transito-msg">
+        <strong>Oi, Fernando! 👷</strong>
+        Carregando seu painel de empregado da <em>Aurora</em>...
+      </div>
+      <div class="transito-loader"></div>
+      <div style="margin-top:30px;font-family:var(--ui);font-size:11px;opacity:.5">Em produção, esta tela redireciona para <strong style="color:var(--laranja)">/eu</strong></div>
+      <button class="btn btn-fantasma" style="background:transparent;color:var(--papel);border-color:rgba(255,255,255,.2);width:auto;padding:8px 20px;font-size:12px;margin-top:24px" onclick="alert('Em produção isto abriria a Fase 4 (04_area_empregado.html).')">Ir para minha área →</button>
+    </div>
+  </div>
+</div>
+
+<div class="tela" id="t-transito-oinora">
+  <div style="min-height:100vh;background:var(--marinho-esc);color:var(--papel);display:flex;align-items:center;justify-content:center">
+    <div class="transito-conteudo">
+      <div class="transito-logo"><span class="oi">Oi</span><span style="color:var(--papel)">Nora</span></div>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:var(--laranja);color:white;padding:4px 10px;border-radius:2px;font-family:var(--ui);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:18px">● CONSOLE INTERNO</div>
+      <div class="transito-msg">
+        <strong>Olá, Cláudia. 💼</strong>
+        Carregando dashboard executivo · 28 clientes · MRR R$ 386k...
+      </div>
+      <div class="transito-loader"></div>
+      <div style="margin-top:30px;font-family:var(--ui);font-size:11px;opacity:.5">Em produção, esta tela redireciona para <strong style="color:var(--laranja)">/admin/dashboard</strong></div>
+      <button class="btn btn-fantasma" style="background:transparent;color:var(--papel);border-color:rgba(255,255,255,.2);width:auto;padding:8px 20px;font-size:12px;margin-top:24px" onclick="alert('Em produção isto abriria a Fase 5 (05_console_oinora.html).')">Ir para console interno →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Login — Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-login">🔑 Login (default)</option>
+    <option value="t-cadastro">✍ Cadastro · Passo 1</option>
+    <option value="t-cadastro-passo2">🔒 Cadastro · Passo 2 (LGPD)</option>
+    <option value="t-recuperar">🔄 Esqueci a senha</option>
+    <option value="t-magic-link">✉ Magic Link enviado</option>
+    <option value="t-transito-candidato">👤 Transição · Candidato</option>
+    <option value="t-transito-empresa">🏢 Transição · Empresa</option>
+    <option value="t-transito-empregado">👷 Transição · Empregado</option>
+    <option value="t-transito-oinora">💼 Transição · Oi Nora Admin</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+
+function togglePwd(el){
+  const input = el.previousElementSibling;
+  if(input.type === 'password'){
+    input.type = 'text';
+    el.textContent = 'Ocultar';
+  } else {
+    input.type = 'password';
+    el.textContent = 'Mostrar';
+  }
+}
+</script>
+</body>
+</html>

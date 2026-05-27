@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Console Interno (Backoffice Master)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .filete{display:flex;align-items:center;gap:10px;font-family:var(--ui);font-size:10px;letter-spacing:3px;color:var(--marinho-med);text-transform:uppercase}
+  .filete::before,.filete::after{content:"";flex:1;height:1px;background:var(--cinza-cl)}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc);transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,99,58,.25)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL ADMIN: visual mais denso, dark sidebar com selo OI NORA INTERNO */
+  .app-shell{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+  .sidebar{background:linear-gradient(180deg,var(--marinho-esc),var(--marinho));color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:24px;padding:0 28px 4px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-selo{padding:8px 28px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px}
+  .sidebar-selo .selo{display:inline-flex;align-items:center;gap:6px;background:var(--laranja);color:white;padding:4px 10px;border-radius:2px;font-family:var(--ui);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+  .sidebar-selo .selo::before{content:"●";font-size:8px}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:20px 28px 8px;font-weight:600}
+  .sidebar-item{padding:10px 28px;font-size:14px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item .ic{font-size:15px;width:18px;text-align:center;opacity:.85}
+  .sidebar-item .badge{margin-left:auto;background:var(--laranja);color:white;font-family:var(--ui);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.5px}
+  .sidebar-item .badge.alerta{background:var(--vermelho)}
+  .sidebar-item .badge.contagem{background:rgba(255,255,255,.1);color:rgba(250,247,242,.7)}
+  .sidebar-perfil{margin-top:auto;padding:16px 28px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.25)}
+  .sidebar-perfil .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:16px}
+  .sidebar-perfil .nome{font-size:13px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:10px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 40px 60px;background:var(--papel);min-height:100vh}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;gap:20px}
+  .topbar h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .topbar h1 em{color:var(--laranja);font-style:italic}
+  .topbar .topbar-meta{font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px}
+  .topbar-acoes{display:flex;gap:8px;align-items:center}
+
+  /* CARDS */
+  .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .cards-grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
+  .card{background:var(--branco);border:1px solid var(--cinza-cl);padding:20px;border-radius:2px;transition:all .2s}
+  .card:hover{border-color:var(--laranja);box-shadow:0 4px 20px rgba(31,42,68,.06)}
+  .card-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:12px}
+  .card-valor{font-size:32px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.3px}
+  .card-valor em{color:var(--laranja);font-style:italic}
+  .card-valor span{font-size:15px;color:var(--cinza)}
+  .card-delta{font-family:var(--ui);font-size:11px;color:var(--verde);margin-top:8px;letter-spacing:.3px}
+  .card-delta.neg{color:var(--vermelho)}
+  .card-delta.neutro{color:var(--cinza)}
+
+  /* GRID */
+  .grid-2{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+  .grid-2-eq{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px}
+
+  /* TAGS */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  /* TABELA */
+  .tabela{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden}
+  .tab-linha{padding:14px 22px;border-bottom:1px solid var(--cinza-cl);align-items:center;cursor:pointer;transition:background .15s;display:grid;gap:14px}
+  .tab-linha:hover{background:var(--cinza-fundo)}
+  .tab-linha:last-child{border-bottom:none}
+  .tab-linha.head{background:var(--cinza-fundo);font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;cursor:default}
+  .tab-linha.head:hover{background:var(--cinza-fundo)}
+  .tl-empresa{display:flex;align-items:center;gap:12px}
+  .tl-logo{width:38px;height:38px;border-radius:2px;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px;flex-shrink:0;font-weight:600}
+  .tl-logo.a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .tl-logo.b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .tl-logo.c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .tl-logo.d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .tl-logo.e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .tl-logo.f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .tl-nome{font-size:14px;font-weight:500;line-height:1.2}
+  .tl-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .tl-valor{font-family:var(--ui);font-size:13px;color:var(--marinho);font-weight:500}
+  .tl-valor.destaque{font-family:var(--serif);font-size:16px;font-style:italic;color:var(--laranja)}
+  .tl-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px}
+
+  /* ABAS */
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;overflow-x:auto}
+  .aba{padding:12px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+
+  /* INFO LINHA */
+  .info-linha{display:grid;grid-template-columns:160px 1fr;gap:14px;padding:11px 0;border-bottom:1px solid var(--cinza-cl);font-size:14px}
+  .info-linha:last-child{border:none}
+  .info-linha .rotulo{color:var(--cinza);font-family:var(--ui);font-size:12px;letter-spacing:.3px}
+  .info-linha .valor{color:var(--marinho)}
+
+  /* BARRAS HORIZONTAIS */
+  .barras-h{display:flex;flex-direction:column;gap:10px}
+  .barra-h-item{display:grid;grid-template-columns:160px 1fr 60px;gap:12px;align-items:center;font-family:var(--ui);font-size:12px}
+  .barra-h-item .barra{height:8px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden}
+  .barra-h-item .barra .preenchimento{height:100%;background:var(--marinho)}
+  .barra-h-item .barra .preenchimento.laranja{background:var(--laranja)}
+  .barra-h-item .barra .preenchimento.verde{background:var(--verde)}
+  .barra-h-item .valor{text-align:right;color:var(--marinho);font-weight:600}
+
+  /* PROGRESS */
+  .barra-progresso{height:6px;background:var(--cinza-fundo);border-radius:3px;overflow:hidden}
+  .barra-progresso .preenchimento{height:100%;background:linear-gradient(90deg,var(--laranja),var(--laranja-esc));transition:width .6s}
+
+  /* BANCO DE TALENTOS - cards de busca avançada */
+  .filtros-bar{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px 22px;border-radius:2px;margin-bottom:18px}
+  .filtros-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  .filtros-row:last-child{margin-bottom:0}
+  .filtros-row input,.filtros-row select{padding:10px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:13px;color:var(--marinho);border-radius:2px}
+  .filtros-row .filtro-skill{padding:5px 12px;background:var(--laranja-cl);border:1px solid var(--laranja);color:var(--laranja);font-family:var(--ui);font-size:11px;letter-spacing:.3px;border-radius:14px;display:inline-flex;align-items:center;gap:6px;font-weight:600}
+  .filtros-row .filtro-skill .x{cursor:pointer;font-size:14px}
+
+  .talento-card{background:var(--branco);border:1px solid var(--cinza-cl);padding:22px;border-radius:2px;cursor:pointer;transition:all .15s;position:relative}
+  .talento-card:hover{border-color:var(--laranja);transform:translateY(-2px);box-shadow:0 6px 18px rgba(31,42,68,.08)}
+  .talento-header{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+  .talento-av{width:48px;height:48px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:18px;flex-shrink:0;font-weight:600}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .talento-nome{font-size:15px;font-weight:500;line-height:1.2}
+  .talento-cargo{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .talento-skills{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px;margin-bottom:12px}
+  .talento-skills .s{font-family:var(--ui);font-size:10px;padding:2px 7px;background:var(--cinza-fundo);color:var(--cinza);border-radius:2px;letter-spacing:.3px;font-weight:500}
+  .talento-footer{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--cinza-cl);font-family:var(--ui);font-size:11px;color:var(--cinza)}
+  .talento-stars{color:var(--amarelo);font-size:12px}
+
+  /* RECRUTADORES */
+  .recrutador-card{background:var(--branco);border:1px solid var(--cinza-cl);padding:22px;border-radius:2px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;margin-bottom:12px;cursor:pointer;transition:all .15s}
+  .recrutador-card:hover{border-color:var(--laranja)}
+  .recrutador-av{width:56px;height:56px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:22px;font-weight:600}
+  .recrutador-stats{display:flex;gap:24px;font-family:var(--ui);font-size:11px;color:var(--cinza)}
+  .recrutador-stats div{text-align:center}
+  .recrutador-stats .v{font-family:var(--serif);font-size:18px;color:var(--marinho);font-style:italic;display:block;letter-spacing:-.3px}
+  .recrutador-stats .v.laranja{color:var(--laranja)}
+  .recrutador-stats .v.verde{color:var(--verde)}
+  .recrutador-stats .l{margin-top:2px;letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+
+  /* FATURAMENTO - grandes números */
+  .resumo-financeiro{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px}
+  .num-grande{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);padding:30px;border-radius:2px;position:relative;overflow:hidden}
+  .num-grande::before{content:"";position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:radial-gradient(circle,rgba(232,99,58,.12) 0%,transparent 65%);pointer-events:none}
+  .num-grande-lab{font-family:var(--ui);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(250,247,242,.6);font-weight:700;margin-bottom:10px;position:relative}
+  .num-grande-val{font-family:var(--serif);font-size:40px;color:var(--papel);font-style:italic;line-height:1;position:relative;letter-spacing:-.5px}
+  .num-grande-val em{color:var(--laranja);font-style:italic}
+  .num-grande-meta{font-family:var(--ui);font-size:12px;color:rgba(250,247,242,.5);margin-top:12px;position:relative}
+
+  /* INBOX UNIFICADA */
+  .inbox-shell{display:grid;grid-template-columns:340px 1fr;gap:16px}
+  .inbox-lista{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;max-height:75vh;overflow-y:auto}
+  .inbox-head{padding:14px 16px;border-bottom:1px solid var(--cinza-cl);font-family:var(--ui);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .inbox-pill{padding:4px 10px;border:1px solid var(--cinza-cl);border-radius:14px;cursor:pointer;font-family:var(--ui);font-size:11px;letter-spacing:.3px;text-transform:none;font-weight:500}
+  .inbox-pill.ativa{background:var(--marinho);color:white;border-color:var(--marinho)}
+  .inbox-item{padding:14px 16px;border-bottom:1px solid var(--cinza-cl);cursor:pointer;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:flex-start;transition:background .15s}
+  .inbox-item:hover{background:var(--cinza-fundo)}
+  .inbox-item.ativa{background:var(--laranja-cl);border-left:3px solid var(--laranja);padding-left:13px}
+  .inbox-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:13px;flex-shrink:0;font-weight:600;position:relative}
+  .inbox-av .contexto-mini{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--ui);font-size:8px;font-style:normal;color:var(--marinho);font-weight:700}
+  .inbox-head-row{display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);margin-bottom:4px;letter-spacing:.3px}
+  .inbox-head-row .nome{font-weight:700;color:var(--marinho);font-size:11px}
+  .inbox-titulo{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:3px}
+  .inbox-preview{font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.4}
+  .inbox-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+
+  .conversa-detalhe{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;display:flex;flex-direction:column;max-height:75vh}
+  .conv-header{padding:18px 24px;border-bottom:1px solid var(--cinza-cl);display:flex;justify-content:space-between;align-items:center;gap:14px;background:var(--cinza-fundo)}
+  .conv-header h4{font-size:16px;font-weight:500}
+  .conv-meta-row{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;display:flex;gap:10px;letter-spacing:.3px}
+  .conv-body{padding:24px;overflow-y:auto;flex:1}
+  .msg{margin-bottom:14px;display:flex;gap:10px;max-width:78%}
+  .msg.me{margin-left:auto;flex-direction:row-reverse}
+  .msg-av-sm{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:12px;color:white;font-weight:600}
+  .msg-bubble{padding:10px 14px;border-radius:6px;font-size:13.5px;line-height:1.5}
+  .msg.them .msg-bubble{background:var(--cinza-fundo);border:1px solid var(--cinza-cl)}
+  .msg.me .msg-bubble{background:var(--laranja);color:white}
+  .msg-time{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+
+  /* MÉTRICAS / DONUT */
+  .donut-wrap{position:relative;width:130px;height:130px;margin:0 auto}
+  .donut-wrap svg{transform:rotate(-90deg)}
+  .donut-bg{fill:none;stroke:var(--cinza-cl);stroke-width:14}
+  .donut-fg{fill:none;stroke:var(--laranja);stroke-width:14;stroke-linecap:round}
+  .donut-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .donut-num .valor{font-size:28px;font-style:italic;color:var(--marinho)}
+  .donut-num .label{font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:1px;text-transform:uppercase}
+
+  /* CONTRATO / PLANO */
+  .plano-card{background:linear-gradient(135deg,var(--laranja-cl),var(--branco));border:1px solid var(--laranja);padding:20px;border-radius:2px;margin-bottom:14px}
+  .plano-tag{display:inline-block;font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--laranja);font-weight:700;background:var(--branco);padding:3px 10px;border-radius:2px;border:1px solid var(--laranja);margin-bottom:8px}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1100px){
+    .cards-grid,.cards-grid-5{grid-template-columns:repeat(2,1fr)}
+    .grid-2,.grid-2-eq{grid-template-columns:1fr}
+    .resumo-financeiro{grid-template-columns:1fr}
+    .inbox-shell{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: DASHBOARD GERAL OI NORA -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-dash">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo">
+        <span class="selo">CONSOLE INTERNO</span>
+      </div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item ativo" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil">
+        <div class="av">CV</div>
+        <div>
+          <div class="nome">Cláudia Vasconcelos</div>
+          <div class="cargo">CEO · Oi Nora</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Olá, <em>Cláudia</em>.</h1>
+          <p class="topbar-meta">Hoje: 87 vagas ativas em 28 clientes · 14 conversas pendentes · MRR R$ 386k · 11 contratações na semana</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📅 Maio 2026 ▾</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Relatório executivo</button>
+          <button class="btn btn-primario btn-sm">+ Nova ação</button>
+        </div>
+      </div>
+
+      <div class="resumo-financeiro">
+        <div class="num-grande">
+          <div class="num-grande-lab">MRR · Maio 2026</div>
+          <div class="num-grande-val"><em>R$ 386</em>k</div>
+          <div class="num-grande-meta">+ 8,4% vs abril · 28 contratos ativos</div>
+        </div>
+        <div class="num-grande">
+          <div class="num-grande-lab">Receita YTD 2026</div>
+          <div class="num-grande-val"><em>R$ 1,82</em>M</div>
+          <div class="num-grande-meta">Meta anual R$ 4,6M · 39,5% atingido</div>
+        </div>
+        <div class="num-grande">
+          <div class="num-grande-lab">NPS de Clientes</div>
+          <div class="num-grande-val"><em>+74</em></div>
+          <div class="num-grande-meta">Zona de Excelência · 23 respondentes</div>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Clientes Ativos</div>
+          <div class="card-valor"><em>28</em></div>
+          <div class="card-delta">+3 no trimestre</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Vagas em Aberto</div>
+          <div class="card-valor"><em>87</em></div>
+          <div class="card-delta">+12 esta semana</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Candidatos no Banco</div>
+          <div class="card-valor"><em>2.847</em></div>
+          <div class="card-delta">+184 este mês</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Time-to-Hire Médio</div>
+          <div class="card-valor"><em>22</em><span>dias</span></div>
+          <div class="card-delta">-3d vs trimestre</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Clientes com atenção</h3><div class="sub-titulo">Necessitam ação imediata</div></div>
+              <button class="btn btn-fantasma btn-sm" onclick="irPara('t-empresas')">Ver todos →</button>
+            </div>
+
+            <div class="tab-linha" style="grid-template-columns:auto 1fr auto auto;background:var(--vermelho-cl);border-left:3px solid var(--vermelho);border-radius:2px;border-bottom:none;margin-bottom:8px;padding:14px 18px">
+              <div class="tl-logo b">P</div>
+              <div>
+                <div class="tl-nome">Pluma Tecnologia</div>
+                <div class="tl-meta">⚠ Vaga "DevOps Sr" aberta há 38 dias · SLA estourado</div>
+              </div>
+              <span class="tag vermelho">Crítico</span>
+              <button class="btn btn-fantasma btn-xs">Ver</button>
+            </div>
+
+            <div class="tab-linha" style="grid-template-columns:auto 1fr auto auto;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px;border-bottom:none;margin-bottom:8px;padding:14px 18px">
+              <div class="tl-logo c">C</div>
+              <div>
+                <div class="tl-nome">Casa Lumière</div>
+                <div class="tl-meta">NPS caiu de 9 para 6 na última pesquisa</div>
+              </div>
+              <span class="tag amarelo">Atenção</span>
+              <button class="btn btn-fantasma btn-xs">Ver</button>
+            </div>
+
+            <div class="tab-linha" style="grid-template-columns:auto 1fr auto auto;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px;border-bottom:none;margin-bottom:8px;padding:14px 18px">
+              <div class="tl-logo d">V</div>
+              <div>
+                <div class="tl-nome">Grupo Verde Campo</div>
+                <div class="tl-meta">Renovação contratual em 23 dias · sem reunião marcada</div>
+              </div>
+              <span class="tag amarelo">Renovação</span>
+              <button class="btn btn-fantasma btn-xs">Ver</button>
+            </div>
+          </div>
+
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Atividade da semana</h3><div class="sub-titulo">Pulso da operação</div></div>
+            </div>
+            <div class="barras-h">
+              <div class="barra-h-item">
+                <span>Vagas abertas</span>
+                <div class="barra"><div class="preenchimento laranja" style="width:60%"></div></div>
+                <span class="valor">12</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Candidatos triados</span>
+                <div class="barra"><div class="preenchimento" style="width:100%"></div></div>
+                <span class="valor">186</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Entrevistas RH</span>
+                <div class="barra"><div class="preenchimento" style="width:48%"></div></div>
+                <span class="valor">68</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Propostas enviadas</span>
+                <div class="barra"><div class="preenchimento verde" style="width:18%"></div></div>
+                <span class="valor">14</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Contratações fechadas</span>
+                <div class="barra"><div class="preenchimento verde" style="width:14%"></div></div>
+                <span class="valor">11</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:17px">Top Recrutadoras · Mês</h3>
+            <div class="sub-titulo">Ranking de performance</div>
+
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--cinza-cl)">
+              <div style="width:24px;text-align:center;font-style:italic;color:var(--laranja);font-size:18px">1</div>
+              <div class="talento-av av-a" style="width:36px;height:36px;font-size:14px">M</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">Mariana Costa</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">4 contratações · 3 vagas</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--serif);font-style:italic;color:var(--laranja);font-size:16px">142%</div>
+                <div style="font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:.5px">DA META</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--cinza-cl)">
+              <div style="width:24px;text-align:center;font-style:italic;color:var(--cinza);font-size:18px">2</div>
+              <div class="talento-av av-c" style="width:36px;height:36px;font-size:14px">R</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">Rafael Vieira</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">3 contratações · 4 vagas</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:16px">118%</div>
+                <div style="font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:.5px">DA META</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--cinza-cl)">
+              <div style="width:24px;text-align:center;font-style:italic;color:var(--cinza);font-size:18px">3</div>
+              <div class="talento-av av-d" style="width:36px;height:36px;font-size:14px">B</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">Beatriz Nunes</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">2 contratações · 5 vagas</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:16px">96%</div>
+                <div style="font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:.5px">DA META</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+              <div style="width:24px;text-align:center;font-style:italic;color:var(--cinza);font-size:18px">4</div>
+              <div class="talento-av av-e" style="width:36px;height:36px;font-size:14px">F</div>
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500">Fernanda Toledo</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">2 contratações · 3 vagas</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--serif);font-style:italic;color:var(--vermelho);font-size:16px">68%</div>
+                <div style="font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:.5px">DA META</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:17px">Taxa de aprovação</h3>
+            <div class="sub-titulo">Triagem → contratação</div>
+            <div class="donut-wrap" style="margin:14px auto">
+              <svg width="130" height="130" viewBox="0 0 130 130">
+                <circle class="donut-bg" cx="65" cy="65" r="54"></circle>
+                <circle class="donut-fg" cx="65" cy="65" r="54" stroke-dasharray="339.3" stroke-dashoffset="220"></circle>
+              </svg>
+              <div class="donut-num">
+                <div class="valor">34%</div>
+                <div class="label">Conversão</div>
+              </div>
+            </div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:center;margin-top:8px">vs 28% no mercado</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: EMPRESAS-CLIENTES (CRM) -->
+<!-- ============================================== -->
+<div class="tela" id="t-empresas">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Empresas-<em>Clientes</em></h1>
+          <p class="topbar-meta">28 ativos · 4 em onboarding · 3 churned em 2025 · ticket médio R$ 13.8k/mês</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar CSV</button>
+          <button class="btn btn-fantasma btn-sm">📊 Relatório carteira</button>
+          <button class="btn btn-primario btn-sm">+ Nova empresa</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">Ativas (28)</div>
+        <div class="aba">Onboarding (4)</div>
+        <div class="aba">Prospects (12)</div>
+        <div class="aba">Churned (3)</div>
+        <div class="aba">Todas</div>
+      </div>
+
+      <div class="filtros-bar">
+        <div class="filtros-row">
+          <div style="flex:1;min-width:240px;position:relative">
+            <input style="width:100%;padding-left:36px" placeholder="Buscar por nome, CNPJ ou setor..."/>
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza)">⌕</span>
+          </div>
+          <select><option>Todo segmento</option><option>Construção</option><option>Tecnologia</option><option>Saúde</option><option>Indústria</option></select>
+          <select><option>Todo plano</option><option>Essencial</option><option>Avançado</option><option>Premium</option></select>
+          <select><option>Toda recrutadora</option><option>Mariana Costa</option><option>Rafael Vieira</option><option>Beatriz Nunes</option></select>
+          <select><option>Ordenar: MRR</option><option>Ticket</option><option>Vagas abertas</option><option>NPS</option></select>
+        </div>
+      </div>
+
+      <div class="tabela">
+        <div class="tab-linha head" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div>Empresa / Plano</div>
+          <div>Recrutadora</div>
+          <div>Vagas Ativas</div>
+          <div>MRR</div>
+          <div>NPS</div>
+          <div></div>
+        </div>
+
+        <div class="tab-linha" onclick="irPara('t-empresa-detalhe')" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo a">A</div>
+            <div>
+              <div class="tl-nome">Construtora Aurora</div>
+              <div class="tl-meta">PREMIUM · Cliente desde 03/2023 · BH/MG · 128 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Mariana Costa</div><div class="tl-sub">+ 1 backup</div></div>
+          <div><div class="tl-valor">7 ativas</div><div class="tl-sub">4 em finalização</div></div>
+          <div><div class="tl-valor destaque">R$ 24.500</div><div class="tl-sub">/mês fixo + sucesso</div></div>
+          <div><div class="tl-valor" style="color:var(--verde)">+9</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo b">P</div>
+            <div>
+              <div class="tl-nome">Pluma Tecnologia <span class="tag vermelho" style="font-size:9px;margin-left:6px">⚠ SLA</span></div>
+              <div class="tl-meta">AVANÇADO · Cliente desde 09/2024 · São Paulo/SP · 89 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Rafael Vieira</div></div>
+          <div><div class="tl-valor">5 ativas</div><div class="tl-sub">1 crítica há 38 dias</div></div>
+          <div><div class="tl-valor destaque">R$ 18.900</div><div class="tl-sub">/mês fixo</div></div>
+          <div><div class="tl-valor" style="color:var(--verde)">+8</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo c">C</div>
+            <div>
+              <div class="tl-nome">Casa Lumière</div>
+              <div class="tl-meta">PREMIUM · Cliente desde 01/2024 · Nova Lima/MG · 54 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Mariana Costa</div></div>
+          <div><div class="tl-valor">4 ativas</div></div>
+          <div><div class="tl-valor destaque">R$ 19.800</div><div class="tl-sub">/mês fixo</div></div>
+          <div><div class="tl-valor" style="color:var(--amarelo)">+6</div><div class="tl-sub">⚠ caiu</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo d">V</div>
+            <div>
+              <div class="tl-nome">Grupo Verde Campo <span class="tag amarelo" style="font-size:9px;margin-left:6px">Renov.</span></div>
+              <div class="tl-meta">AVANÇADO · Cliente desde 06/2024 · Uberlândia/MG · 210 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Beatriz Nunes</div></div>
+          <div><div class="tl-valor">12 ativas</div><div class="tl-sub">grande conta</div></div>
+          <div><div class="tl-valor destaque">R$ 32.400</div><div class="tl-sub">/mês fixo</div></div>
+          <div><div class="tl-valor" style="color:var(--verde)">+9</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo e">S</div>
+            <div>
+              <div class="tl-nome">Indústria Solar</div>
+              <div class="tl-meta">ESSENCIAL · Cliente desde 11/2024 · Contagem/MG · 76 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Fernanda Toledo</div></div>
+          <div><div class="tl-valor">3 ativas</div></div>
+          <div><div class="tl-valor destaque">R$ 8.900</div><div class="tl-sub">/mês fixo</div></div>
+          <div><div class="tl-valor" style="color:var(--verde)">+10</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo f">M</div>
+            <div>
+              <div class="tl-nome">Metalúrgica Horizonte</div>
+              <div class="tl-meta">AVANÇADO · Cliente desde 02/2023 · Betim/MG · 156 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Rafael Vieira</div></div>
+          <div><div class="tl-valor">6 ativas</div></div>
+          <div><div class="tl-valor destaque">R$ 22.100</div><div class="tl-sub">/mês fixo</div></div>
+          <div><div class="tl-valor" style="color:var(--verde)">+8</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo a">N</div>
+            <div>
+              <div class="tl-nome">Nutrare Alimentos</div>
+              <div class="tl-meta">AVANÇADO · Cliente desde 08/2024 · Pouso Alegre/MG · 124 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Beatriz Nunes</div></div>
+          <div><div class="tl-valor">8 ativas</div></div>
+          <div><div class="tl-valor destaque">R$ 19.600</div><div class="tl-sub">/mês fixo</div></div>
+          <div><div class="tl-valor" style="color:var(--verde)">+9</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo b">T</div>
+            <div>
+              <div class="tl-nome">Têxtil Brilhante</div>
+              <div class="tl-meta">ESSENCIAL · Cliente desde 03/2025 · Juiz de Fora/MG · 42 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Fernanda Toledo</div></div>
+          <div><div class="tl-valor">2 ativas</div></div>
+          <div><div class="tl-valor destaque">R$ 7.200</div></div>
+          <div><div class="tl-valor" style="color:var(--marinho)">+5</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.2fr 1fr 1fr .8fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo c">L</div>
+            <div>
+              <div class="tl-nome">Logística Andorinha</div>
+              <div class="tl-meta">AVANÇADO · Cliente desde 05/2024 · Cubatão/SP · 178 empregados</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Rafael Vieira</div></div>
+          <div><div class="tl-valor">4 ativas</div></div>
+          <div><div class="tl-valor destaque">R$ 17.500</div></div>
+          <div><div class="tl-valor" style="color:var(--verde)">+7</div></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:30px;padding:14px;font-family:var(--ui);font-size:12px;color:var(--cinza)">Mostrando 9 de 28 · <a style="color:var(--laranja)">Carregar mais</a></div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: FICHA DE CLIENTE (DETALHE) -->
+<!-- ============================================== -->
+<div class="tela" id="t-empresa-detalhe">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item ativo"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <button class="btn btn-fantasma btn-xs" onclick="irPara('t-empresas')" style="margin-bottom:14px">← Empresas-Clientes</button>
+
+      <div class="painel" style="display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl))">
+        <div class="tl-logo a" style="width:80px;height:80px;font-size:32px;border-radius:4px">A</div>
+        <div>
+          <h2 style="font-size:30px;font-weight:400;margin-bottom:4px">Construtora Aurora</h2>
+          <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:12px;letter-spacing:.3px">CNPJ 12.345.678/0001-90 · construtoraaurora.com.br · BH/MG</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="tag laranja">⭐ PREMIUM</span>
+            <span class="tag verde">Ativo · NPS +9</span>
+            <span class="tag marinho">Cliente há 3 anos</span>
+            <span class="tag">128 empregados</span>
+            <span class="tag">22 contratações com a Oi Nora</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primario btn-sm">💬 Falar c/ Roberto</button>
+          <button class="btn btn-fantasma btn-sm">📅 Agendar reunião</button>
+          <button class="btn btn-fantasma btn-sm">📋 Editar contrato</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">Visão Geral</div>
+        <div class="aba">Vagas (7)</div>
+        <div class="aba">Histórico</div>
+        <div class="aba">Contatos &amp; Stakeholders</div>
+        <div class="aba">Contrato &amp; Faturamento</div>
+        <div class="aba">Métricas</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <h3>Resumo Operacional</h3>
+            <div class="sub-titulo">Histórico desde 03/2023</div>
+            <div class="cards-grid" style="margin:14px 0 0">
+              <div class="card">
+                <div class="card-titulo">Total Contratado</div>
+                <div class="card-valor"><em>22</em></div>
+                <div class="card-delta">em 3 anos</div>
+              </div>
+              <div class="card">
+                <div class="card-titulo">Vagas Ativas</div>
+                <div class="card-valor"><em>7</em></div>
+                <div class="card-delta">4 finalizando</div>
+              </div>
+              <div class="card">
+                <div class="card-titulo">Time-to-Hire</div>
+                <div class="card-valor"><em>18</em><span>d</span></div>
+                <div class="card-delta">abaixo da média</div>
+              </div>
+              <div class="card">
+                <div class="card-titulo">Retention</div>
+                <div class="card-valor"><em>91</em><span>%</span></div>
+                <div class="card-delta">após 1 ano</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>Vagas em andamento</h3>
+            <div class="sub-titulo">7 ativas · Mariana Costa coordena</div>
+            <div class="tabela" style="border:none">
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1fr auto;padding:12px 14px">
+                <div>
+                  <div class="tl-nome">Analista Financeiro Sr</div>
+                  <div class="tl-meta">12 dias · 47 candidatos · Entrev. RH</div>
+                </div>
+                <div><span class="tag laranja">Em curso</span></div>
+                <div class="tl-valor">R$ 11k</div>
+                <div><button class="btn btn-fantasma btn-xs">→</button></div>
+              </div>
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1fr auto;padding:12px 14px">
+                <div>
+                  <div class="tl-nome">Engenheiro Civil Pl</div>
+                  <div class="tl-meta">8 dias · 28 candidatos · Teste</div>
+                </div>
+                <div><span class="tag laranja">Em curso</span></div>
+                <div class="tl-valor">R$ 9.5k</div>
+                <div><button class="btn btn-fantasma btn-xs">→</button></div>
+              </div>
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1fr auto;padding:12px 14px">
+                <div>
+                  <div class="tl-nome">Mestre de Obras</div>
+                  <div class="tl-meta">4 dias · 34 candidatos · Triagem</div>
+                </div>
+                <div><span class="tag marinho">Início</span></div>
+                <div class="tl-valor">R$ 7.2k</div>
+                <div><button class="btn btn-fantasma btn-xs">→</button></div>
+              </div>
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1fr auto;padding:12px 14px;background:var(--verde-cl)">
+                <div>
+                  <div class="tl-nome">Assistente Adm. Jr</div>
+                  <div class="tl-meta">28 dias · Camila Reis · início 01/06</div>
+                </div>
+                <div><span class="tag verde">Fechada 🎉</span></div>
+                <div class="tl-valor">R$ 2.8k</div>
+                <div><button class="btn btn-fantasma btn-xs">→</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>Histórico de Atividade</h3>
+            <div class="sub-titulo">Eventos importantes da conta</div>
+            <div style="border-left:2px solid var(--cinza-cl);padding-left:18px;margin-left:8px">
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-25px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--verde);border:3px solid var(--branco);box-shadow:0 0 0 2px var(--verde)"></div>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px">HOJE · 14:48</div>
+                <div style="font-size:14px;font-weight:500;margin-top:3px">Camila Reis aceitou a proposta</div>
+                <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:2px">Vaga "Asst. Administrativo Jr" fechada</div>
+              </div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-25px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--laranja);border:3px solid var(--branco);box-shadow:0 0 0 2px var(--laranja)"></div>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px">ONTEM · 16:30</div>
+                <div style="font-size:14px;font-weight:500;margin-top:3px">Briefing técnico revisado</div>
+                <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:2px">Roberto pediu incluir Inglês intermediário</div>
+              </div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-25px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--marinho);border:3px solid var(--branco);box-shadow:0 0 0 2px var(--marinho)"></div>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px">SEM PASSADA</div>
+                <div style="font-size:14px;font-weight:500;margin-top:3px">Reunião quinzenal de status</div>
+                <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:2px">Cláudia + Roberto + Mariana · 45min · feedback +9 sobre Mariana</div>
+              </div>
+              <div style="position:relative;padding-bottom:18px">
+                <div style="position:absolute;left:-25px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--cinza);border:3px solid var(--branco);box-shadow:0 0 0 2px var(--cinza)"></div>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px">15/05/2026</div>
+                <div style="font-size:14px;font-weight:500;margin-top:3px">3 novas vagas abertas</div>
+                <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:2px">Mestre de Obras, Comprador Sr, Estagiário Eng.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="plano-card">
+            <span class="plano-tag">⭐ Plano Premium</span>
+            <h3 style="font-size:22px;font-weight:400;margin-top:8px">R$ 24.500<span style="font-size:14px;color:var(--cinza)">/mês</span></h3>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px">Fixo + taxa de sucesso por contratação<br>Contrato anual · renovação automática</div>
+            <hr style="margin:14px 0;border:none;border-top:1px solid var(--cinza-cl)">
+            <div style="font-family:var(--ui);font-size:11px;line-height:1.7">
+              ✓ Recrutadora dedicada Sênior<br>
+              ✓ Vagas ilimitadas<br>
+              ✓ Banco Master de talentos<br>
+              ✓ HRIS completo (Gestão de Pessoas)<br>
+              ✓ Avaliações &amp; Pesquisas<br>
+              ✓ NPS de processo + SLA garantido<br>
+              ✓ Reuniões quinzenais de calibração
+            </div>
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px">Detalhes do contrato</button>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:17px">Stakeholders na Aurora</h3>
+            <div class="sub-titulo">Quem manda</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px;display:flex;gap:12px;align-items:center">
+                <div class="talento-av av-a" style="width:38px;height:38px;font-size:14px">A</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Alfredo Aurora</div>
+                  <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.3px">CEO · DECISOR FINAL</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">📧</button>
+              </div>
+              <div style="padding:12px;background:var(--laranja-cl);border:1px solid var(--laranja);border-radius:2px;display:flex;gap:12px;align-items:center">
+                <div class="talento-av av-a" style="width:38px;height:38px;font-size:14px">R</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Roberto Aurora</div>
+                  <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);margin-top:2px;letter-spacing:.3px">DIR. RH · PONTO FOCAL</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">💬</button>
+              </div>
+              <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px;display:flex;gap:12px;align-items:center">
+                <div class="talento-av av-b" style="width:38px;height:38px;font-size:14px">L</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Luísa Mendonça</div>
+                  <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.3px">DIR. ENG · INFLUENCIADORA</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">📧</button>
+              </div>
+              <div style="padding:12px;background:var(--cinza-fundo);border-radius:2px;display:flex;gap:12px;align-items:center">
+                <div class="talento-av av-c" style="width:38px;height:38px;font-size:14px">E</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500">Eduardo Santos</div>
+                  <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.3px">DIR. FIN · APROVA PROPOSTAS</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">📧</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel" style="background:var(--marinho);color:var(--papel);border:none">
+            <h3 style="color:var(--papel);font-size:16px">🎯 Oportunidades</h3>
+            <div class="sub-titulo" style="color:rgba(255,255,255,.5)">Detectadas pela IA</div>
+            <div style="margin-top:14px;padding:12px;background:rgba(255,255,255,.05);border-left:3px solid var(--laranja);border-radius:2px;font-family:var(--ui);font-size:12px;line-height:1.5">
+              <strong>Upsell · módulo Folha</strong><br><span style="opacity:.7">Aurora ainda usa Sólides para folha. Migração: +R$ 6.5k/mês</span>
+            </div>
+            <div style="margin-top:8px;padding:12px;background:rgba(255,255,255,.05);border-left:3px solid var(--verde);border-radius:2px;font-family:var(--ui);font-size:12px;line-height:1.5">
+              <strong>Renovação confortável</strong><br><span style="opacity:.7">NPS +9, churn risk &lt;5%, expansion provável em 2026-S2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: TODAS AS VAGAS (MASTER) -->
+<!-- ============================================== -->
+<div class="tela" id="t-vagas-master">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item ativo"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Todas as <em>Vagas</em></h1>
+          <p class="topbar-meta">87 ativas em 28 clientes · 1.842 candidatos no pipeline · 4 vagas críticas (SLA estourado)</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar</button>
+          <button class="btn btn-primario btn-sm">+ Atribuir vaga</button>
+        </div>
+      </div>
+
+      <div class="cards-grid-5">
+        <div class="card">
+          <div class="card-titulo">Total Ativas</div>
+          <div class="card-valor"><em>87</em></div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Em Triagem</div>
+          <div class="card-valor"><em>24</em></div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Entrevistas</div>
+          <div class="card-valor"><em>38</em></div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Propostas</div>
+          <div class="card-valor"><em>17</em></div>
+        </div>
+        <div class="card" style="background:var(--vermelho-cl);border-color:var(--vermelho)">
+          <div class="card-titulo" style="color:var(--vermelho)">SLA Estourado</div>
+          <div class="card-valor" style="color:var(--vermelho)"><em>4</em></div>
+        </div>
+      </div>
+
+      <div class="filtros-bar">
+        <div class="filtros-row">
+          <div style="flex:1;min-width:240px;position:relative">
+            <input style="width:100%;padding-left:36px" placeholder="Buscar vaga ou empresa..."/>
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza)">⌕</span>
+          </div>
+          <select><option>Todas empresas</option><option>Construtora Aurora</option><option>Pluma Tecnologia</option></select>
+          <select><option>Todo status</option><option>Triagem</option><option>Entrevistas</option><option>Proposta</option></select>
+          <select><option>Toda recrutadora</option></select>
+          <select><option>Ordenar: + crítica</option><option>+ recente</option><option>SLA</option></select>
+        </div>
+      </div>
+
+      <div class="tabela">
+        <div class="tab-linha head" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px">
+          <div>Vaga / Empresa</div>
+          <div>Recrutadora</div>
+          <div>Candidatos</div>
+          <div>Tempo</div>
+          <div>Status</div>
+          <div></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px;background:var(--vermelho-cl)">
+          <div class="tl-empresa">
+            <div class="tl-logo b">P</div>
+            <div>
+              <div class="tl-nome">DevOps Sr · Pluma Tecnologia</div>
+              <div class="tl-meta">São Paulo/SP · CLT · R$ 15-18k · Remoto</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Rafael Vieira</div></div>
+          <div><div class="tl-valor">22 inscritos</div><div class="tl-sub">3 finalistas</div></div>
+          <div><div class="tl-valor" style="color:var(--vermelho);font-weight:700">38 dias</div><div class="tl-sub" style="color:var(--vermelho)">⚠ SLA 30d</div></div>
+          <div><span class="tag vermelho">Crítica</span></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo a">A</div>
+            <div>
+              <div class="tl-nome">Analista Financeiro Sr · Const. Aurora</div>
+              <div class="tl-meta">BH/MG · CLT · R$ 9.5–12k</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Mariana Costa</div></div>
+          <div><div class="tl-valor">47 inscritos</div><div class="tl-sub">8 finalistas</div></div>
+          <div><div class="tl-valor">12 dias</div><div class="tl-sub">SLA 30d</div></div>
+          <div><span class="tag laranja">Entrev. RH</span></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo d">V</div>
+            <div>
+              <div class="tl-nome">Gerente Agrícola · Grupo Verde Campo</div>
+              <div class="tl-meta">Uberlândia/MG · CLT · R$ 14-17k</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Beatriz Nunes</div></div>
+          <div><div class="tl-valor">31 inscritos</div><div class="tl-sub">2 propostas</div></div>
+          <div><div class="tl-valor">18 dias</div><div class="tl-sub">SLA 35d</div></div>
+          <div><span class="tag verde">Proposta</span></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo c">C</div>
+            <div>
+              <div class="tl-nome">Decorador Sr · Casa Lumière</div>
+              <div class="tl-meta">Nova Lima/MG · PJ · R$ 12-14k</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Mariana Costa</div></div>
+          <div><div class="tl-valor">19 inscritos</div></div>
+          <div><div class="tl-valor">6 dias</div></div>
+          <div><span class="tag marinho">Triagem</span></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo f">M</div>
+            <div>
+              <div class="tl-nome">Soldador Sênior · Met. Horizonte</div>
+              <div class="tl-meta">Betim/MG · CLT · R$ 4.2-5k</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Rafael Vieira</div></div>
+          <div><div class="tl-valor">42 inscritos</div></div>
+          <div><div class="tl-valor">9 dias</div></div>
+          <div><span class="tag laranja">Teste prático</span></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo e">S</div>
+            <div>
+              <div class="tl-nome">Técnico Elétrico Solar · Ind. Solar</div>
+              <div class="tl-meta">Contagem/MG · CLT · R$ 5-6k</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Fernanda Toledo</div></div>
+          <div><div class="tl-valor">28 inscritos</div></div>
+          <div><div class="tl-valor">14 dias</div></div>
+          <div><span class="tag laranja">Entrev. Gestor</span></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo a">N</div>
+            <div>
+              <div class="tl-nome">Vendedor Externo · Nutrare</div>
+              <div class="tl-meta">Pouso Alegre/MG · CLT · R$ 3.5k + comissão</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Beatriz Nunes</div></div>
+          <div><div class="tl-valor">68 inscritos</div></div>
+          <div><div class="tl-valor">5 dias</div></div>
+          <div><span class="tag marinho">Triagem</span></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <div class="tab-linha" style="grid-template-columns:2.4fr 1.5fr 1fr .9fr .9fr 60px">
+          <div class="tl-empresa">
+            <div class="tl-logo c">L</div>
+            <div>
+              <div class="tl-nome">Motorista Cat. E · Log. Andorinha</div>
+              <div class="tl-meta">Cubatão/SP · CLT · R$ 3.8k</div>
+            </div>
+          </div>
+          <div><div class="tl-valor">Rafael Vieira</div></div>
+          <div><div class="tl-valor">52 inscritos</div></div>
+          <div><div class="tl-valor">11 dias</div></div>
+          <div><span class="tag laranja">Teste prático</span></div>
+          <div><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:30px;padding:14px;font-family:var(--ui);font-size:12px;color:var(--cinza)">Mostrando 8 de 87 · <a style="color:var(--laranja)">Carregar mais</a></div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: BANCO MASTER DE TALENTOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-banco-master">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item ativo"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Banco <em>Master</em> de Talentos</h1>
+          <p class="topbar-meta">2.847 profissionais qualificados · 184 novos este mês · 38 em processo ativo agora</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📊 Estatísticas</button>
+          <button class="btn btn-fantasma btn-sm">📧 Campanha</button>
+          <button class="btn btn-primario btn-sm">+ Convocar p/ vaga</button>
+        </div>
+      </div>
+
+      <div class="filtros-bar">
+        <div class="filtros-row">
+          <div style="flex:1;min-width:300px;position:relative">
+            <input style="width:100%;padding-left:36px" placeholder="Buscar por nome, cargo, empresa, skill, formação..."/>
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza)">⌕</span>
+          </div>
+          <button class="btn btn-marinho btn-sm">⚡ Busca avançada com IA</button>
+        </div>
+        <div class="filtros-row">
+          <span style="font-family:var(--ui);font-size:11px;color:var(--cinza);font-weight:600;letter-spacing:.5px;text-transform:uppercase">Filtros ativos:</span>
+          <span class="filtro-skill">Eng. Financeira <span class="x">✕</span></span>
+          <span class="filtro-skill">Sênior <span class="x">✕</span></span>
+          <span class="filtro-skill">Sienge <span class="x">✕</span></span>
+          <span class="filtro-skill">BH/MG ou Remoto <span class="x">✕</span></span>
+          <span class="filtro-skill">★4+ <span class="x">✕</span></span>
+          <span style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-left:auto">386 resultados</span>
+        </div>
+        <div class="filtros-row">
+          <select><option>Área: Financeiro</option></select>
+          <select><option>Nível: Sr/Esp</option></select>
+          <select><option>Salário: R$ 9-13k</option></select>
+          <select><option>Disponibilidade: 30d</option></select>
+          <select><option>Idiomas: qualquer</option></select>
+          <select><option>Formação: superior</option></select>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:18px">
+        <div class="talento-card" style="border:2px solid var(--laranja);background:var(--laranja-cl)">
+          <div class="talento-header">
+            <div class="talento-av av-a">L</div>
+            <div style="flex:1">
+              <div class="talento-nome">Letícia Ferraz Almeida</div>
+              <div class="talento-cargo">Analista Financeira Sr · 34 anos · BH/MG</div>
+              <div style="margin-top:5px"><span class="tag verde" style="font-size:9px">★ Em processo · Aurora</span></div>
+            </div>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">7 anos em construção · MBA FDC · UFMG · Big Five Conscienciosidade 87</div>
+          <div class="talento-skills">
+            <span class="s">Sienge</span><span class="s">Power BI</span><span class="s">Excel adv.</span><span class="s">DRE</span><span class="s">Inglês int.</span>
+          </div>
+          <div class="talento-footer">
+            <span>R$ 10-12k · CLT</span>
+            <span class="talento-stars">★★★★★</span>
+          </div>
+        </div>
+
+        <div class="talento-card">
+          <div class="talento-header">
+            <div class="talento-av av-b">A</div>
+            <div style="flex:1">
+              <div class="talento-nome">André Pacheco Lemos</div>
+              <div class="talento-cargo">Controller · 41 anos · BH/MG</div>
+              <div style="margin-top:5px"><span class="tag" style="font-size:9px">Finalista 2024</span></div>
+            </div>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">9 anos · Indústria · TOTVS · MBA FDC · CRC ativo</div>
+          <div class="talento-skills">
+            <span class="s">TOTVS</span><span class="s">Power BI</span><span class="s">DRE</span><span class="s">Inglês fl.</span>
+          </div>
+          <div class="talento-footer">
+            <span>R$ 13-16k · CLT</span>
+            <span class="talento-stars">★★★★☆</span>
+          </div>
+        </div>
+
+        <div class="talento-card">
+          <div class="talento-header">
+            <div class="talento-av av-c">C</div>
+            <div style="flex:1">
+              <div class="talento-nome">Carolina Vidal Brito</div>
+              <div class="talento-cargo">Analista Sr · 32 anos · Contagem/MG</div>
+              <div style="margin-top:5px"><span class="tag marinho" style="font-size:9px">Talento estratégico</span></div>
+            </div>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">7 anos · Construção · SAP · Sienge · PUC-Minas</div>
+          <div class="talento-skills">
+            <span class="s">SAP</span><span class="s">Sienge</span><span class="s">Inglês fl.</span><span class="s">Espanhol</span>
+          </div>
+          <div class="talento-footer">
+            <span>R$ 11-13k · CLT/PJ</span>
+            <span class="talento-stars">★★★★☆</span>
+          </div>
+        </div>
+
+        <div class="talento-card">
+          <div class="talento-header">
+            <div class="talento-av av-d">M</div>
+            <div style="flex:1">
+              <div class="talento-nome">Marcos Vinícius Oliveira</div>
+              <div class="talento-cargo">Analista Fin. Sr · 36 anos · BH/MG</div>
+              <div style="margin-top:5px"><span class="tag verde" style="font-size:9px">★ Em processo · Aurora</span></div>
+            </div>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">8 anos · Construção · Sienge · UFMG · CRA ativo</div>
+          <div class="talento-skills">
+            <span class="s">Sienge</span><span class="s">Power BI</span><span class="s">DRE</span><span class="s">Fluxo Caixa</span>
+          </div>
+          <div class="talento-footer">
+            <span>R$ 10-12k · CLT</span>
+            <span class="talento-stars">★★★★★</span>
+          </div>
+        </div>
+
+        <div class="talento-card">
+          <div class="talento-header">
+            <div class="talento-av av-e">B</div>
+            <div style="flex:1">
+              <div class="talento-nome">Bruno Cardoso Lima</div>
+              <div class="talento-cargo">Analista Pl/Sr · 28 anos · BH/MG</div>
+            </div>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">6 anos · Construção · Sienge · UFMG</div>
+          <div class="talento-skills">
+            <span class="s">Sienge</span><span class="s">Excel</span><span class="s">Inglês int.</span>
+          </div>
+          <div class="talento-footer">
+            <span>R$ 9-11k · CLT</span>
+            <span class="talento-stars">★★★★☆</span>
+          </div>
+        </div>
+
+        <div class="talento-card">
+          <div class="talento-header">
+            <div class="talento-av av-f">D</div>
+            <div style="flex:1">
+              <div class="talento-nome">Daniela Borges Furtado</div>
+              <div class="talento-cargo">Analista Sr · 35 anos · Nova Lima/MG</div>
+              <div style="margin-top:5px"><span class="tag amarelo" style="font-size:9px">Aguardando feedback</span></div>
+            </div>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">7 anos · Construção · SAP · Sienge · Pós FGV</div>
+          <div class="talento-skills">
+            <span class="s">SAP</span><span class="s">Sienge</span><span class="s">FGV</span><span class="s">Inglês int.</span>
+          </div>
+          <div class="talento-footer">
+            <span>R$ 11-13k · CLT</span>
+            <span class="talento-stars">★★★★☆</span>
+          </div>
+        </div>
+
+        <div class="talento-card">
+          <div class="talento-header">
+            <div class="talento-av av-a">G</div>
+            <div style="flex:1">
+              <div class="talento-nome">Gabriela Lima Costa</div>
+              <div class="talento-cargo">Coord. Financeira · 38 anos · BH/MG</div>
+            </div>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">10 anos · Multi-setor · Sienge · MBA Ibmec · CRA ativo</div>
+          <div class="talento-skills">
+            <span class="s">Sienge</span><span class="s">SAP</span><span class="s">Power BI</span><span class="s">Liderança</span>
+          </div>
+          <div class="talento-footer">
+            <span>R$ 14-17k · CLT</span>
+            <span class="talento-stars">★★★★★</span>
+          </div>
+        </div>
+
+        <div class="talento-card">
+          <div class="talento-header">
+            <div class="talento-av av-b">T</div>
+            <div style="flex:1">
+              <div class="talento-nome">Thiago Resende Pinheiro</div>
+              <div class="talento-cargo">Analista Sr · 31 anos · Vila Velha/ES</div>
+              <div style="margin-top:5px"><span class="tag verde" style="font-size:9px">Contratado 2026 · Aurora</span></div>
+            </div>
+          </div>
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5">8 anos · Construção · Sienge · UFES</div>
+          <div class="talento-skills">
+            <span class="s">Sienge</span><span class="s">DRE</span><span class="s">Mudança aceita</span>
+          </div>
+          <div class="talento-footer">
+            <span>R$ 11.5k · CLT</span>
+            <span class="talento-stars">★★★★★</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:14px;font-family:var(--ui);font-size:12px;color:var(--cinza)">Mostrando 8 de 386 · <a style="color:var(--laranja);font-weight:600">Carregar mais</a></div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 6: INBOX UNIFICADA -->
+<!-- ============================================== -->
+<div class="tela" id="t-inbox">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item ativo"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Inbox <em>Unificada</em></h1>
+          <p class="topbar-meta">14 não lidas · candidatos, empresas e equipe interna em um só lugar</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">⚙ Filtros</button>
+          <button class="btn btn-primario btn-sm">+ Nova conversa</button>
+        </div>
+      </div>
+
+      <div class="inbox-shell">
+        <div class="inbox-lista">
+          <div class="inbox-head">
+            <span class="inbox-pill ativa">Todas (87)</span>
+            <span class="inbox-pill">Candidatos</span>
+            <span class="inbox-pill">Empresas</span>
+            <span class="inbox-pill">Interno</span>
+          </div>
+
+          <div class="inbox-item ativa">
+            <div class="inbox-av av-a">R<div class="contexto-mini">E</div></div>
+            <div>
+              <div class="inbox-head-row"><span class="nome">ROBERTO AURORA · CONSTR. AURORA</span><span>14:48</span></div>
+              <div class="inbox-titulo">Re: Analista Financeiro Sr</div>
+              <div class="inbox-preview">"Tudo certo, prefiro qualidade a velocidade. Pode seguir..."</div>
+              <div class="inbox-tags"><span class="tag laranja" style="font-size:9px">Vaga ativa</span><span class="tag" style="font-size:9px">Mariana</span></div>
+            </div>
+          </div>
+
+          <div class="inbox-item">
+            <div class="inbox-av av-b">L<div class="contexto-mini">C</div></div>
+            <div>
+              <div class="inbox-head-row"><span class="nome">LETÍCIA FERRAZ · CANDIDATA</span><span>14:30</span></div>
+              <div class="inbox-titulo">Dúvida sobre o cronograma</div>
+              <div class="inbox-preview">"Oi Mariana, tudo bem? Você poderia me confirmar quando..."</div>
+              <div class="inbox-tags"><span class="tag verde" style="font-size:9px">Finalista</span></div>
+            </div>
+          </div>
+
+          <div class="inbox-item">
+            <div class="inbox-av av-c">P<div class="contexto-mini">E</div></div>
+            <div>
+              <div class="inbox-head-row"><span class="nome">PEDRO HUNG · PLUMA TECH</span><span>13:12</span></div>
+              <div class="inbox-titulo">⚠ DevOps Sr — onde estamos?</div>
+              <div class="inbox-preview">"Pessoal, tá indo pra 40 dias essa vaga aberta. Preciso..."</div>
+              <div class="inbox-tags"><span class="tag vermelho" style="font-size:9px">Crítico</span><span class="tag" style="font-size:9px">Rafael</span></div>
+            </div>
+          </div>
+
+          <div class="inbox-item">
+            <div class="inbox-av av-d">M<div class="contexto-mini">I</div></div>
+            <div>
+              <div class="inbox-head-row"><span class="nome">MARIANA COSTA · INTERNO</span><span>12:48</span></div>
+              <div class="inbox-titulo">Cobertura férias semana que vem</div>
+              <div class="inbox-preview">"Cláudia, vou tirar 5 dias na próxima semana. A Beatriz..."</div>
+              <div class="inbox-tags"><span class="tag marinho" style="font-size:9px">Time</span></div>
+            </div>
+          </div>
+
+          <div class="inbox-item">
+            <div class="inbox-av av-e">F<div class="contexto-mini">C</div></div>
+            <div>
+              <div class="inbox-head-row"><span class="nome">FELIPE ANDRADE · CANDIDATO</span><span>11:20</span></div>
+              <div class="inbox-titulo">Confirmação de presença · entrevista</div>
+              <div class="inbox-preview">"Confirmo presença amanhã às 10h. Levo currículo impresso?"</div>
+            </div>
+          </div>
+
+          <div class="inbox-item">
+            <div class="inbox-av av-f">C<div class="contexto-mini">E</div></div>
+            <div>
+              <div class="inbox-head-row"><span class="nome">CAMILA NUNES · CASA LUMIÈRE</span><span>10:05</span></div>
+              <div class="inbox-titulo">Pesquisa NPS — vamos conversar?</div>
+              <div class="inbox-preview">"Vi o resultado do NPS. Topo agendar 30min pra conversar..."</div>
+              <div class="inbox-tags"><span class="tag amarelo" style="font-size:9px">Risco churn</span></div>
+            </div>
+          </div>
+
+          <div class="inbox-item">
+            <div class="inbox-av av-a">G<div class="contexto-mini">C</div></div>
+            <div>
+              <div class="inbox-head-row"><span class="nome">GABRIELA LIMA · CANDIDATA</span><span>09:42</span></div>
+              <div class="inbox-titulo">Re: Próximos passos</div>
+              <div class="inbox-preview">"Ótimo! Posso comparecer ao teste online no dia 28..."</div>
+            </div>
+          </div>
+
+          <div class="inbox-item">
+            <div class="inbox-av av-b">B<div class="contexto-mini">I</div></div>
+            <div>
+              <div class="inbox-head-row"><span class="nome">BEATRIZ NUNES · INTERNO</span><span>Ontem</span></div>
+              <div class="inbox-titulo">Verde Campo: vamos quebrar a meta</div>
+              <div class="inbox-preview">"Tô animada — 3 finalistas pra Gerente Agrícola. Quer ver?"</div>
+              <div class="inbox-tags"><span class="tag marinho" style="font-size:9px">Time</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="conversa-detalhe">
+          <div class="conv-header">
+            <div style="display:flex;align-items:center;gap:12px;flex:1">
+              <div class="msg-av-sm av-a" style="width:42px;height:42px;font-size:16px">R</div>
+              <div>
+                <h4>Roberto Aurora</h4>
+                <div class="conv-meta-row">
+                  <span>Diretor de RH · Construtora Aurora</span>
+                  <span>·</span>
+                  <span>Contexto: Vaga Analista Financeiro Sr</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-fantasma btn-xs">📋 Abrir vaga</button>
+              <button class="btn btn-fantasma btn-xs">🏢 Ver empresa</button>
+              <button class="btn btn-fantasma btn-xs">⋮</button>
+            </div>
+          </div>
+
+          <div class="conv-body">
+            <div style="text-align:center;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-bottom:14px;letter-spacing:1px">HOJE</div>
+
+            <div class="msg me">
+              <div>
+                <div class="msg-bubble">Bom dia, Roberto! 😊 Já temos 8 finalistas qualificadas — 3 estão na fase de entrevista comigo essa semana.</div>
+                <div class="msg-time">Mariana · 09:22</div>
+              </div>
+            </div>
+
+            <div class="msg them">
+              <div class="msg-av-sm av-a">R</div>
+              <div>
+                <div class="msg-bubble">Ótimo! Aliás, queria ajustar uma coisa no briefing: precisamos que tenha inglês intermediário no mínimo.</div>
+                <div class="msg-time">09:31</div>
+              </div>
+            </div>
+
+            <div class="msg me">
+              <div>
+                <div class="msg-bubble">Anotado! Vou aplicar esse filtro no banco e refazer a triagem. Isso reduz nosso pool em ~35%, mas mantemos as 8 finalistas.</div>
+                <div class="msg-time">Mariana · 09:45</div>
+              </div>
+            </div>
+
+            <div class="msg them">
+              <div class="msg-av-sm av-a">R</div>
+              <div>
+                <div class="msg-bubble">Tudo certo, prefiro qualidade a velocidade. Pode seguir.</div>
+                <div class="msg-time">14:20</div>
+              </div>
+            </div>
+
+            <div class="msg me">
+              <div>
+                <div class="msg-bubble">Combinado! Te envio hoje as 3 finalistas — Letícia, Carol e Marcos. Os três têm muito potencial 🌟</div>
+                <div class="msg-time">Mariana · 14:48</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:14px 22px;background:var(--branco);border-top:1px solid var(--cinza-cl);display:flex;gap:10px;align-items:center">
+            <button class="btn btn-fantasma btn-sm" style="padding:8px 12px">📎</button>
+            <input style="flex:1;padding:11px 14px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:14px;border-radius:2px" placeholder="Responder como Mariana..."/>
+            <button class="btn btn-primario btn-sm">Enviar →</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 7: RECRUTADORES (TIME) -->
+<!-- ============================================== -->
+<div class="tela" id="t-recrutadores">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Time de <em>Recrutadoras</em></h1>
+          <p class="topbar-meta">8 ativas · 22 contratações em maio · 4 abaixo da meta · workload médio 9 vagas/cabeça</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📊 Performance</button>
+          <button class="btn btn-fantasma btn-sm">🎯 Definir metas</button>
+          <button class="btn btn-primario btn-sm">+ Adicionar pessoa</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Equipe Total</div>
+          <div class="card-valor"><em>8</em></div>
+          <div class="card-delta">+2 contratadas em 2026</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Workload Médio</div>
+          <div class="card-valor"><em>9</em><span>vagas</span></div>
+          <div class="card-delta neutro">Saudável (8-12)</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Atingimento Médio</div>
+          <div class="card-valor"><em>104</em><span>%</span></div>
+          <div class="card-delta">+ 12pp vs Q1</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Comissões a Pagar</div>
+          <div class="card-valor"><em>R$ 42</em><span>k</span></div>
+          <div class="card-delta neutro">Fechamento 30/05</div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>Ranking de performance · Maio 2026</h3><div class="sub-titulo">Ordenado por % de atingimento</div></div>
+        </div>
+
+        <div class="recrutador-card" style="border-color:var(--laranja);background:linear-gradient(90deg,var(--laranja-cl),var(--branco))">
+          <div class="recrutador-av av-a">M</div>
+          <div>
+            <h4 style="font-size:18px;font-weight:500">Mariana Costa <span style="color:var(--laranja);font-family:var(--ui);font-size:11px;letter-spacing:1px;margin-left:8px">🥇 LÍDER</span></h4>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;letter-spacing:.3px">Sênior · entrou em 03/2023 · 28 contratações YTD</div>
+            <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+              <span class="tag" style="font-size:9px">3 clientes</span>
+              <span class="tag" style="font-size:9px">Aurora (premium)</span>
+              <span class="tag" style="font-size:9px">Casa Lumière</span>
+              <span class="tag" style="font-size:9px">Pluma</span>
+            </div>
+          </div>
+          <div class="recrutador-stats">
+            <div><span class="v">3</span><span class="l">Vagas</span></div>
+            <div><span class="v laranja">4</span><span class="l">Hires</span></div>
+            <div><span class="v">8.2</span><span class="l">NPS</span></div>
+            <div><span class="v laranja">142%</span><span class="l">Meta</span></div>
+            <div><span class="v verde">R$ 14k</span><span class="l">Comissão</span></div>
+          </div>
+        </div>
+
+        <div class="recrutador-card">
+          <div class="recrutador-av av-c">R</div>
+          <div>
+            <h4 style="font-size:18px;font-weight:500">Rafael Vieira</h4>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;letter-spacing:.3px">Pleno · entrou em 11/2023 · 21 contratações YTD</div>
+            <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+              <span class="tag" style="font-size:9px">3 clientes</span>
+              <span class="tag" style="font-size:9px">Pluma</span>
+              <span class="tag" style="font-size:9px">Metalúrgica Horizonte</span>
+              <span class="tag" style="font-size:9px">Logística Andorinha</span>
+            </div>
+          </div>
+          <div class="recrutador-stats">
+            <div><span class="v">4</span><span class="l">Vagas</span></div>
+            <div><span class="v laranja">3</span><span class="l">Hires</span></div>
+            <div><span class="v">7.8</span><span class="l">NPS</span></div>
+            <div><span class="v">118%</span><span class="l">Meta</span></div>
+            <div><span class="v verde">R$ 9.2k</span><span class="l">Comissão</span></div>
+          </div>
+        </div>
+
+        <div class="recrutador-card">
+          <div class="recrutador-av av-d">B</div>
+          <div>
+            <h4 style="font-size:18px;font-weight:500">Beatriz Nunes</h4>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;letter-spacing:.3px">Pleno · entrou em 05/2024 · 17 contratações YTD</div>
+            <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+              <span class="tag" style="font-size:9px">3 clientes</span>
+              <span class="tag" style="font-size:9px">Verde Campo</span>
+              <span class="tag" style="font-size:9px">Nutrare</span>
+            </div>
+          </div>
+          <div class="recrutador-stats">
+            <div><span class="v">5</span><span class="l">Vagas</span></div>
+            <div><span class="v laranja">2</span><span class="l">Hires</span></div>
+            <div><span class="v">8.0</span><span class="l">NPS</span></div>
+            <div><span class="v">96%</span><span class="l">Meta</span></div>
+            <div><span class="v">R$ 6.8k</span><span class="l">Comissão</span></div>
+          </div>
+        </div>
+
+        <div class="recrutador-card">
+          <div class="recrutador-av av-e">F</div>
+          <div>
+            <h4 style="font-size:18px;font-weight:500">Fernanda Toledo <span style="color:var(--amarelo);font-family:var(--ui);font-size:10px;letter-spacing:1px;margin-left:8px">⚠ ABAIXO META</span></h4>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;letter-spacing:.3px">Júnior · entrou em 02/2025 · 9 contratações YTD</div>
+            <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+              <span class="tag" style="font-size:9px">2 clientes</span>
+              <span class="tag" style="font-size:9px">Indústria Solar</span>
+              <span class="tag" style="font-size:9px">Têxtil Brilhante</span>
+            </div>
+          </div>
+          <div class="recrutador-stats">
+            <div><span class="v">3</span><span class="l">Vagas</span></div>
+            <div><span class="v laranja">2</span><span class="l">Hires</span></div>
+            <div><span class="v">7.4</span><span class="l">NPS</span></div>
+            <div><span class="v" style="color:var(--vermelho)">68%</span><span class="l">Meta</span></div>
+            <div><span class="v">R$ 3.2k</span><span class="l">Comissão</span></div>
+          </div>
+        </div>
+
+        <div class="recrutador-card">
+          <div class="recrutador-av av-b">P</div>
+          <div>
+            <h4 style="font-size:18px;font-weight:500">Patrícia Lemos</h4>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;letter-spacing:.3px">Sênior · entrou em 07/2024 · sourcing especialista</div>
+            <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+              <span class="tag" style="font-size:9px">Banco Master</span>
+              <span class="tag" style="font-size:9px">Sourcing &amp; Caça-talentos</span>
+            </div>
+          </div>
+          <div class="recrutador-stats">
+            <div><span class="v">—</span><span class="l">Vagas</span></div>
+            <div><span class="v laranja">186</span><span class="l">Novos</span></div>
+            <div><span class="v">—</span><span class="l">NPS</span></div>
+            <div><span class="v">112%</span><span class="l">Meta</span></div>
+            <div><span class="v">R$ 4.6k</span><span class="l">Bônus</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 7.5: METAS E COMISSÕES -->
+<!-- ============================================== -->
+<div class="tela" id="t-comissoes">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item ativo"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Metas &amp; <em>Comissões</em></h1>
+          <p class="topbar-meta">Maio 2026 · 8 recrutadoras · R$ 42k em comissões a pagar · fechamento 30/05</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Folha de comissões</button>
+          <button class="btn btn-fantasma btn-sm">⚙ Configurar plano</button>
+          <button class="btn btn-primario btn-sm">Aprovar pagamento</button>
+        </div>
+      </div>
+
+      <div class="resumo-financeiro">
+        <div class="num-grande">
+          <div class="num-grande-lab">Comissões do mês</div>
+          <div class="num-grande-val"><em>R$ 42</em>k</div>
+          <div class="num-grande-meta">11 contratações · ticket médio R$ 3.8k</div>
+        </div>
+        <div class="num-grande">
+          <div class="num-grande-lab">Meta da equipe</div>
+          <div class="num-grande-val"><em>104</em>%</div>
+          <div class="num-grande-meta">12 vagas previstas · 11 fechadas</div>
+        </div>
+        <div class="num-grande">
+          <div class="num-grande-lab">Bônus por excelência</div>
+          <div class="num-grande-val"><em>R$ 8</em>k</div>
+          <div class="num-grande-meta">2 recrutadoras acima de 120%</div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>Plano de comissionamento ativo</h3><div class="sub-titulo">Vigente desde 01/2026</div></div>
+          <button class="btn btn-fantasma btn-sm">✏ Editar regras</button>
+        </div>
+        <div class="grid-3-eq" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px">
+          <div style="padding:18px;background:var(--cinza-fundo);border-radius:2px">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700">FIXO MENSAL</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:28px;color:var(--marinho);margin-top:6px">R$ 4.500</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px">Salário-base recrutadora pleno</div>
+          </div>
+          <div style="padding:18px;background:var(--laranja-cl);border-radius:2px;border:1px solid var(--laranja)">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1.5px;font-weight:700">POR CONTRATAÇÃO</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:28px;color:var(--laranja);margin-top:6px">8%</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px">Do 1º salário do contratado</div>
+          </div>
+          <div style="padding:18px;background:var(--verde-cl);border-radius:2px;border:1px solid var(--verde)">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--verde);letter-spacing:1.5px;font-weight:700">BÔNUS ACELERADOR</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:28px;color:var(--verde);margin-top:6px">+50%</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px">Acima de 120% da meta</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>Detalhamento por recrutadora · Maio 2026</h3>
+        <div class="sub-titulo">A pagar em 30/05/2026</div>
+
+        <div class="tabela" style="margin-top:14px">
+          <div class="tab-linha head" style="grid-template-columns:1.8fr .8fr .8fr .8fr 1fr 1fr">
+            <div>Recrutadora</div>
+            <div>Meta</div>
+            <div>Hires</div>
+            <div>Atingido</div>
+            <div>Comissão</div>
+            <div>Acelerador</div>
+          </div>
+
+          <div class="tab-linha" style="grid-template-columns:1.8fr .8fr .8fr .8fr 1fr 1fr;background:var(--laranja-cl)">
+            <div class="tl-empresa">
+              <div class="recrutador-av av-a" style="width:38px;height:38px;font-size:14px">M</div>
+              <div><div class="tl-nome">Mariana Costa 🥇</div><div class="tl-meta">Sênior · 3 clientes</div></div>
+            </div>
+            <div><div class="tl-valor">3 hires</div></div>
+            <div><div class="tl-valor">4</div></div>
+            <div><div class="tl-valor destaque">142%</div></div>
+            <div><div class="tl-valor">R$ 9.500</div></div>
+            <div><div class="tl-valor" style="color:var(--verde)">+ R$ 4.500</div></div>
+          </div>
+
+          <div class="tab-linha" style="grid-template-columns:1.8fr .8fr .8fr .8fr 1fr 1fr">
+            <div class="tl-empresa">
+              <div class="recrutador-av av-c" style="width:38px;height:38px;font-size:14px">R</div>
+              <div><div class="tl-nome">Rafael Vieira</div><div class="tl-meta">Pleno · 3 clientes</div></div>
+            </div>
+            <div><div class="tl-valor">2 hires</div></div>
+            <div><div class="tl-valor">3</div></div>
+            <div><div class="tl-valor destaque">118%</div></div>
+            <div><div class="tl-valor">R$ 9.200</div></div>
+            <div><div class="tl-valor" style="color:var(--cinza)">—</div></div>
+          </div>
+
+          <div class="tab-linha" style="grid-template-columns:1.8fr .8fr .8fr .8fr 1fr 1fr">
+            <div class="tl-empresa">
+              <div class="recrutador-av av-d" style="width:38px;height:38px;font-size:14px">B</div>
+              <div><div class="tl-nome">Beatriz Nunes</div><div class="tl-meta">Pleno · 3 clientes</div></div>
+            </div>
+            <div><div class="tl-valor">2 hires</div></div>
+            <div><div class="tl-valor">2</div></div>
+            <div><div class="tl-valor destaque">96%</div></div>
+            <div><div class="tl-valor">R$ 6.800</div></div>
+            <div><div class="tl-valor" style="color:var(--cinza)">—</div></div>
+          </div>
+
+          <div class="tab-linha" style="grid-template-columns:1.8fr .8fr .8fr .8fr 1fr 1fr">
+            <div class="tl-empresa">
+              <div class="recrutador-av av-e" style="width:38px;height:38px;font-size:14px">F</div>
+              <div><div class="tl-nome">Fernanda Toledo</div><div class="tl-meta">Júnior · 2 clientes</div></div>
+            </div>
+            <div><div class="tl-valor">3 hires</div></div>
+            <div><div class="tl-valor">2</div></div>
+            <div><div class="tl-valor" style="color:var(--vermelho)">68%</div></div>
+            <div><div class="tl-valor">R$ 3.200</div></div>
+            <div><div class="tl-valor" style="color:var(--cinza)">—</div></div>
+          </div>
+
+          <div class="tab-linha" style="grid-template-columns:1.8fr .8fr .8fr .8fr 1fr 1fr">
+            <div class="tl-empresa">
+              <div class="recrutador-av av-b" style="width:38px;height:38px;font-size:14px">P</div>
+              <div><div class="tl-nome">Patrícia Lemos</div><div class="tl-meta">Sourcing · Banco Master</div></div>
+            </div>
+            <div><div class="tl-valor">150 novos</div></div>
+            <div><div class="tl-valor">186</div></div>
+            <div><div class="tl-valor destaque">124%</div></div>
+            <div><div class="tl-valor">R$ 3.000</div></div>
+            <div><div class="tl-valor" style="color:var(--verde)">+ R$ 1.600</div></div>
+          </div>
+
+          <div class="tab-linha" style="grid-template-columns:1.8fr .8fr .8fr .8fr 1fr 1fr;background:var(--cinza-fundo);font-weight:600">
+            <div style="font-family:var(--serif);font-size:14px;font-style:italic">TOTAL</div>
+            <div></div>
+            <div><div class="tl-valor">11 hires</div></div>
+            <div><div class="tl-valor destaque">104%</div></div>
+            <div><div class="tl-valor" style="font-size:18px">R$ 31.700</div></div>
+            <div><div class="tl-valor" style="color:var(--verde);font-size:18px">+ R$ 6.100</div></div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;padding:14px;background:var(--verde-cl);border-left:3px solid var(--verde);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.6">
+          <strong style="color:var(--verde)">Total a pagar: R$ 37.800</strong> em comissões + R$ 4.200 em bônus de equipe (NPS) = <strong style="color:var(--marinho)">R$ 42.000</strong> · Aprovação pendente da CEO.
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="painel">
+          <h3 style="font-size:17px">Histórico de pagamentos</h3>
+          <div class="sub-titulo">Últimos 6 meses</div>
+          <div style="height:160px;display:flex;align-items:flex-end;gap:6px;margin-top:14px;padding:14px 0;border-bottom:1px solid var(--cinza-cl)">
+            <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:62%;border-radius:2px 2px 0 0" title="Dez: R$ 28k"></div>
+            <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:71%;border-radius:2px 2px 0 0"></div>
+            <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:78%;border-radius:2px 2px 0 0"></div>
+            <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:84%;border-radius:2px 2px 0 0"></div>
+            <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:91%;border-radius:2px 2px 0 0"></div>
+            <div style="flex:1;background:linear-gradient(180deg,var(--laranja),var(--laranja-esc));height:100%;border-radius:2px 2px 0 0;border:1px solid var(--laranja-esc)" title="Mai: R$ 42k"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:6px;letter-spacing:.5px"><span>Dez</span><span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span></div>
+        </div>
+
+        <div class="painel">
+          <h3 style="font-size:17px">Regras de pagamento</h3>
+          <div class="sub-titulo">Política da Oi Nora</div>
+          <div style="font-family:var(--ui);font-size:13px;line-height:1.7;margin-top:14px">
+            ✓ Comissão paga apenas após período de garantia (45 dias)<br>
+            ✓ Recrutador recebe 8% do 1º salário bruto do contratado<br>
+            ✓ Acelerador de 50% sobre o que ultrapassar 120% da meta<br>
+            ✓ Penalidade de devolução se contratado sair em &lt; 45 dias<br>
+            ✓ Bônus de NPS: R$ 500 se NPS do cliente &gt;= 9<br>
+            ✓ Sourcing recebe R$ 20 por talento qualificado adicionado
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 8: PIPELINE COMERCIAL -->
+<!-- ============================================== -->
+<div class="tela" id="t-pipeline-com">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item ativo"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Pipeline <em>Comercial</em></h1>
+          <p class="topbar-meta">12 oportunidades · R$ 1,84M em pipeline · 6 fechamentos previstos no trimestre</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📅 Forecast</button>
+          <button class="btn btn-primario btn-sm">+ Nova oportunidade</button>
+        </div>
+      </div>
+
+      <!-- Funil visual -->
+      <div class="painel">
+        <h3>Funil do Trimestre · Q2/2026</h3>
+        <div class="sub-titulo">Pipeline weighted: R$ 720k · Forecast 90 dias</div>
+
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:24px">
+          <div style="background:var(--cinza-fundo);padding:18px 14px;border-radius:2px;border-top:3px solid var(--marinho-med);text-align:center">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1px;font-weight:700;text-transform:uppercase">PROSPECT</div>
+            <div style="font-size:24px;color:var(--marinho);font-style:italic;margin-top:8px">12</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">R$ 1,84M</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px">10% prob.</div>
+          </div>
+          <div style="background:#FFF5E5;padding:18px 14px;border-radius:2px;border-top:3px solid var(--amarelo);text-align:center">
+            <div style="font-family:var(--ui);font-size:10px;color:#876715;letter-spacing:1px;font-weight:700;text-transform:uppercase">REUNIÃO</div>
+            <div style="font-size:24px;color:var(--marinho);font-style:italic;margin-top:8px">8</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">R$ 1,32M</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px">25%</div>
+          </div>
+          <div style="background:var(--laranja-cl);padding:18px 14px;border-radius:2px;border-top:3px solid var(--laranja);text-align:center">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1px;font-weight:700;text-transform:uppercase">DIAGNÓSTICO</div>
+            <div style="font-size:24px;color:var(--marinho);font-style:italic;margin-top:8px">6</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">R$ 920k</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px">50%</div>
+          </div>
+          <div style="background:#F4F0FB;padding:18px 14px;border-radius:2px;border-top:3px solid var(--roxo);text-align:center">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--roxo);letter-spacing:1px;font-weight:700;text-transform:uppercase">PROPOSTA</div>
+            <div style="font-size:24px;color:var(--marinho);font-style:italic;margin-top:8px">4</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">R$ 640k</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px">70%</div>
+          </div>
+          <div style="background:var(--verde-cl);padding:18px 14px;border-radius:2px;border-top:3px solid var(--verde);text-align:center">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--verde);letter-spacing:1px;font-weight:700;text-transform:uppercase">NEGOCIAÇÃO</div>
+            <div style="font-size:24px;color:var(--marinho);font-style:italic;margin-top:8px">3</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">R$ 480k</div>
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px">90%</div>
+          </div>
+          <div style="background:var(--marinho);padding:18px 14px;border-radius:2px;text-align:center;color:white">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1px;font-weight:700;text-transform:uppercase">FECHADO</div>
+            <div style="font-size:24px;color:var(--papel);font-style:italic;margin-top:8px">3</div>
+            <div style="font-family:var(--ui);font-size:11px;opacity:.7;margin-top:4px">R$ 386k MRR</div>
+            <div style="font-family:var(--ui);font-size:10px;opacity:.6;margin-top:2px">Q2</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>Oportunidades em negociação ativa</h3>
+        <div class="sub-titulo">3 deals · R$ 480k weighted · próximos 30 dias</div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-top:18px">
+          <div style="padding:20px;border:1px solid var(--verde);background:var(--verde-cl);border-radius:2px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div>
+                <h4 style="font-size:16px;font-weight:500">RioMar Comércio</h4>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px">Varejo · BH/MG · 184 empregados</div>
+              </div>
+              <span class="tag verde">90%</span>
+            </div>
+            <div style="font-family:var(--serif);font-size:22px;font-style:italic;color:var(--marinho);margin:8px 0">R$ 18.500<span style="font-size:13px;color:var(--cinza)">/mês</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.6">
+              Plano: Avançado · 18 meses<br>
+              Próximo passo: Assinatura · 28/05<br>
+              Responsável: Cláudia
+            </div>
+          </div>
+
+          <div style="padding:20px;border:1px solid var(--verde);background:var(--verde-cl);border-radius:2px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div>
+                <h4 style="font-size:16px;font-weight:500">Hospital São Vicente</h4>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px">Saúde · Belo Horizonte/MG · 312 empregados</div>
+              </div>
+              <span class="tag verde">90%</span>
+            </div>
+            <div style="font-family:var(--serif);font-size:22px;font-style:italic;color:var(--marinho);margin:8px 0">R$ 28.900<span style="font-size:13px;color:var(--cinza)">/mês</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.6">
+              Plano: Premium · 24 meses<br>
+              Próximo passo: Reunião final 30/05<br>
+              Responsável: Cláudia
+            </div>
+          </div>
+
+          <div style="padding:20px;border:1px solid var(--verde);background:var(--verde-cl);border-radius:2px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div>
+                <h4 style="font-size:16px;font-weight:500">Engesa Engenharia</h4>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px">Construção · Vitória/ES · 94 empregados</div>
+              </div>
+              <span class="tag verde">90%</span>
+            </div>
+            <div style="font-family:var(--serif);font-size:22px;font-style:italic;color:var(--marinho);margin:8px 0">R$ 14.200<span style="font-size:13px;color:var(--cinza)">/mês</span></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.6">
+              Plano: Essencial + Recrutamento<br>
+              Próximo passo: Pricing review<br>
+              Responsável: Cláudia
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 9: FATURAMENTO -->
+<!-- ============================================== -->
+<div class="tela" id="t-faturamento">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item ativo"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item" onclick="irPara('t-analytics')"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Faturamento &amp; <em>Contratos</em></h1>
+          <p class="topbar-meta">28 contratos ativos · MRR R$ 386k · 3 inadimplências · 4 renovações nos próximos 60 dias</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar NFs</button>
+          <button class="btn btn-primario btn-sm">+ Emitir cobrança</button>
+        </div>
+      </div>
+
+      <div class="resumo-financeiro">
+        <div class="num-grande">
+          <div class="num-grande-lab">MRR · Receita Recorrente</div>
+          <div class="num-grande-val"><em>R$ 386</em>k</div>
+          <div class="num-grande-meta">+ 8,4% vs abril</div>
+        </div>
+        <div class="num-grande">
+          <div class="num-grande-lab">ARR Projetado</div>
+          <div class="num-grande-val"><em>R$ 4,63</em>M</div>
+          <div class="num-grande-meta">Run rate atual</div>
+        </div>
+        <div class="num-grande">
+          <div class="num-grande-lab">Taxas de Sucesso (Mês)</div>
+          <div class="num-grande-val"><em>R$ 142</em>k</div>
+          <div class="num-grande-meta">11 contratações · ~R$ 13k médio</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <h3>Cobranças do mês · Maio 2026</h3>
+            <div class="sub-titulo">Status de pagamento</div>
+
+            <div class="tabela" style="border:none;margin-top:14px">
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1.4fr .8fr;padding:14px 16px;background:var(--verde-cl);border-radius:2px;margin-bottom:6px">
+                <div class="tl-empresa">
+                  <div class="tl-logo a" style="width:32px;height:32px;font-size:12px">A</div>
+                  <div><div class="tl-nome">Construtora Aurora</div><div class="tl-meta">NF #2026-0421</div></div>
+                </div>
+                <div><div class="tl-valor destaque">R$ 24.500</div></div>
+                <div><div class="tl-valor">Venc. 05/05/2026</div><div class="tl-sub">Pago 03/05</div></div>
+                <div><span class="tag verde">Pago</span></div>
+              </div>
+
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1.4fr .8fr;padding:14px 16px;background:var(--verde-cl);border-radius:2px;margin-bottom:6px">
+                <div class="tl-empresa">
+                  <div class="tl-logo d" style="width:32px;height:32px;font-size:12px">V</div>
+                  <div><div class="tl-nome">Grupo Verde Campo</div><div class="tl-meta">NF #2026-0422</div></div>
+                </div>
+                <div><div class="tl-valor destaque">R$ 32.400</div></div>
+                <div><div class="tl-valor">Venc. 05/05/2026</div><div class="tl-sub">Pago 02/05</div></div>
+                <div><span class="tag verde">Pago</span></div>
+              </div>
+
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1.4fr .8fr;padding:14px 16px;background:var(--amarelo-cl);border-radius:2px;margin-bottom:6px">
+                <div class="tl-empresa">
+                  <div class="tl-logo c" style="width:32px;height:32px;font-size:12px">C</div>
+                  <div><div class="tl-nome">Casa Lumière</div><div class="tl-meta">NF #2026-0423</div></div>
+                </div>
+                <div><div class="tl-valor destaque">R$ 19.800</div></div>
+                <div><div class="tl-valor">Venc. 10/05/2026</div><div class="tl-sub">Em aberto · 15 dias</div></div>
+                <div><span class="tag amarelo">Atrasada</span></div>
+              </div>
+
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1.4fr .8fr;padding:14px 16px;background:var(--vermelho-cl);border-radius:2px;margin-bottom:6px">
+                <div class="tl-empresa">
+                  <div class="tl-logo b" style="width:32px;height:32px;font-size:12px">T</div>
+                  <div><div class="tl-nome">Têxtil Brilhante</div><div class="tl-meta">NF #2026-0419</div></div>
+                </div>
+                <div><div class="tl-valor destaque">R$ 7.200</div></div>
+                <div><div class="tl-valor">Venc. 20/04/2026</div><div class="tl-sub">35 dias atraso</div></div>
+                <div><span class="tag vermelho">Inadimplente</span></div>
+              </div>
+
+              <div class="tab-linha" style="grid-template-columns:2fr 1fr 1.4fr .8fr;padding:14px 16px;background:var(--cinza-fundo);border-radius:2px;margin-bottom:6px">
+                <div class="tl-empresa">
+                  <div class="tl-logo e" style="width:32px;height:32px;font-size:12px">S</div>
+                  <div><div class="tl-nome">Indústria Solar</div><div class="tl-meta">NF #2026-0424</div></div>
+                </div>
+                <div><div class="tl-valor destaque">R$ 8.900</div></div>
+                <div><div class="tl-valor">Venc. 28/05/2026</div><div class="tl-sub">A vencer · 3 dias</div></div>
+                <div><span class="tag">A vencer</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:17px">Renovações próximas</h3>
+            <div class="sub-titulo">Próximos 60 dias</div>
+
+            <div style="padding:14px;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px;margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+                <div style="font-size:14px;font-weight:500">Grupo Verde Campo</div>
+                <span style="font-family:var(--ui);font-size:11px;color:#876715;font-weight:700">23 dias</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">R$ 32.400/mês · Avançado<br>Sem reunião marcada ainda ⚠</div>
+              <button class="btn btn-primario btn-sm" style="margin-top:10px;padding:6px 14px;font-size:11px">Agendar</button>
+            </div>
+
+            <div style="padding:14px;background:var(--cinza-fundo);border-left:3px solid var(--marinho);border-radius:2px;margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+                <div style="font-size:14px;font-weight:500">Metalúrgica Horizonte</div>
+                <span style="font-family:var(--ui);font-size:11px;color:var(--cinza);font-weight:700">42 dias</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">R$ 22.100/mês · Avançado<br>Reunião marcada 10/06 ✓</div>
+            </div>
+
+            <div style="padding:14px;background:var(--verde-cl);border-left:3px solid var(--verde);border-radius:2px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+                <div style="font-size:14px;font-weight:500">Construtora Aurora</div>
+                <span style="font-family:var(--ui);font-size:11px;color:var(--verde);font-weight:700">57 dias</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">R$ 24.500/mês · Premium<br>Renovação automática ✓ (alta confiança)</div>
+            </div>
+          </div>
+
+          <div class="painel" style="background:var(--vermelho-cl);border-color:var(--vermelho)">
+            <h3 style="font-size:17px;color:var(--vermelho)">⚠ Inadimplência</h3>
+            <div class="sub-titulo">Ação imediata</div>
+
+            <div style="padding:12px;background:white;border-radius:2px;margin-bottom:8px">
+              <div style="font-size:14px;font-weight:500">Têxtil Brilhante</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px">R$ 7.200 em atraso há 35 dias<br>3ª tentativa de contato sem resposta</div>
+              <button class="btn btn-primario btn-sm" style="margin-top:10px;width:100%;padding:6px;font-size:11px">Acionar jurídico</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 10: ANALYTICS MASTER -->
+<!-- ============================================== -->
+<div class="tela" id="t-analytics">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item" onclick="irPara('t-dash')"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item" onclick="irPara('t-empresas')"><span class="ic">🏢</span> Empresas-Clientes <span class="badge contagem">28</span></div>
+      <div class="sidebar-item" onclick="irPara('t-empresa-detalhe')"><span class="ic">◉</span> Ficha de Cliente</div>
+      <div class="sidebar-item" onclick="irPara('t-vagas-master')"><span class="ic">▤</span> Todas as Vagas <span class="badge contagem">87</span></div>
+      <div class="sidebar-item" onclick="irPara('t-banco-master')"><span class="ic">◆</span> Banco Master <span class="badge contagem">2.8k</span></div>
+      <div class="sidebar-item" onclick="irPara('t-inbox')"><span class="ic">✉</span> Inbox Unificada <span class="badge alerta">14</span></div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item" onclick="irPara('t-recrutadores')"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item" onclick="irPara('t-comissoes')"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-pipeline-com')"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item" onclick="irPara('t-faturamento')"><span class="ic">💰</span> Faturamento &amp; Contratos</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item ativo"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item"><span class="ic">⚙</span> Configurações</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="topbar">
+        <div>
+          <h1>Analytics <em>Master</em></h1>
+          <p class="topbar-meta">KPIs estratégicos · 12 meses · forecast e modelos preditivos</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📅 Q2 2026 ▾</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Apresentação para sócios</button>
+        </div>
+      </div>
+
+      <div class="cards-grid-5">
+        <div class="card">
+          <div class="card-titulo">CAC</div>
+          <div class="card-valor"><em>R$ 8.4</em><span>k</span></div>
+          <div class="card-delta">-14% YoY</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">LTV</div>
+          <div class="card-valor"><em>R$ 248</em><span>k</span></div>
+          <div class="card-delta">+ 8% YoY</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">LTV/CAC</div>
+          <div class="card-valor"><em>29,5</em><span>×</span></div>
+          <div class="card-delta">Excelente (alvo &gt;3)</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Churn Logo</div>
+          <div class="card-valor"><em>4,2</em><span>%</span></div>
+          <div class="card-delta">12m móveis</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Net Revenue Retention</div>
+          <div class="card-valor"><em>114</em><span>%</span></div>
+          <div class="card-delta">Expansão líquida</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="painel">
+            <div class="painel-header"><div><h3>Receita por Plano</h3><div class="sub-titulo">Maio · R$ 386k MRR</div></div></div>
+            <div class="barras-h">
+              <div class="barra-h-item">
+                <span>Premium (6 clientes)</span>
+                <div class="barra"><div class="preenchimento laranja" style="width:100%"></div></div>
+                <span class="valor">R$ 168k</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Avançado (14 clientes)</span>
+                <div class="barra"><div class="preenchimento" style="width:90%"></div></div>
+                <span class="valor">R$ 152k</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Essencial (8 clientes)</span>
+                <div class="barra"><div class="preenchimento" style="width:40%"></div></div>
+                <span class="valor">R$ 66k</span>
+              </div>
+            </div>
+            <div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--cinza-cl);font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.6">
+              Premium é apenas 21% dos clientes mas <strong style="color:var(--laranja)">43,5% da receita</strong>. <br>Estratégia 2026-S2: focar em upselling Essencial → Avançado.
+            </div>
+          </div>
+
+          <div class="painel">
+            <div class="painel-header"><div><h3>Indicadores de Operação</h3><div class="sub-titulo">Eficiência da máquina</div></div></div>
+            <div class="barras-h">
+              <div class="barra-h-item">
+                <span>Time-to-Hire (média)</span>
+                <div class="barra"><div class="preenchimento verde" style="width:73%"></div></div>
+                <span class="valor">22 dias</span>
+              </div>
+              <div class="barra-h-item">
+                <span>SLA Cumprido</span>
+                <div class="barra"><div class="preenchimento verde" style="width:96%"></div></div>
+                <span class="valor">96%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Conversão Triagem→Hire</span>
+                <div class="barra"><div class="preenchimento laranja" style="width:34%"></div></div>
+                <span class="valor">34%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>Retention &gt;1 ano</span>
+                <div class="barra"><div class="preenchimento verde" style="width:89%"></div></div>
+                <span class="valor">89%</span>
+              </div>
+              <div class="barra-h-item">
+                <span>NPS Cliente</span>
+                <div class="barra"><div class="preenchimento verde" style="width:87%"></div></div>
+                <span class="valor">+74</span>
+              </div>
+              <div class="barra-h-item">
+                <span>NPS Candidato</span>
+                <div class="barra"><div class="preenchimento" style="width:62%"></div></div>
+                <span class="valor">+48</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel" style="background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);border:none">
+            <h3 style="color:var(--papel);font-size:18px">🤖 Predição de Churn (IA)</h3>
+            <div class="sub-titulo" style="color:rgba(255,255,255,.5)">Clientes com risco nos próximos 90 dias</div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;margin-bottom:10px;margin-top:14px;border-left:3px solid var(--vermelho)">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <div class="tl-logo b" style="width:32px;height:32px;font-size:13px">T</div>
+                  <div><div style="font-size:14px">Têxtil Brilhante</div><div style="font-family:var(--ui);font-size:11px;opacity:.6">R$ 7.200/mês</div></div>
+                </div>
+                <span style="color:var(--vermelho);font-style:italic;font-size:24px">88%</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;opacity:.7;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">Sinais: inadimplência 35d · 0 vagas em 60d · NPS não respondido</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;margin-bottom:10px;border-left:3px solid var(--amarelo)">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <div class="tl-logo c" style="width:32px;height:32px;font-size:13px">C</div>
+                  <div><div style="font-size:14px">Casa Lumière</div><div style="font-family:var(--ui);font-size:11px;opacity:.6">R$ 19.800/mês</div></div>
+                </div>
+                <span style="color:var(--amarelo);font-style:italic;font-size:24px">52%</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;opacity:.7;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">Sinais: NPS caiu (9→6) · cobrança atrasada · 1 vaga 35d aberta</div>
+            </div>
+
+            <div style="background:rgba(255,255,255,.05);padding:14px;border-radius:2px;border-left:3px solid var(--laranja)">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <div class="tl-logo e" style="width:32px;height:32px;font-size:13px">N</div>
+                  <div><div style="font-size:14px">Nutrare Alimentos</div><div style="font-family:var(--ui);font-size:11px;opacity:.6">R$ 19.600/mês</div></div>
+                </div>
+                <span style="color:var(--laranja);font-style:italic;font-size:24px">34%</span>
+              </div>
+              <div style="font-family:var(--ui);font-size:11px;opacity:.7;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)">Sinais: 2 contratações canceladas pela empresa em 60d</div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:17px">Crescimento MRR · 12 meses</h3>
+            <div class="sub-titulo">Evolução mensal</div>
+            <div style="position:relative;height:160px;display:flex;align-items:flex-end;gap:4px;margin-top:14px;padding:14px 0;border-bottom:1px solid var(--cinza-cl)">
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:36%;border-radius:2px 2px 0 0" title="Jun: R$ 142k"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:42%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:48%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:53%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:58%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:64%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:70%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:76%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:82%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:88%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja-cl),var(--laranja));height:93%;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;background:linear-gradient(180deg,var(--laranja),var(--laranja-esc));height:100%;border-radius:2px 2px 0 0;border:1px solid var(--laranja-esc)" title="Mai: R$ 386k"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-family:var(--ui);font-size:9px;color:var(--cinza);margin-top:6px;letter-spacing:.5px">
+              <span>J</span><span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span>D</span><span>J</span><span>F</span><span>M</span><span>A</span><span>M</span>
+            </div>
+            <div style="margin-top:14px;display:flex;justify-content:space-between;font-family:var(--ui);font-size:12px;padding-top:14px;border-top:1px solid var(--cinza-cl)">
+              <span style="color:var(--cinza)">Início: R$ 142k</span>
+              <span style="color:var(--verde);font-weight:600">+172% em 12 meses</span>
+              <span style="color:var(--marinho);font-family:var(--serif);font-style:italic">R$ 386k</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Fase 5 — Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-dash">⌂ Visão Geral Oi Nora</option>
+    <option value="t-empresas">🏢 Empresas-Clientes (CRM)</option>
+    <option value="t-empresa-detalhe">◉ Ficha da Aurora</option>
+    <option value="t-vagas-master">▤ Todas as Vagas (87)</option>
+    <option value="t-banco-master">◆ Banco Master de Talentos</option>
+    <option value="t-inbox">✉ Inbox Unificada</option>
+    <option value="t-recrutadores">👥 Time de Recrutadoras</option>
+    <option value="t-comissoes">💸 Metas &amp; Comissões</option>
+    <option value="t-pipeline-com">📊 Pipeline Comercial</option>
+    <option value="t-faturamento">💰 Faturamento & Contratos</option>
+    <option value="t-analytics">📈 Analytics Master</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+</script>
+</body>
+</html>

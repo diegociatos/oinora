@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Gerenciar Usuários (Construtora Aurora)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-perigo{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .btn-perigo:hover{background:var(--vermelho);color:white}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.5}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:18px}
+  .topbar h1{font-size:30px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .topbar h1 em{color:var(--laranja);font-style:italic}
+  .topbar .topbar-meta{font-family:var(--ui);font-size:12.5px;color:var(--cinza);margin-top:5px}
+
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  /* CARDS */
+  .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .card{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .card-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:10px}
+  .card-valor{font-size:28px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.3px}
+  .card-valor em{color:var(--laranja);font-style:italic}
+  .card-valor span{font-size:13px;color:var(--cinza)}
+  .card-delta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:8px;letter-spacing:.3px}
+
+  /* ABAS */
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:22px;overflow-x:auto}
+  .aba{padding:11px 20px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap;display:flex;gap:6px;align-items:center}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .aba .cnt{background:var(--cinza-fundo);font-size:10px;padding:1px 8px;border-radius:10px;letter-spacing:.3px;font-weight:700}
+  .aba.ativa .cnt{background:var(--laranja);color:white}
+
+  /* PAINEL */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px}
+
+  /* FILTROS */
+  .filtros-bar{background:var(--branco);border:1px solid var(--cinza-cl);padding:14px 18px;border-radius:2px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .filtros-bar input,.filtros-bar select{padding:8px 12px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:13px;color:var(--marinho);border-radius:2px}
+  .filtros-bar .busca{flex:1;min-width:240px;position:relative}
+  .filtros-bar .busca input{width:100%;padding-left:34px}
+  .filtros-bar .busca span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--cinza)}
+
+  /* TABELA USUÁRIOS */
+  .tabela{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden}
+  .tab-linha{padding:14px 22px;border-bottom:1px solid var(--cinza-cl);display:grid;grid-template-columns:2fr 1.8fr 1.6fr 1fr auto;gap:14px;align-items:center;transition:background .15s}
+  .tab-linha:hover{background:var(--cinza-fundo)}
+  .tab-linha:last-child{border-bottom:none}
+  .tab-linha.head{background:var(--cinza-fundo);font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700}
+  .tab-linha.head:hover{background:var(--cinza-fundo)}
+  .tab-pessoa{display:flex;align-items:center;gap:12px;min-width:0}
+  .tab-av{width:38px;height:38px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:14px;flex-shrink:0;font-weight:600;position:relative}
+  .tab-av .estado{position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;border-radius:50%;border:2px solid var(--branco)}
+  .estado-active{background:var(--verde)}
+  .estado-pending{background:var(--amarelo)}
+  .estado-suspended{background:var(--cinza)}
+  .estado-alumni{background:var(--roxo)}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .tab-nome{font-size:14px;font-weight:500;line-height:1.2;display:flex;align-items:center;gap:8px}
+  .tab-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .tab-papeis{display:flex;flex-wrap:wrap;gap:4px}
+  .papel-tag{font-family:var(--ui);font-size:10px;padding:3px 8px;border-radius:12px;font-weight:600;letter-spacing:.3px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+  .pt-owner{background:var(--marinho);color:white}
+  .pt-admin{background:#EEF1F6;color:var(--marinho);border:1px solid var(--marinho)}
+  .pt-recruiter{background:var(--branco);color:var(--marinho-med);border:1px solid var(--marinho-med)}
+  .pt-hr-ops{background:var(--branco);color:var(--cinza);border:1px solid var(--cinza-cl)}
+  .pt-employee{background:var(--verde-cl);color:var(--verde);border:1px solid var(--verde)}
+  .pt-leader{background:var(--amarelo-cl);color:#876715;border:1px solid var(--amarelo)}
+  .pt-approver{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .tab-estado{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px}
+  .tab-acoes{display:flex;gap:4px}
+
+  /* TAGS */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+
+  /* ALERT BANNER */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.5}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* DETALHE / EDITOR (Tela 3) */
+  .editor-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+
+  .ficha-pessoa{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px}
+  .ficha-head{display:flex;gap:16px;align-items:center;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--cinza-cl)}
+  .ficha-av{width:64px;height:64px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:26px;font-weight:600;flex-shrink:0}
+  .ficha-nome{font-size:22px;font-weight:400;letter-spacing:-.2px}
+  .ficha-cargo{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .ficha-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+
+  .campo{margin-bottom:18px}
+  .campo label{display:block;font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--marinho-med);margin-bottom:6px;font-weight:600}
+  .campo input,.campo select{width:100%;padding:10px 12px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;color:var(--marinho);border-radius:2px}
+  .campo-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  /* SELETORES DE PAPEL */
+  .papel-seletor{display:flex;flex-direction:column;gap:10px}
+  .papel-opt{padding:14px;border:1px solid var(--cinza-cl);border-radius:2px;background:var(--branco);cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:all .15s}
+  .papel-opt:hover{border-color:var(--marinho)}
+  .papel-opt.selecionado{border-color:var(--laranja);background:var(--laranja-cl);box-shadow:0 0 0 3px rgba(232,99,58,.08)}
+  .papel-opt.desabilitado{opacity:.4;cursor:not-allowed;background:var(--cinza-fundo)}
+  .papel-opt input{margin-top:3px;width:16px;height:16px;accent-color:var(--laranja);flex-shrink:0}
+  .papel-opt-info{flex:1;min-width:0}
+  .papel-opt-titulo{font-size:14px;font-weight:500;display:flex;gap:8px;align-items:center}
+  .papel-opt-codigo{font-family:'SF Mono','Monaco',monospace;font-size:10px;color:var(--cinza);background:var(--cinza-fundo);padding:1px 6px;border-radius:2px}
+  .papel-opt-desc{font-family:var(--ui);font-size:11.5px;color:var(--cinza);line-height:1.5;margin-top:4px}
+
+  /* PROPRIEDADES (líder, aprovador) */
+  .prop-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--cinza-cl);font-family:var(--ui);font-size:13px}
+  .prop-row:last-child{border:none}
+  .prop-row .info{flex:1}
+  .prop-row .titulo-row{font-weight:600;color:var(--marinho);margin-bottom:2px}
+  .prop-row .sub-row{font-size:11px;color:var(--cinza)}
+  .toggle{position:relative;width:42px;height:22px;background:var(--cinza-cl);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0}
+  .toggle::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:white;border-radius:50%;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+  .toggle.ativo{background:var(--laranja)}
+  .toggle.ativo::after{transform:translateX(20px)}
+
+  /* RESUMO PERMISSÕES */
+  .resumo-permissoes{background:var(--marinho);color:var(--papel);padding:20px;border-radius:2px;position:relative;overflow:hidden}
+  .resumo-permissoes::before{content:"";position:absolute;top:-50%;right:-20%;width:280px;height:280px;background:radial-gradient(circle,rgba(232,99,58,.12) 0%,transparent 65%);pointer-events:none}
+  .resumo-permissoes h4{font-size:14px;font-weight:500;color:var(--papel);margin-bottom:14px;position:relative;display:flex;align-items:center;gap:8px}
+  .perm-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-family:var(--ui);font-size:12px;position:relative}
+  .perm-ic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+  .perm-ic.sim{background:rgba(45,125,90,.3);color:#7FCB9F}
+  .perm-ic.nao{background:rgba(196,69,69,.2);color:#FF9A9A}
+  .perm-texto{opacity:.85}
+  .perm-row.sim .perm-texto{opacity:1}
+  .perm-row.nao .perm-texto{opacity:.6;text-decoration:line-through}
+
+  /* CONVITE (Tela 2) */
+  .form-convite{max-width:680px;margin:0 auto}
+  .alert-dica{background:var(--laranja-cl);border-left:3px solid var(--laranja);padding:14px 18px;border-radius:2px;font-family:var(--ui);font-size:13px;color:var(--marinho);line-height:1.55;margin-bottom:24px}
+
+  .canal-grade{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .canal-opt{padding:12px 14px;border:1px solid var(--cinza-cl);border-radius:2px;background:var(--branco);cursor:pointer;display:flex;gap:10px;align-items:center;font-size:13px;transition:all .15s}
+  .canal-opt:hover{border-color:var(--marinho)}
+  .canal-opt.ativo{border-color:var(--laranja);background:var(--laranja-cl)}
+  .canal-opt input{width:14px;height:14px;accent-color:var(--laranja)}
+
+  /* RODAPÉ DE AÇÕES */
+  .acoes-rodape{position:sticky;bottom:0;background:var(--branco);border-top:1px solid var(--cinza-cl);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;margin:24px -36px -60px;font-family:var(--ui);font-size:12px;color:var(--cinza)}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:260px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1000px){
+    .cards-grid{grid-template-columns:repeat(2,1fr)}
+    .editor-grid{grid-template-columns:1fr}
+    .tab-linha{grid-template-columns:1fr;gap:8px;padding:12px 16px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: LISTA DE USUÁRIOS -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-usuarios-lista">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item ativo"><span class="ic">🔐</span> Usuários &amp; Papéis</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb">Configurações &gt; <a>Usuários &amp; Papéis</a></div>
+      <div class="topbar">
+        <div>
+          <h1>Usuários &amp; <em>Papéis</em></h1>
+          <p class="topbar-meta">Quem tem acesso à plataforma da Aurora · 142 cadastrados · LGPD: todos com termos aceitos</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar lista</button>
+          <button class="btn btn-fantasma btn-sm">📋 Política de papéis</button>
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-convidar')">+ Convidar usuário</button>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-titulo">Usuários ativos</div>
+          <div class="card-valor"><em>134</em></div>
+          <div class="card-delta">+8 nos últimos 30d</div>
+        </div>
+        <div class="card" style="border-color:var(--amarelo);background:var(--amarelo-cl)">
+          <div class="card-titulo" style="color:#876715">Convites pendentes</div>
+          <div class="card-valor" style="color:#876715"><em>6</em></div>
+          <div class="card-delta" style="color:#876715">3 expiram em 48h</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Administradores</div>
+          <div class="card-valor"><em>3</em></div>
+          <div class="card-delta">1 Owner + 2 Admins</div>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Alumni (ex-empregados)</div>
+          <div class="card-valor"><em>11</em></div>
+          <div class="card-delta">acesso limitado · só dados próprios</div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa">Todos <span class="cnt">142</span></div>
+        <div class="aba">Administrativo <span class="cnt">8</span></div>
+        <div class="aba">Empregados <span class="cnt">128</span></div>
+        <div class="aba">Líderes <span class="cnt">14</span></div>
+        <div class="aba">Convites <span class="cnt">6</span></div>
+        <div class="aba">Alumni <span class="cnt">11</span></div>
+      </div>
+
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🔒</span>
+        <div>
+          <strong>Lembrete de segurança</strong>
+          Apenas <strong style="color:var(--laranja)">você (Owner)</strong> e <strong style="color:var(--laranja)">Carla Aurora (Admin)</strong> podem alterar papéis. Todas as alterações são registradas em auditoria. Pessoas com papéis administrativos têm autenticação em 2 fatores recomendada.
+        </div>
+      </div>
+
+      <div class="filtros-bar">
+        <div class="busca">
+          <span>⌕</span>
+          <input placeholder="Buscar por nome, e-mail ou departamento..."/>
+        </div>
+        <select><option>Todos os papéis</option><option>Owner</option><option>Admin</option><option>Recrutador</option><option>HR Ops</option><option>Empregado</option></select>
+        <select><option>Todos os estados</option><option>Active</option><option>Pending</option><option>Suspended</option><option>Alumni</option></select>
+        <select><option>Todos os departamentos</option><option>Engenharia</option><option>Operações</option><option>Financeiro</option><option>Comercial</option></select>
+        <select><option>Ordenar: + recente</option><option>A-Z</option><option>Último acesso</option></select>
+      </div>
+
+      <div class="tabela">
+        <div class="tab-linha head">
+          <div>Pessoa</div>
+          <div>Papéis</div>
+          <div>Propriedades</div>
+          <div>Último acesso</div>
+          <div></div>
+        </div>
+
+        <!-- ROBERTO - OWNER -->
+        <div class="tab-linha" style="background:var(--laranja-cl)" onclick="irPara('t-editar-papeis')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-b">RA<span class="estado estado-active"></span></div>
+            <div>
+              <div class="tab-nome">Roberto Aurora <span class="tag laranja" style="font-size:9px">VOCÊ</span></div>
+              <div class="tab-meta">roberto@construtoraaurora.com.br · Dir. RH</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-owner">⭐ Owner</span>
+            <span class="papel-tag pt-employee">👷 Employee</span>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-leader">⊕ Líder (RH · 2)</span>
+          </div>
+          <div class="tab-estado">Agora · Active ●</div>
+          <div class="tab-acoes">
+            <button class="btn btn-fantasma btn-xs">⋮</button>
+          </div>
+        </div>
+
+        <!-- CARLA - ADMIN -->
+        <div class="tab-linha" onclick="irPara('t-editar-papeis')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-c">CA<span class="estado estado-active"></span></div>
+            <div>
+              <div class="tab-nome">Carla Aurora</div>
+              <div class="tab-meta">carla@construtoraaurora.com.br · Coord. RH</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-admin">🛡 Admin</span>
+            <span class="papel-tag pt-employee">👷 Employee</span>
+          </div>
+          <div class="tab-papeis"></div>
+          <div class="tab-estado">há 12min · Active ●</div>
+          <div class="tab-acoes"><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <!-- LUÍSA - LÍDER -->
+        <div class="tab-linha" onclick="irPara('t-editar-papeis')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-b">LM<span class="estado estado-active"></span></div>
+            <div>
+              <div class="tab-nome">Luísa Mendonça</div>
+              <div class="tab-meta">luisa@construtoraaurora.com.br · Dir. Engenharia</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-employee">👷 Employee</span>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-leader">⊕ Líder (Eng · 6)</span>
+            <span class="papel-tag pt-approver" style="font-size:9px">⊕ Aprov. férias</span>
+          </div>
+          <div class="tab-estado">há 1h · Active ●</div>
+          <div class="tab-acoes"><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <!-- EDUARDO - APROVADOR FINANCEIRO -->
+        <div class="tab-linha" onclick="irPara('t-editar-papeis')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-c">ES<span class="estado estado-active"></span></div>
+            <div>
+              <div class="tab-nome">Eduardo Santos</div>
+              <div class="tab-meta">eduardo@construtoraaurora.com.br · Dir. Financeiro</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-employee">👷 Employee</span>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-leader">⊕ Líder (Fin · 22)</span>
+            <span class="papel-tag pt-approver" style="font-size:9px">⊕ Offer Approver R$ 50k</span>
+          </div>
+          <div class="tab-estado">há 3h · Active ●</div>
+          <div class="tab-acoes"><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <!-- TIAGO - RECRUTADOR INTERNO -->
+        <div class="tab-linha" onclick="irPara('t-editar-papeis')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-d">TF<span class="estado estado-active"></span></div>
+            <div>
+              <div class="tab-nome">Tiago Ferreira</div>
+              <div class="tab-meta">tiago@construtoraaurora.com.br · Analista R&amp;S</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-recruiter">🎯 Recrutador</span>
+            <span class="papel-tag pt-employee">👷 Employee</span>
+          </div>
+          <div class="tab-papeis"></div>
+          <div class="tab-estado">há 5h · Active ●</div>
+          <div class="tab-acoes"><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <!-- BRUNA - HR OPS -->
+        <div class="tab-linha" onclick="irPara('t-editar-papeis')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-e">BL<span class="estado estado-active"></span></div>
+            <div>
+              <div class="tab-nome">Bruna Lima</div>
+              <div class="tab-meta">bruna@construtoraaurora.com.br · Analista DP</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-hr-ops">📋 HR Ops</span>
+            <span class="papel-tag pt-employee">👷 Employee</span>
+          </div>
+          <div class="tab-papeis"></div>
+          <div class="tab-estado">há 8h · Active ●</div>
+          <div class="tab-acoes"><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <!-- FERNANDO - EMPREGADO PURO -->
+        <div class="tab-linha" onclick="irPara('t-editar-papeis')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-a">F<span class="estado estado-active"></span></div>
+            <div>
+              <div class="tab-nome">Fernando Lacerda Costa</div>
+              <div class="tab-meta">fernando.lacerda@construtoraaurora.com.br · Eng. Civil Sr</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-employee">👷 Employee</span>
+          </div>
+          <div class="tab-papeis">
+            <span style="font-family:var(--ui);font-size:10px;color:var(--cinza);font-style:italic">— sem propriedades extras</span>
+          </div>
+          <div class="tab-estado">há 2h · Active ●</div>
+          <div class="tab-acoes"><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+        <!-- CONVITE PENDENTE -->
+        <div class="tab-linha" style="background:var(--amarelo-cl)">
+          <div class="tab-pessoa">
+            <div class="tab-av av-f" style="opacity:.6">PM<span class="estado estado-pending"></span></div>
+            <div>
+              <div class="tab-nome" style="color:var(--cinza)">Paula Marques <span class="tag amarelo" style="font-size:9px">⏳ PENDENTE</span></div>
+              <div class="tab-meta">paula@construtoraaurora.com.br · convidada por Roberto há 2 dias</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag pt-admin" style="opacity:.6">🛡 Admin</span>
+          </div>
+          <div class="tab-papeis">
+            <span style="font-family:var(--ui);font-size:10px;color:#876715">⚠ Expira em 5 dias</span>
+          </div>
+          <div class="tab-estado" style="color:#876715">Não ativou</div>
+          <div class="tab-acoes">
+            <button class="btn btn-fantasma btn-xs">↻ Reenviar</button>
+            <button class="btn btn-fantasma btn-xs">⋮</button>
+          </div>
+        </div>
+
+        <!-- ALUMNI -->
+        <div class="tab-linha" style="opacity:.7">
+          <div class="tab-pessoa">
+            <div class="tab-av av-d">JS<span class="estado estado-alumni"></span></div>
+            <div>
+              <div class="tab-nome" style="color:var(--cinza)">João Sampaio</div>
+              <div class="tab-meta">Eng. Civil · saiu em 14/03/2026</div>
+            </div>
+          </div>
+          <div class="tab-papeis">
+            <span class="papel-tag" style="background:var(--roxo-cl);color:var(--roxo);border:1px solid var(--roxo)">📁 Alumni</span>
+          </div>
+          <div class="tab-papeis">
+            <span style="font-family:var(--ui);font-size:10px;color:var(--cinza)">acesso só aos próprios holerites</span>
+          </div>
+          <div class="tab-estado">há 23 dias</div>
+          <div class="tab-acoes"><button class="btn btn-fantasma btn-xs">⋮</button></div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;margin-top:24px;padding:14px;font-family:var(--ui);font-size:12px;color:var(--cinza)">Mostrando 8 de 142 · <a style="color:var(--laranja)">Carregar mais</a></div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: CONVIDAR USUÁRIO -->
+<!-- ============================================== -->
+<div class="tela" id="t-convidar">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item ativo" onclick="irPara('t-usuarios-lista')"><span class="ic">🔐</span> Usuários &amp; Papéis</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-usuarios-lista')">Usuários &amp; Papéis</a> &gt; <span style="color:var(--laranja)">Convidar usuário</span></div>
+      <div class="topbar">
+        <div>
+          <h1>Convidar <em>novo usuário</em></h1>
+          <p class="topbar-meta">A pessoa receberá um link por e-mail · primeiro acesso configura senha · você define os papéis</p>
+        </div>
+      </div>
+
+      <div class="form-convite">
+
+        <div class="alert-dica">
+          <strong>💡 Importando empregado novo?</strong>
+          Se o usuário também é empregado da empresa, ative "Criar registro de empregado" no fim do formulário — assim ele aparece no quadro do RH e na folha automaticamente.
+        </div>
+
+        <div class="painel">
+          <h3>1. Dados da pessoa</h3>
+          <div class="sub-titulo">Identificação básica</div>
+
+          <div class="campo">
+            <label>Nome completo</label>
+            <input value="Paula Marques Souza"/>
+          </div>
+          <div class="campo-grid-2">
+            <div class="campo">
+              <label>E-mail corporativo</label>
+              <input type="email" value="paula@construtoraaurora.com.br"/>
+            </div>
+            <div class="campo">
+              <label>Cargo</label>
+              <input value="Coordenadora de RH"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3>2. Papéis na plataforma</h3>
+          <div class="sub-titulo">Pode marcar mais de um · escolha o menor papel necessário</div>
+
+          <div class="papel-seletor">
+            <label class="papel-opt desabilitado">
+              <input type="radio" name="papel" disabled/>
+              <div class="papel-opt-info">
+                <div class="papel-opt-titulo">⭐ Owner do Tenant <span class="papel-opt-codigo">tenant_owner</span></div>
+                <div class="papel-opt-desc">Só uma pessoa por empresa. Você é o Owner atual. Para transferir, vá em <a style="color:var(--laranja)">"Transferir propriedade"</a>.</div>
+              </div>
+            </label>
+
+            <label class="papel-opt selecionado">
+              <input type="checkbox" checked/>
+              <div class="papel-opt-info">
+                <div class="papel-opt-titulo">🛡 Admin do Tenant <span class="papel-opt-codigo">tenant_admin</span></div>
+                <div class="papel-opt-desc">Configura organograma, salários, papéis menores · acessa todos os módulos · não pode promover Owner.</div>
+              </div>
+            </label>
+
+            <label class="papel-opt">
+              <input type="checkbox"/>
+              <div class="papel-opt-info">
+                <div class="papel-opt-titulo">🎯 Recrutador <span class="papel-opt-codigo">tenant_recruiter</span></div>
+                <div class="papel-opt-desc">Cria vagas, gerencia pipeline, acessa banco de talentos. Não vê folha, ponto, férias, avaliações.</div>
+              </div>
+            </label>
+
+            <label class="papel-opt">
+              <input type="checkbox"/>
+              <div class="papel-opt-info">
+                <div class="papel-opt-titulo">📋 Gestor de Pessoas (HR Ops) <span class="papel-opt-codigo">tenant_hr_ops</span></div>
+                <div class="papel-opt-desc">Processa folha, ajusta ponto, aprova férias, vê fichas. Não recruta nem altera salários.</div>
+              </div>
+            </label>
+
+            <label class="papel-opt selecionado">
+              <input type="checkbox" checked/>
+              <div class="papel-opt-info">
+                <div class="papel-opt-titulo">👷 Empregado <span class="papel-opt-codigo">employee</span></div>
+                <div class="papel-opt-desc">Acesso à própria área (ponto, holerite, férias, avaliação). Recomendado para qualquer pessoa que também é CLT.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3>3. Propriedades extras (opcional)</h3>
+          <div class="sub-titulo">Definidas explicitamente · independente do papel</div>
+
+          <div class="prop-row">
+            <div class="info">
+              <div class="titulo-row">⊕ Aprovador de propostas (offer)</div>
+              <div class="sub-row">Aprova ofertas de contratação acima de determinado valor</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+
+          <div class="prop-row">
+            <div class="info">
+              <div class="titulo-row">⊕ Aprovador de férias</div>
+              <div class="sub-row">Aprova férias de outros empregados (além das do próprio time, se for líder)</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+
+          <div style="margin-top:14px;padding:12px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:11.5px;color:var(--cinza);line-height:1.55">
+            <strong style="color:var(--marinho)">Sobre liderança:</strong> não precisa marcar manualmente. Quem aparece como gestor no organograma vira líder automaticamente.
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3>4. Criar empregado vinculado?</h3>
+          <div class="sub-titulo">Se Paula também trabalhar na Aurora como CLT</div>
+
+          <label class="papel-opt selecionado" style="cursor:pointer">
+            <input type="checkbox" checked/>
+            <div class="papel-opt-info">
+              <div class="papel-opt-titulo">✓ Sim, criar registro de empregada</div>
+              <div class="papel-opt-desc">Você será direcionado para preencher dados de admissão (CPF, salário, departamento) após enviar o convite.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="painel">
+          <h3>5. Como enviar o convite</h3>
+          <div class="sub-titulo">A pessoa precisa abrir o link em 7 dias</div>
+
+          <div class="canal-grade">
+            <label class="canal-opt ativo">
+              <input type="checkbox" checked/>
+              <div>
+                <strong style="font-size:13px">✉ E-mail</strong>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px">Padrão · com magic link de 7 dias</div>
+              </div>
+            </label>
+            <label class="canal-opt">
+              <input type="checkbox"/>
+              <div>
+                <strong style="font-size:13px">💬 WhatsApp</strong>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px">Cópia do link (opcional)</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="campo" style="margin-top:18px">
+            <label>Mensagem personalizada (opcional)</label>
+            <textarea rows="3" style="width:100%;padding:10px 12px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;color:var(--marinho);border-radius:2px" placeholder="Ex: Oi Paula! Bem-vinda à Aurora. Aqui está seu acesso à plataforma. Qualquer dúvida me chama!">Oi Paula! Como combinado, esse é seu acesso à plataforma da Oi Nora. Qualquer dúvida me chama. Bem-vinda!</textarea>
+          </div>
+        </div>
+
+        <div class="alert alert-marinho" style="margin-top:8px">
+          <span class="ic-grande">🔒</span>
+          <div>
+            <strong>LGPD &amp; Auditoria</strong>
+            Ao enviar, o sistema registra: quem convidou, quando, com quais papéis. A pessoa receberá os Termos de Uso e Política de Privacidade no primeiro acesso e precisa aceitar antes de usar a plataforma.
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px">
+          <button class="btn btn-fantasma" onclick="irPara('t-usuarios-lista')">← Cancelar</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-fantasma">Salvar como rascunho</button>
+            <button class="btn btn-primario" onclick="irPara('t-usuarios-lista')">✉ Enviar convite →</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: EDITAR PAPÉIS (FERNANDO) -->
+<!-- ============================================== -->
+<div class="tela" id="t-editar-papeis">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto &amp; Jornada</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha &amp; Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação &amp; PDI</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Analytics Clima</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item ativo" onclick="irPara('t-usuarios-lista')"><span class="ic">🔐</span> Usuários &amp; Papéis</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-usuarios-lista')">Usuários &amp; Papéis</a> &gt; <span style="color:var(--laranja)">Fernando Lacerda</span></div>
+      <div class="topbar">
+        <div>
+          <h1>Editar <em>papéis</em></h1>
+          <p class="topbar-meta">As alterações entram em vigor imediatamente · ficam registradas em auditoria</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm">📜 Histórico de alterações</button>
+          <button class="btn btn-perigo btn-sm">⏸ Suspender acesso</button>
+        </div>
+      </div>
+
+      <div class="editor-grid">
+
+        <!-- COLUNA ESQUERDA -->
+        <div>
+          <div class="ficha-pessoa">
+            <div class="ficha-head">
+              <div class="ficha-av av-a">F</div>
+              <div style="flex:1">
+                <div class="ficha-nome">Fernando Lacerda Costa</div>
+                <div class="ficha-cargo">fernando.lacerda@construtoraaurora.com.br · MAT 0112</div>
+                <div class="ficha-tags">
+                  <span class="tag verde">✓ Active</span>
+                  <span class="tag">4 anos de casa</span>
+                  <span class="tag">Eng. Civil Sr · R$ 12.500</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="painel-header" style="padding-bottom:0;margin-bottom:14px">
+              <div><h3 style="font-size:17px">Papéis atribuídos</h3><div class="sub-titulo">Marque os papéis que Fernando deve ter</div></div>
+            </div>
+
+            <div class="papel-seletor">
+              <label class="papel-opt desabilitado">
+                <input type="checkbox" disabled/>
+                <div class="papel-opt-info">
+                  <div class="papel-opt-titulo">⭐ Owner do Tenant <span class="papel-opt-codigo">tenant_owner</span></div>
+                  <div class="papel-opt-desc">Já existe um Owner (Roberto Aurora). Para transferir, vá em "Transferir propriedade".</div>
+                </div>
+              </label>
+
+              <label class="papel-opt">
+                <input type="checkbox"/>
+                <div class="papel-opt-info">
+                  <div class="papel-opt-titulo">🛡 Admin do Tenant <span class="papel-opt-codigo">tenant_admin</span></div>
+                  <div class="papel-opt-desc">Configura organograma, salários, papéis menores · acessa todos os módulos.</div>
+                </div>
+              </label>
+
+              <label class="papel-opt">
+                <input type="checkbox"/>
+                <div class="papel-opt-info">
+                  <div class="papel-opt-titulo">🎯 Recrutador <span class="papel-opt-codigo">tenant_recruiter</span></div>
+                  <div class="papel-opt-desc">Cria vagas, gerencia pipeline. Não vê folha, ponto, férias.</div>
+                </div>
+              </label>
+
+              <label class="papel-opt">
+                <input type="checkbox"/>
+                <div class="papel-opt-info">
+                  <div class="papel-opt-titulo">📋 Gestor de Pessoas (HR Ops) <span class="papel-opt-codigo">tenant_hr_ops</span></div>
+                  <div class="papel-opt-desc">Processa folha, ajusta ponto, aprova férias.</div>
+                </div>
+              </label>
+
+              <label class="papel-opt selecionado">
+                <input type="checkbox" checked/>
+                <div class="papel-opt-info">
+                  <div class="papel-opt-titulo">👷 Empregado <span class="papel-opt-codigo">employee</span></div>
+                  <div class="papel-opt-desc">Acesso à própria área (ponto, holerite, férias, avaliação).</div>
+                </div>
+              </label>
+            </div>
+
+            <div class="painel-header" style="padding-top:24px;margin-top:24px;border-top:1px solid var(--cinza-cl);margin-bottom:14px;padding-bottom:0">
+              <div><h3 style="font-size:17px">Propriedades extras</h3><div class="sub-titulo">Configurações específicas independentes do papel</div></div>
+            </div>
+
+            <div class="prop-row">
+              <div class="info">
+                <div class="titulo-row">⊕ É Líder</div>
+                <div class="sub-row" style="color:var(--cinza)">Calculado automaticamente · Fernando não tem liderados diretos no organograma</div>
+              </div>
+              <span style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px;text-transform:uppercase;font-weight:600">Auto</span>
+            </div>
+
+            <div class="prop-row">
+              <div class="info">
+                <div class="titulo-row">⊕ Aprovador de propostas (offer)</div>
+                <div class="sub-row">Aprova ofertas de contratação acima de determinado valor</div>
+              </div>
+              <div class="toggle"></div>
+            </div>
+
+            <div class="prop-row">
+              <div class="info">
+                <div class="titulo-row">⊕ Aprovador de despesas</div>
+                <div class="sub-row">Aprova reembolsos e despesas do time</div>
+              </div>
+              <div class="toggle"></div>
+            </div>
+
+            <div class="prop-row">
+              <div class="info">
+                <div class="titulo-row">⊕ Autenticação em 2 fatores (2FA)</div>
+                <div class="sub-row" style="color:var(--cinza)">Recomendado para qualquer papel administrativo</div>
+              </div>
+              <div class="toggle"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- COLUNA DIREITA: RESUMO -->
+        <div>
+          <div class="resumo-permissoes">
+            <h4>👁 O que Fernando pode fazer agora</h4>
+            <div class="perm-row sim"><div class="perm-ic sim">✓</div><div class="perm-texto">Bater o próprio ponto</div></div>
+            <div class="perm-row sim"><div class="perm-ic sim">✓</div><div class="perm-texto">Solicitar férias</div></div>
+            <div class="perm-row sim"><div class="perm-ic sim">✓</div><div class="perm-texto">Ver os próprios holerites</div></div>
+            <div class="perm-row sim"><div class="perm-ic sim">✓</div><div class="perm-texto">Responder autoavaliação</div></div>
+            <div class="perm-row sim"><div class="perm-ic sim">✓</div><div class="perm-texto">Avaliar pares (quando designado)</div></div>
+            <div class="perm-row sim"><div class="perm-ic sim">✓</div><div class="perm-texto">Editar PDI próprio</div></div>
+            <div class="perm-row sim"><div class="perm-ic sim">✓</div><div class="perm-texto">Conversar com RH no chat</div></div>
+            <div class="perm-row nao"><div class="perm-ic nao">✕</div><div class="perm-texto">Ver ficha de outros empregados</div></div>
+            <div class="perm-row nao"><div class="perm-ic nao">✕</div><div class="perm-texto">Aprovar férias de outros</div></div>
+            <div class="perm-row nao"><div class="perm-ic nao">✕</div><div class="perm-texto">Configurar a empresa</div></div>
+            <div class="perm-row nao"><div class="perm-ic nao">✕</div><div class="perm-texto">Criar vagas ou ver banco de talentos</div></div>
+            <div class="perm-row nao"><div class="perm-ic nao">✕</div><div class="perm-texto">Ver folha consolidada</div></div>
+          </div>
+
+          <div class="painel" style="margin-top:14px;background:var(--cinza-fundo)">
+            <h3 style="font-size:15px">📜 Últimas alterações</h3>
+            <div class="sub-titulo">Auditoria do usuário</div>
+            <div style="font-family:var(--ui);font-size:11.5px;line-height:1.65;color:var(--cinza)">
+              <div style="padding:8px 0;border-bottom:1px solid var(--cinza-cl)">
+                <strong style="color:var(--marinho)">15/05/2026 14:32 · Roberto Aurora</strong><br>
+                Adicionou papel <span class="papel-tag pt-employee" style="font-size:9px">👷 employee</span>
+              </div>
+              <div style="padding:8px 0;border-bottom:1px solid var(--cinza-cl)">
+                <strong style="color:var(--marinho)">22/04/2022 09:14 · Sistema</strong><br>
+                Conta criada via convite enviado por João Aurora
+              </div>
+            </div>
+          </div>
+
+          <div class="painel" style="margin-top:14px;background:var(--vermelho-cl);border-color:var(--vermelho)">
+            <h3 style="font-size:15px;color:var(--vermelho)">⚠ Zona perigosa</h3>
+            <div class="sub-titulo" style="color:var(--vermelho)">Ações irreversíveis</div>
+            <button class="btn btn-perigo btn-sm" style="width:100%;justify-content:center;margin-bottom:8px">⏸ Suspender acesso temporariamente</button>
+            <button class="btn btn-perigo btn-sm" style="width:100%;justify-content:center">📁 Desligar (converter em Alumni)</button>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--vermelho);margin-top:10px;line-height:1.5">Suspender mantém os dados e permite reativar. Desligar bloqueia acesso operacional mas mantém holerites e histórico por 5 anos (obrigação legal).</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="acoes-rodape">
+        <div>
+          <strong style="color:var(--marinho)">Alterado: 1 papel marcado, 0 desmarcados, 1 propriedade alterada.</strong><br>
+          As mudanças serão salvas e o usuário notificado por e-mail.
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-usuarios-lista')">Cancelar</button>
+          <button class="btn btn-primario btn-sm">✓ Salvar alterações</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Gerenciar Usuários — Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-usuarios-lista">🔐 Lista de Usuários</option>
+    <option value="t-convidar">✉ Convidar Usuário</option>
+    <option value="t-editar-papeis">⚙ Editar Papéis (Fernando)</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+
+// Toggles
+document.querySelectorAll('.toggle').forEach(t=>{
+  t.addEventListener('click',function(){this.classList.toggle('ativo')});
+});
+
+// Cards de papéis (visual)
+document.querySelectorAll('.papel-opt').forEach(o=>{
+  o.addEventListener('click',function(e){
+    if(this.classList.contains('desabilitado')) return;
+    if(e.target.tagName!=='INPUT'){
+      const inp = this.querySelector('input');
+      if(inp && !inp.disabled){
+        inp.checked = !inp.checked;
+      }
+    }
+    setTimeout(()=>{
+      const inp = this.querySelector('input');
+      if(inp && inp.checked) this.classList.add('selecionado');
+      else this.classList.remove('selecionado');
+    },0);
+  });
+});
+</script>
+</body>
+</html>

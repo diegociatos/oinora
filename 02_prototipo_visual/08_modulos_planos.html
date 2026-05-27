@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Módulos & Pacotes</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL · CONSOLE OI NORA (igual fase 5) */
+  .app-shell{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+  .sidebar{background:linear-gradient(180deg,var(--marinho-esc),var(--marinho));color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:24px;padding:0 28px 4px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-selo{padding:8px 28px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px}
+  .sidebar-selo .selo{display:inline-flex;align-items:center;gap:6px;background:var(--laranja);color:white;padding:4px 10px;border-radius:2px;font-family:var(--ui);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+  .sidebar-selo .selo::before{content:"●";font-size:8px}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:20px 28px 8px;font-weight:600}
+  .sidebar-item{padding:10px 28px;font-size:14px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:15px;width:18px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:16px 28px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.25)}
+  .sidebar-perfil .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:16px}
+  .sidebar-perfil .nome{font-size:13px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:10px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  /* SHELL · EMPRESA (igual fase 3) */
+  .app-shell-empresa .sidebar{background:var(--marinho)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-empresa .plano-tag{display:inline-block;font-family:var(--ui);font-size:9px;letter-spacing:1.5px;background:rgba(232,99,58,.15);color:var(--laranja);padding:2px 8px;border-radius:2px;margin-top:6px;font-weight:700;text-transform:uppercase}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:18px;flex-wrap:wrap}
+  .topbar h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .topbar h1 em{color:var(--laranja);font-style:italic}
+  .topbar .topbar-meta{font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:6px}
+  .topbar-acoes{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  /* PAINEL */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+
+  /* TAGS */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  /* ===== HEADER DA EMPRESA ===== */
+  .empresa-header{background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}
+  .empresa-logo{width:72px;height:72px;border-radius:4px;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:30px;font-weight:600;background:linear-gradient(135deg,#E8633A,#C94E28);flex-shrink:0}
+  .empresa-info h2{font-size:26px;font-weight:400;letter-spacing:-.2px;margin-bottom:4px}
+  .empresa-info .meta{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px;margin-bottom:10px}
+  .empresa-tags{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* ===== ALERT ===== */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none}
+  .alert-laranja{background:var(--laranja-cl);border-left:3px solid var(--laranja);color:var(--marinho)}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert .ic-grande{font-size:22px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* ===== PLANOS ===== */
+  .planos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+  .plano-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:20px;cursor:pointer;transition:all .15s;position:relative}
+  .plano-card:hover{border-color:var(--marinho)}
+  .plano-card.atual{border:2px solid var(--laranja);background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl))}
+  .plano-card.atual::before{content:"PLANO ATUAL";position:absolute;top:-10px;right:14px;background:var(--laranja);color:white;font-family:var(--ui);font-size:9px;letter-spacing:1.5px;padding:3px 10px;border-radius:2px;font-weight:700}
+  .plano-cabeca{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:4px}
+  .plano-nome{font-size:22px;font-weight:400;letter-spacing:-.2px}
+  .plano-preco{font-family:var(--serif);font-style:italic;font-size:30px;color:var(--marinho);margin-top:8px;line-height:1}
+  .plano-preco em{color:var(--laranja)}
+  .plano-preco span{font-size:13px;color:var(--cinza);font-style:normal}
+  .plano-target{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;padding-top:6px;border-top:1px solid var(--cinza-cl);line-height:1.55}
+  .plano-incluso{font-family:var(--ui);font-size:12px;line-height:1.7;margin-top:12px;color:var(--marinho-med)}
+
+  /* ===== MÓDULO ===== */
+  .modulos-secao{margin-bottom:24px}
+  .secao-titulo{font-family:var(--ui);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--marinho);font-weight:700;display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .secao-titulo::after{content:"";flex:1;height:1px;background:var(--cinza-cl)}
+  .secao-sub{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:14px;line-height:1.55;max-width:680px}
+
+  .modulos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+
+  .modulo{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:flex-start;transition:all .15s}
+  .modulo:hover{border-color:var(--marinho-med)}
+  .modulo.ativo{border-left:3px solid var(--verde);background:linear-gradient(135deg,var(--branco) 88%,var(--verde-cl))}
+  .modulo.inativo{opacity:.85}
+  .modulo.core{border-left:3px solid var(--marinho);background:linear-gradient(135deg,var(--branco) 88%,#EEF1F6)}
+  .modulo.extra{border-left:3px solid var(--laranja);background:linear-gradient(135deg,var(--branco) 70%,var(--laranja-cl))}
+
+  .modulo-ic{width:46px;height:46px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--cinza-fundo);border:1px solid var(--cinza-cl)}
+  .modulo.ativo .modulo-ic{background:var(--verde-cl);border-color:var(--verde);color:var(--verde)}
+  .modulo.core .modulo-ic{background:#EEF1F6;border-color:var(--marinho);color:var(--marinho)}
+  .modulo.extra .modulo-ic{background:var(--laranja-cl);border-color:var(--laranja);color:var(--laranja)}
+
+  .modulo-corpo{min-width:0}
+  .modulo-titulo{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+  .modulo-nome{font-size:15px;font-weight:500;line-height:1.2}
+  .modulo-codigo{font-family:'SF Mono','Monaco',monospace;font-size:10px;color:var(--cinza);background:var(--cinza-fundo);padding:1px 6px;border-radius:2px}
+  .modulo-desc{font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.55;margin-top:2px}
+  .modulo-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center}
+  .modulo-meta .tag{font-size:10px;padding:2px 7px}
+  .modulo-preco{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px}
+  .modulo-preco strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:14px;font-weight:400}
+  .modulo-acao{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+
+  /* TOGGLE */
+  .toggle{position:relative;width:42px;height:22px;background:var(--cinza-cl);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0}
+  .toggle::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:white;border-radius:50%;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+  .toggle.ativo{background:var(--verde)}
+  .toggle.ativo::after{transform:translateX(20px)}
+  .toggle.bloqueado{background:var(--marinho);cursor:not-allowed;opacity:.7}
+  .toggle.bloqueado::after{transform:translateX(20px);background:var(--marinho-med)}
+
+  /* RESUMO FATURA · sticky */
+  .resumo-fatura{position:sticky;top:24px;background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);padding:24px;border-radius:2px;position:relative;overflow:hidden}
+  .resumo-fatura::before{content:"";position:absolute;top:-40%;right:-15%;width:280px;height:280px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .resumo-fatura h4{font-size:16px;font-weight:500;color:var(--papel);margin-bottom:4px;position:relative}
+  .resumo-fatura .sub{font-family:var(--ui);font-size:11px;opacity:.6;letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:18px;position:relative}
+  .fatura-linha{display:flex;justify-content:space-between;padding:8px 0;font-family:var(--ui);font-size:12.5px;border-bottom:1px solid rgba(255,255,255,.08);position:relative;opacity:.85}
+  .fatura-linha.destaque{opacity:1;padding-top:14px;border-bottom:none;margin-top:8px;border-top:1px solid rgba(255,255,255,.15)}
+  .fatura-linha.destaque .valor{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--laranja)}
+  .fatura-linha.adicional{color:var(--laranja);opacity:1}
+  .fatura-linha .label{flex:1}
+  .fatura-linha .valor{font-weight:600;color:var(--papel)}
+  .fatura-rodape{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);font-family:var(--ui);font-size:11px;opacity:.6;line-height:1.6;position:relative}
+
+  /* GRID LAYOUT */
+  .layout-com-sidebar{display:grid;grid-template-columns:1fr 320px;gap:20px}
+
+  /* ===== TELA 2: UPGRADE PROMPT (visão do cliente) ===== */
+  .upgrade-wrapper{max-width:780px;margin:80px auto;padding:0 20px}
+  .upgrade-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:48px;text-align:center;position:relative;overflow:hidden}
+  .upgrade-icone{font-size:64px;margin-bottom:24px}
+  .upgrade-titulo{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.2;margin-bottom:14px}
+  .upgrade-titulo em{color:var(--laranja);font-style:italic}
+  .upgrade-sub{font-family:var(--ui);font-size:14px;color:var(--cinza);line-height:1.6;max-width:520px;margin:0 auto 30px}
+  .upgrade-features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:30px 0;text-align:left}
+  .upgrade-feat{padding:16px;background:var(--cinza-fundo);border-radius:2px;border-left:3px solid var(--laranja)}
+  .upgrade-feat h5{font-size:13px;font-weight:600;margin-bottom:4px}
+  .upgrade-feat p{font-family:var(--ui);font-size:11px;color:var(--cinza);line-height:1.5}
+  .upgrade-acoes{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+  .upgrade-info{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:20px;padding-top:20px;border-top:1px solid var(--cinza-cl);letter-spacing:.3px}
+
+  /* ===== TELA 3: VISÃO DO CLIENTE ESSENCIAL ===== */
+  .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .demo-card-grande{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:4px;padding:0;overflow:hidden;position:relative}
+  .demo-card-head{padding:16px 20px;background:var(--marinho);color:white;display:flex;justify-content:space-between;align-items:center}
+  .demo-card-head h4{font-size:14px;font-weight:500;letter-spacing:.5px}
+  .demo-card-head .plano-pill{background:var(--laranja);color:white;font-family:var(--ui);font-size:9px;padding:2px 8px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;border-radius:2px}
+  .demo-sidebar-preview{padding:14px 0;background:var(--marinho);color:var(--papel);min-height:480px}
+  .demo-sb-item{padding:8px 20px;font-family:var(--ui);font-size:12px;display:flex;align-items:center;gap:10px;border-left:3px solid transparent}
+  .demo-sb-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .demo-sb-item .ic{font-size:13px;width:14px;text-align:center;opacity:.85}
+  .demo-sb-secao{padding:14px 20px 4px;font-family:var(--ui);font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.4);text-transform:uppercase;font-weight:600}
+  .demo-sb-bloqueado{opacity:.35;font-style:italic}
+  .demo-sb-bloqueado .lock-ic{margin-left:auto;font-size:10px}
+
+  /* ===== ALERT FOOTER ===== */
+  .acoes-rodape{position:sticky;bottom:0;background:var(--branco);border-top:1px solid var(--cinza-cl);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;margin:24px -36px -60px;gap:14px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,.05)}
+  .acoes-info{font-family:var(--ui);font-size:12px;color:var(--cinza);flex:1}
+  .acoes-info strong{color:var(--marinho)}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:80px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:280px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1100px){
+    .modulos-grid{grid-template-columns:1fr}
+    .planos-grid{grid-template-columns:1fr}
+    .layout-com-sidebar{grid-template-columns:1fr}
+    .upgrade-features{grid-template-columns:1fr}
+    .demo-grid{grid-template-columns:1fr}
+    .empresa-header{grid-template-columns:1fr;text-align:center}
+    .empresa-logo{margin:0 auto}
+    .empresa-tags{justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: CONFIGURAR MÓDULOS DO CLIENTE -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-config-modulos">
+  <div class="app-shell">
+
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-selo"><span class="selo">CONSOLE INTERNO</span></div>
+      <div class="sidebar-secao">Operação</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresas-Clientes</div>
+      <div class="sidebar-item ativo"><span class="ic">⚙</span> Módulos &amp; Planos</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Todas as Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco Master</div>
+      <div class="sidebar-item outro"><span class="ic">✉</span> Inbox Unificada</div>
+      <div class="sidebar-secao">Time</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Recrutadores</div>
+      <div class="sidebar-item outro"><span class="ic">💸</span> Metas &amp; Comissões</div>
+      <div class="sidebar-secao">Comercial</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Pipeline Comercial</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Faturamento</div>
+      <div class="sidebar-secao">Inteligência</div>
+      <div class="sidebar-item outro"><span class="ic">📈</span> Analytics Master</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Catálogo de Módulos</div>
+      <div class="sidebar-perfil"><div class="av">CV</div><div><div class="nome">Cláudia Vasconcelos</div><div class="cargo">CEO · Oi Nora</div></div></div>
+    </aside>
+
+    <main class="app-main">
+
+      <div class="breadcrumb">Empresas-Clientes &gt; <a>Construtora Aurora</a> &gt; <span style="color:var(--laranja)">Módulos &amp; Plano</span></div>
+
+      <div class="topbar">
+        <div>
+          <h1>Configurar <em>módulos</em> · Construtora Aurora</h1>
+          <p class="topbar-meta">15 módulos disponíveis · 4 obrigatórios · plano atual Premium · cliente há 3 anos · 128 empregados</p>
+        </div>
+        <div class="topbar-acoes">
+          <button class="btn btn-fantasma btn-sm">📜 Histórico de mudanças</button>
+          <button class="btn btn-fantasma btn-sm">📋 Ver catálogo completo</button>
+          <button class="btn btn-marinho btn-sm" onclick="irPara('t-sidebar-essencial')">👁 Como o cliente vê</button>
+        </div>
+      </div>
+
+      <div class="empresa-header">
+        <div class="empresa-logo">A</div>
+        <div class="empresa-info">
+          <h2>Construtora Aurora</h2>
+          <div class="meta">CNPJ 12.345.678/0001-90 · BH/MG · 128 empregados · Mariana Costa atende</div>
+          <div class="empresa-tags">
+            <span class="tag laranja">⭐ PREMIUM</span>
+            <span class="tag verde">Ativo · NPS +9</span>
+            <span class="tag marinho">12 módulos ativos / 15 disponíveis</span>
+            <span class="tag">R$ 24.500/mês fixo</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primario btn-sm">↑ Trocar plano</button>
+          <button class="btn btn-fantasma btn-sm">📅 Reunião com cliente</button>
+        </div>
+      </div>
+
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🎛</span>
+        <div>
+          <strong>Como funciona a configuração de módulos</strong>
+          O plano atual define o <strong style="color:var(--laranja)">conjunto incluso</strong> (sem custo extra). Você pode <strong style="color:var(--laranja)">ligar módulos fora do plano</strong> como adicional, ou <strong style="color:var(--laranja)">desligar módulos do plano</strong> se o cliente preferir (sem desconto, mas evita sobrecarga visual). Mudanças entram em vigor na próxima fatura.
+        </div>
+      </div>
+
+      <div class="layout-com-sidebar">
+        <div>
+
+          <!-- PLANOS -->
+          <div class="planos-grid">
+            <div class="plano-card">
+              <div class="plano-cabeca">Plano</div>
+              <div class="plano-nome">Essencial</div>
+              <div class="plano-preco"><em>R$ 590</em><span>/mês</span></div>
+              <div class="plano-target">Para empresas de 5–30 empregados que estão começando a se organizar. O básico, sem assustar.</div>
+              <div class="plano-incluso">
+                ✓ Cadastro de empregados<br>
+                ✓ Organograma simples<br>
+                ✓ Documentos digitais<br>
+                ✓ Chat interno<br>
+                ✓ Recrutamento &amp; vagas
+              </div>
+            </div>
+            <div class="plano-card">
+              <div class="plano-cabeca">Plano</div>
+              <div class="plano-nome">Avançado</div>
+              <div class="plano-preco"><em>R$ 1.490</em><span>/mês</span></div>
+              <div class="plano-target">Para empresas de 30–100 empregados que querem profissionalizar processos sem complicar.</div>
+              <div class="plano-incluso">
+                ✓ Tudo do Essencial<br>
+                ✓ Banco de Talentos<br>
+                ✓ Ponto eletrônico<br>
+                ✓ Folha &amp; holerites<br>
+                ✓ Férias &amp; solicitações<br>
+                ✓ Avaliação simples
+              </div>
+            </div>
+            <div class="plano-card atual">
+              <div class="plano-cabeca">Plano</div>
+              <div class="plano-nome">Premium</div>
+              <div class="plano-preco"><em>R$ 3.490</em><span>/mês</span></div>
+              <div class="plano-target">Para empresas de 100+ empregados que querem dados, predição e plataforma completa.</div>
+              <div class="plano-incluso">
+                ✓ Tudo do Avançado<br>
+                ✓ Benefícios estruturados<br>
+                ✓ Avaliação 360° + Calibração<br>
+                ✓ Pesquisas &amp; clima com IA<br>
+                ✓ Treinamentos &amp; trilhas<br>
+                ✓ Analytics preditivo
+              </div>
+            </div>
+          </div>
+
+          <!-- MÓDULOS CORE (sempre ligados) -->
+          <div class="modulos-secao">
+            <div class="secao-titulo">⚓ Core · Sempre ligado</div>
+            <p class="secao-sub">Estes 4 módulos são a fundação da plataforma. Sem eles a empresa não funciona, então não dá pra desligar — incluso em todos os planos.</p>
+
+            <div class="modulos-grid">
+
+              <div class="modulo core">
+                <div class="modulo-ic">👥</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Cadastro de Empregados</span>
+                    <span class="modulo-codigo">core.employees</span>
+                  </div>
+                  <p class="modulo-desc">Ficha completa, contratos, documentos, vínculos.</p>
+                  <div class="modulo-meta">
+                    <span class="tag marinho" style="font-size:9px">⚓ CORE</span>
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                  </div>
+                </div>
+                <div class="modulo-acao"><div class="toggle ativo bloqueado" title="Não pode desligar"></div></div>
+              </div>
+
+              <div class="modulo core">
+                <div class="modulo-ic">🌳</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Organograma</span>
+                    <span class="modulo-codigo">core.org_chart</span>
+                  </div>
+                  <p class="modulo-desc">Estrutura hierárquica, áreas, gestores. Define a propriedade "é líder".</p>
+                  <div class="modulo-meta">
+                    <span class="tag marinho" style="font-size:9px">⚓ CORE</span>
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                  </div>
+                </div>
+                <div class="modulo-acao"><div class="toggle ativo bloqueado"></div></div>
+              </div>
+
+              <div class="modulo core">
+                <div class="modulo-ic">📄</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Documentos Digitais</span>
+                    <span class="modulo-codigo">core.docs</span>
+                  </div>
+                  <p class="modulo-desc">Upload, organização e assinatura de documentos do empregado.</p>
+                  <div class="modulo-meta">
+                    <span class="tag marinho" style="font-size:9px">⚓ CORE</span>
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                  </div>
+                </div>
+                <div class="modulo-acao"><div class="toggle ativo bloqueado"></div></div>
+              </div>
+
+              <div class="modulo core">
+                <div class="modulo-ic">💬</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Comunicação Interna</span>
+                    <span class="modulo-codigo">core.chat</span>
+                  </div>
+                  <p class="modulo-desc">Chat empregado ↔ RH e empresa ↔ Oi Nora.</p>
+                  <div class="modulo-meta">
+                    <span class="tag marinho" style="font-size:9px">⚓ CORE</span>
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                  </div>
+                </div>
+                <div class="modulo-acao"><div class="toggle ativo bloqueado"></div></div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- RECRUTAMENTO -->
+          <div class="modulos-secao">
+            <div class="secao-titulo">🎯 Recrutamento &amp; Seleção</div>
+            <p class="secao-sub">Tudo relacionado ao processo de contratar.</p>
+
+            <div class="modulos-grid">
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">▤</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Recrutamento &amp; Vagas</span>
+                    <span class="modulo-codigo">rec.jobs</span>
+                  </div>
+                  <p class="modulo-desc">Criar vagas, pipeline kanban, propostas, contratação.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                    <span class="tag" style="font-size:9px">No plano</span>
+                  </div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                  <span style="font-family:var(--ui);font-size:10px;color:var(--cinza)">incluso</span>
+                </div>
+              </div>
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">◆</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Banco de Talentos</span>
+                    <span class="modulo-codigo">rec.talent_pool</span>
+                  </div>
+                  <p class="modulo-desc">Acesso compartilhado ao banco da Oi Nora (2.847 profissionais).</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                    <span class="tag" style="font-size:9px">No plano</span>
+                  </div>
+                  <div class="modulo-preco">Avulso: <strong>R$ 800/mês</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                  <span style="font-family:var(--ui);font-size:10px;color:var(--cinza)">incluso</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- HRIS -->
+          <div class="modulos-secao">
+            <div class="secao-titulo">🏢 Gestão de Pessoas (HRIS)</div>
+            <p class="secao-sub">Folha, ponto, férias, benefícios. Cobra por empregado ativo.</p>
+
+            <div class="modulos-grid">
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">⏱</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Ponto Eletrônico</span>
+                    <span class="modulo-codigo">hr.timeclock</span>
+                  </div>
+                  <p class="modulo-desc">Bater ponto via app, banco de horas, Portaria 671/2021.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                  </div>
+                  <div class="modulo-preco">R$ 12/empregado · <strong>128 × R$ 12 = R$ 1.536/mês</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                </div>
+              </div>
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">💰</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Folha &amp; Holerites</span>
+                    <span class="modulo-codigo">hr.payroll</span>
+                  </div>
+                  <p class="modulo-desc">Processamento, integrações DCTFWeb/eSocial, holerite digital.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                  </div>
+                  <div class="modulo-preco">R$ 18/empregado · <strong>128 × R$ 18 = R$ 2.304/mês</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                </div>
+              </div>
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">🌴</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Férias &amp; Solicitações</span>
+                    <span class="modulo-codigo">hr.vacation</span>
+                  </div>
+                  <p class="modulo-desc">Solicitação, aprovação por líder, agenda da equipe.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                  </div>
+                  <div class="modulo-preco">R$ 8/empregado · <strong>128 × R$ 8 = R$ 1.024/mês</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                </div>
+              </div>
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">🎁</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Benefícios</span>
+                    <span class="modulo-codigo">hr.benefits</span>
+                  </div>
+                  <p class="modulo-desc">VR, VT, plano de saúde, gestão de elegibilidade.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                    <span class="tag laranja" style="font-size:9px">Premium</span>
+                  </div>
+                  <div class="modulo-preco">R$ 6/empregado · <strong>128 × R$ 6 = R$ 768/mês</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- DESENVOLVIMENTO -->
+          <div class="modulos-secao">
+            <div class="secao-titulo">⭐ Desenvolvimento &amp; Cultura</div>
+            <p class="secao-sub">A camada mais avançada. Requer maturidade da empresa para usar bem.</p>
+
+            <div class="modulos-grid">
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">📊</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Avaliação Simples</span>
+                    <span class="modulo-codigo">dev.evaluation_basic</span>
+                  </div>
+                  <p class="modulo-desc">Ciclo anual com autoavaliação + gestor. Sem 360°, sem calibração.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                  </div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                  <span style="font-family:var(--ui);font-size:10px;color:var(--cinza)">incluso</span>
+                </div>
+              </div>
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">🎯</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Avaliação 360° + Calibração</span>
+                    <span class="modulo-codigo">dev.evaluation_360</span>
+                  </div>
+                  <p class="modulo-desc">Autoavaliação + gestor + pares + liderados + sessão de calibração 9-Box.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                    <span class="tag laranja" style="font-size:9px">Premium</span>
+                  </div>
+                  <div class="modulo-preco">Avulso: <strong>R$ 2.500/ciclo</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                </div>
+              </div>
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">📋</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Pesquisas &amp; Clima com IA</span>
+                    <span class="modulo-codigo">dev.surveys_ai</span>
+                  </div>
+                  <p class="modulo-desc">Editor de pesquisas, eNPS, análise de sentimento, recomendações automáticas.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                    <span class="tag laranja" style="font-size:9px">Premium</span>
+                  </div>
+                  <div class="modulo-preco">Avulso: <strong>R$ 1.800/mês</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                </div>
+              </div>
+
+              <div class="modulo inativo">
+                <div class="modulo-ic">🎓</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Treinamentos &amp; Trilhas</span>
+                    <span class="modulo-codigo">dev.training</span>
+                  </div>
+                  <p class="modulo-desc">Trilhas obrigatórias, certificados, integração com Alura/Udemy/FDC.</p>
+                  <div class="modulo-meta">
+                    <span class="tag" style="font-size:9px">⊝ DESLIGADO</span>
+                    <span class="tag laranja" style="font-size:9px">No plano Premium</span>
+                  </div>
+                  <div class="modulo-preco">Se ligar: <strong>+ R$ 14 × 128 = R$ 1.792/mês</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle"></div>
+                  <span style="font-family:var(--ui);font-size:10px;color:var(--cinza)">cliente recusou</span>
+                </div>
+              </div>
+
+              <div class="modulo ativo">
+                <div class="modulo-ic">📈</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Analytics Preditivo</span>
+                    <span class="modulo-codigo">dev.analytics_ai</span>
+                  </div>
+                  <p class="modulo-desc">Predição de turnover, análise de gaps, recomendação de talentos internos.</p>
+                  <div class="modulo-meta">
+                    <span class="tag verde" style="font-size:9px">✓ ATIVO</span>
+                    <span class="tag laranja" style="font-size:9px">Premium</span>
+                  </div>
+                  <div class="modulo-preco">Avulso: <strong>R$ 3.000/mês</strong></div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle ativo"></div>
+                </div>
+              </div>
+
+              <div class="modulo inativo">
+                <div class="modulo-ic">🏆</div>
+                <div class="modulo-corpo">
+                  <div class="modulo-titulo">
+                    <span class="modulo-nome">Reconhecimento &amp; Kudos</span>
+                    <span class="modulo-codigo">dev.kudos</span>
+                  </div>
+                  <p class="modulo-desc">Sistema P2P de reconhecimento entre colegas, badges, bônus discretos.</p>
+                  <div class="modulo-meta">
+                    <span class="tag" style="font-size:9px">⊝ EM BREVE</span>
+                  </div>
+                  <div class="modulo-preco">Beta gratuito até dez/2026</div>
+                </div>
+                <div class="modulo-acao">
+                  <div class="toggle"></div>
+                  <span style="font-family:var(--ui);font-size:10px;color:var(--cinza)">não lançado</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RESUMO FATURA · sidebar -->
+        <aside>
+          <div class="resumo-fatura">
+            <h4>📋 Resumo da fatura</h4>
+            <div class="sub">Próxima cobrança · 05/06/2026</div>
+
+            <div class="fatura-linha"><span class="label">Plano Premium (fixo)</span><span class="valor">R$ 3.490</span></div>
+            <div class="fatura-linha"><span class="label">Empregados (128)</span><span class="valor">incluso</span></div>
+            <div class="fatura-linha"><span class="label">Banco de Talentos</span><span class="valor">incluso</span></div>
+            <div class="fatura-linha"><span class="label">Ponto · 128 × R$12</span><span class="valor">R$ 1.536</span></div>
+            <div class="fatura-linha"><span class="label">Folha · 128 × R$18</span><span class="valor">R$ 2.304</span></div>
+            <div class="fatura-linha"><span class="label">Férias · 128 × R$8</span><span class="valor">R$ 1.024</span></div>
+            <div class="fatura-linha"><span class="label">Benefícios · 128 × R$6</span><span class="valor">R$ 768</span></div>
+            <div class="fatura-linha"><span class="label">Avaliação 360° (ciclo)</span><span class="valor">R$ 2.500</span></div>
+            <div class="fatura-linha"><span class="label">Pesquisas com IA</span><span class="valor">R$ 1.800</span></div>
+            <div class="fatura-linha"><span class="label">Analytics preditivo</span><span class="valor">R$ 3.000</span></div>
+            <div class="fatura-linha"><span class="label">- Desconto fidelidade 3 anos</span><span class="valor">- R$ 1.922</span></div>
+
+            <div class="fatura-linha destaque"><span class="label">Total mensal</span><span class="valor">R$ 14.500</span></div>
+
+            <div class="fatura-rodape">
+              📌 Cliente Premium pagou R$ 24.500/mês até abril/2026.<br>Em maio renegociou plano e modulares, total reduzido para R$ 14.500 — segura churn.
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>3 alterações pendentes:</strong> ligar Treinamentos, desligar Reconhecimento, ajustar limite de aprovação.<br>
+          Mudanças entram em vigor na próxima fatura · cliente é notificado por e-mail.
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm">Cancelar mudanças</button>
+          <button class="btn btn-primario btn-sm">✓ Salvar configuração</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: VISÃO DO CLIENTE · ESSENCIAL × PREMIUM -->
+<!-- ============================================== -->
+<div class="tela" id="t-sidebar-essencial">
+
+  <main class="app-main" style="max-width:1280px;margin:0 auto">
+
+    <div class="breadcrumb"><a onclick="irPara('t-config-modulos')">Configurar Módulos</a> &gt; <span style="color:var(--laranja)">Como o cliente vê</span></div>
+
+    <div class="topbar">
+      <div>
+        <h1>Como o cliente <em>vê</em> a plataforma</h1>
+        <p class="topbar-meta">Comparação visual: cliente Essencial (Têxtil Brilhante) × cliente Premium (Aurora) · sidebars lado a lado</p>
+      </div>
+      <div class="topbar-acoes">
+        <button class="btn btn-fantasma btn-sm" onclick="irPara('t-config-modulos')">← Voltar à configuração</button>
+        <button class="btn btn-fantasma btn-sm" onclick="irPara('t-upgrade')">Ver tela de upgrade →</button>
+      </div>
+    </div>
+
+    <div class="alert alert-laranja">
+      <span class="ic-grande">💡</span>
+      <div>
+        <strong>Por que isso importa</strong>
+        Cliente pequeno (5-30 funcionários) <strong>se assusta com tela cheia</strong>. Cliente grande <strong>quer ver tudo que tem direito</strong>. O sistema esconde o que não está contratado: menos atrito visual, menos suporte, mais adoção.
+      </div>
+    </div>
+
+    <div class="demo-grid">
+
+      <!-- CLIENTE ESSENCIAL -->
+      <div>
+        <div class="demo-card-grande">
+          <div class="demo-card-head">
+            <h4>Têxtil Brilhante · 42 empregados</h4>
+            <span class="plano-pill" style="background:var(--cinza);color:white">ESSENCIAL</span>
+          </div>
+          <div class="demo-sidebar-preview">
+            <div style="padding:18px 20px 6px;display:flex;align-items:flex-end;gap:6px;font-family:var(--serif);font-size:18px"><span style="color:var(--laranja);font-style:italic">Oi</span><span style="color:var(--papel)">Nora</span></div>
+            <div style="padding:0 20px 14px;font-family:var(--ui);font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase">Têxtil Brilhante</div>
+
+            <div class="demo-sb-secao">Operação</div>
+            <div class="demo-sb-item ativo"><span class="ic">⌂</span> Visão Geral</div>
+            <div class="demo-sb-item"><span class="ic">👥</span> Empregados</div>
+            <div class="demo-sb-item"><span class="ic">🌳</span> Organograma</div>
+            <div class="demo-sb-item"><span class="ic">📄</span> Documentos</div>
+            <div class="demo-sb-item"><span class="ic">💬</span> Comunicação</div>
+
+            <div class="demo-sb-secao">Recrutamento</div>
+            <div class="demo-sb-item"><span class="ic">▤</span> Vagas</div>
+
+            <div class="demo-sb-secao">Plano Essencial</div>
+            <div class="demo-sb-item demo-sb-bloqueado"><span class="ic">⏱</span> Ponto Eletrônico <span class="lock-ic">🔒</span></div>
+            <div class="demo-sb-item demo-sb-bloqueado"><span class="ic">💰</span> Folha <span class="lock-ic">🔒</span></div>
+            <div class="demo-sb-item demo-sb-bloqueado"><span class="ic">🌴</span> Férias <span class="lock-ic">🔒</span></div>
+            <div class="demo-sb-item demo-sb-bloqueado"><span class="ic">⭐</span> Avaliação 360° <span class="lock-ic">🔒</span></div>
+            <div class="demo-sb-item demo-sb-bloqueado"><span class="ic">📋</span> Pesquisas IA <span class="lock-ic">🔒</span></div>
+
+            <div style="padding:14px 20px;margin-top:14px;background:rgba(232,99,58,.12);border-left:3px solid var(--laranja);font-family:var(--ui);font-size:11px;line-height:1.5">
+              <strong style="color:var(--laranja)">⚡ Expandir plano</strong><br>
+              <span style="opacity:.8">Conheça os módulos do Avançado</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:14px 18px;background:var(--cinza-fundo);border-radius:2px;margin-top:14px;font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.6">
+          <strong style="color:var(--marinho)">6 módulos visíveis</strong> · 5 itens "trancados" mostrando upgrade path<br>
+          <strong style="color:var(--marinho)">Resultado</strong>: menos assustador, foco em começar
+        </div>
+      </div>
+
+      <!-- CLIENTE PREMIUM -->
+      <div>
+        <div class="demo-card-grande">
+          <div class="demo-card-head">
+            <h4>Construtora Aurora · 128 empregados</h4>
+            <span class="plano-pill">PREMIUM</span>
+          </div>
+          <div class="demo-sidebar-preview">
+            <div style="padding:18px 20px 6px;display:flex;align-items:flex-end;gap:6px;font-family:var(--serif);font-size:18px"><span style="color:var(--laranja);font-style:italic">Oi</span><span style="color:var(--papel)">Nora</span></div>
+            <div style="padding:0 20px 14px;font-family:var(--ui);font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase">Construtora Aurora</div>
+
+            <div class="demo-sb-secao">Operação</div>
+            <div class="demo-sb-item ativo"><span class="ic">⌂</span> Visão Geral</div>
+            <div class="demo-sb-item"><span class="ic">👥</span> Empregados</div>
+            <div class="demo-sb-item"><span class="ic">🌳</span> Organograma</div>
+            <div class="demo-sb-item"><span class="ic">📄</span> Documentos</div>
+            <div class="demo-sb-item"><span class="ic">💬</span> Comunicação</div>
+
+            <div class="demo-sb-secao">Recrutamento</div>
+            <div class="demo-sb-item"><span class="ic">▤</span> Vagas</div>
+            <div class="demo-sb-item"><span class="ic">◆</span> Banco de Talentos</div>
+
+            <div class="demo-sb-secao">Gestão de Pessoas</div>
+            <div class="demo-sb-item"><span class="ic">⏱</span> Ponto Eletrônico</div>
+            <div class="demo-sb-item"><span class="ic">💰</span> Folha</div>
+            <div class="demo-sb-item"><span class="ic">🌴</span> Férias</div>
+            <div class="demo-sb-item"><span class="ic">🎁</span> Benefícios</div>
+
+            <div class="demo-sb-secao">Desenvolvimento</div>
+            <div class="demo-sb-item"><span class="ic">⭐</span> Avaliação 360°</div>
+            <div class="demo-sb-item"><span class="ic">📋</span> Pesquisas IA</div>
+            <div class="demo-sb-item"><span class="ic">📈</span> Analytics Preditivo</div>
+
+            <div class="demo-sb-secao">Configurações</div>
+            <div class="demo-sb-item"><span class="ic">🔐</span> Usuários</div>
+          </div>
+        </div>
+
+        <div style="padding:14px 18px;background:var(--cinza-fundo);border-radius:2px;margin-top:14px;font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.6">
+          <strong style="color:var(--marinho)">15 módulos visíveis</strong> · todas as funcionalidades disponíveis<br>
+          <strong style="color:var(--marinho)">Resultado</strong>: poder de gestão completo, denso, profissional
+        </div>
+      </div>
+    </div>
+
+    <div class="painel" style="margin-top:24px">
+      <h3>Regras de exibição da sidebar</h3>
+      <p class="sub-titulo">Como o sistema decide o que mostrar</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px">
+        <div style="padding:14px;background:var(--verde-cl);border-left:3px solid var(--verde);border-radius:2px">
+          <div style="font-family:var(--ui);font-size:11px;color:var(--verde);letter-spacing:1px;font-weight:700;text-transform:uppercase;margin-bottom:6px">MÓDULO ATIVO</div>
+          <p style="font-family:var(--ui);font-size:12px;color:var(--marinho);line-height:1.55">Aparece normal na sidebar, clica e funciona.</p>
+        </div>
+        <div style="padding:14px;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px">
+          <div style="font-family:var(--ui);font-size:11px;color:#876715;letter-spacing:1px;font-weight:700;text-transform:uppercase;margin-bottom:6px">MÓDULO INATIVO · UPGRADE PATH</div>
+          <p style="font-family:var(--ui);font-size:12px;color:var(--marinho);line-height:1.55">Aparece "trancado" 🔒 — clique abre tela de upgrade. Mostrado <strong>seletivamente</strong>: só os "próximos do upgrade", não a plataforma toda.</p>
+        </div>
+        <div style="padding:14px;background:var(--cinza-fundo);border-left:3px solid var(--cinza);border-radius:2px">
+          <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1px;font-weight:700;text-transform:uppercase;margin-bottom:6px">MÓDULO DESLIGADO MANUAL</div>
+          <p style="font-family:var(--ui);font-size:12px;color:var(--marinho);line-height:1.55">Não aparece, ponto. Cliente desligou de propósito (ex: Aurora desligou Treinamentos), não deve ser tentado a reativar.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: UPGRADE PROMPT (visão do cliente) -->
+<!-- ============================================== -->
+<div class="tela" id="t-upgrade">
+
+  <main style="background:linear-gradient(180deg,var(--cinza-fundo),var(--papel));min-height:100vh">
+
+    <div class="breadcrumb" style="max-width:1280px;margin:0 auto;padding:20px 36px 0"><a onclick="irPara('t-sidebar-essencial')">Como o cliente vê</a> &gt; <span style="color:var(--laranja)">Tela de upgrade</span></div>
+
+    <div class="upgrade-wrapper">
+
+      <div style="text-align:center;font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:3px;text-transform:uppercase;font-weight:600;margin-bottom:20px">📱 Tela mostrada quando Roberto da Têxtil Brilhante clica num item "🔒"</div>
+
+      <div class="upgrade-card">
+        <div class="upgrade-icone">⭐</div>
+        <h1 class="upgrade-titulo">Esse é um módulo do <em>plano Avançado</em></h1>
+        <p class="upgrade-sub">O <strong>Ponto Eletrônico</strong> não está incluso no seu plano Essencial. Veja o que vai liberar quando você expandir.</p>
+
+        <div class="upgrade-features">
+          <div class="upgrade-feat">
+            <h5>⏱ Ponto na palma da mão</h5>
+            <p>Empregados batem ponto pelo app, com foto e geolocalização. Sem precisar passar no relógio.</p>
+          </div>
+          <div class="upgrade-feat">
+            <h5>📊 Banco de horas automático</h5>
+            <p>Cálculo de horas extras, faltas e atrasos. Exportação para a folha em um clique.</p>
+          </div>
+          <div class="upgrade-feat">
+            <h5>⚖ Portaria 671/2021</h5>
+            <p>Conformidade legal garantida. AFD pronto para fiscalização do Ministério do Trabalho.</p>
+          </div>
+        </div>
+
+        <div style="background:var(--laranja-cl);padding:18px;border-radius:2px;margin:24px 0;text-align:left;border:1px solid var(--laranja)">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-family:var(--ui);font-size:10px;letter-spacing:2px;color:var(--laranja);font-weight:700">EXPANDIR PARA AVANÇADO</div>
+              <div style="font-family:var(--serif);font-size:24px;color:var(--marinho);margin-top:4px">+ R$ 900<span style="font-family:var(--ui);font-size:13px;color:var(--cinza)">/mês</span></div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">Inclui Banco de Talentos + Ponto + Folha + Férias + Avaliação simples</div>
+            </div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:right;line-height:1.5">
+              Plano atual:<br><strong style="color:var(--marinho);font-family:var(--serif);font-size:14px;font-style:italic">R$ 590/mês</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="upgrade-acoes">
+          <button class="btn btn-primario">✓ Expandir para Avançado</button>
+          <button class="btn btn-fantasma">💬 Falar com a Fernanda (sua recrutadora)</button>
+        </div>
+
+        <div class="upgrade-info">
+          🔒 Sem fidelidade · Você pode voltar para Essencial a qualquer momento · Preço travado por 12 meses ao fazer upgrade
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:30px">
+        <button class="btn btn-fantasma btn-sm" onclick="irPara('t-sidebar-essencial')">← Voltar para o que você estava fazendo</button>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Módulos — Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-config-modulos">⚙ Configurar módulos (admin Oi Nora)</option>
+    <option value="t-sidebar-essencial">👁 Como o cliente vê (Essencial × Premium)</option>
+    <option value="t-upgrade">⭐ Tela de upgrade (cliente)</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+
+// Toggles funcionais
+document.querySelectorAll('.toggle:not(.bloqueado)').forEach(t=>{
+  t.addEventListener('click',function(){this.classList.toggle('ativo')});
+});
+
+// Plano selecionado
+document.querySelectorAll('.plano-card').forEach(c=>{
+  c.addEventListener('click',function(){
+    document.querySelectorAll('.plano-card').forEach(p=>p.classList.remove('atual'));
+    this.classList.add('atual');
+  });
+});
+</script>
+</body>
+</html>

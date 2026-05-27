@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Configurações da Empresa (Aurora)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-verde{background:var(--verde);color:white}
+  .btn-perigo{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  /* HEADER */
+  .header-bar{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:24px 28px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+  .header-bar h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .header-bar h1 em{color:var(--laranja);font-style:italic}
+  .header-bar .meta{font-family:var(--ui);font-size:12px;color:var(--cinza);letter-spacing:.5px;margin-top:6px}
+  .header-bar .meta strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:16px;font-weight:400}
+  .header-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .header-bar-acoes{display:flex;flex-direction:column;gap:8px}
+
+  /* SUB-NAVEGAÇÃO LATERAL */
+  .config-shell{display:grid;grid-template-columns:240px 1fr;gap:20px;align-items:flex-start}
+  .config-nav{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px;position:sticky;top:20px}
+  .config-nav-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:10px;padding:6px 8px}
+  .config-nav-item{padding:11px 12px;font-family:var(--ui);font-size:13px;display:flex;align-items:center;gap:10px;cursor:pointer;border-radius:2px;color:var(--marinho-med);transition:all .15s;border-left:3px solid transparent;margin-bottom:2px}
+  .config-nav-item:hover{background:var(--cinza-fundo);color:var(--marinho)}
+  .config-nav-item.ativo{background:var(--laranja-cl);border-left-color:var(--laranja);color:var(--laranja);font-weight:600}
+  .config-nav-item .ic{font-size:14px;width:16px;text-align:center}
+  .config-nav-item .badge{margin-left:auto;font-size:9px;background:var(--cinza-cl);color:var(--cinza);padding:1px 6px;border-radius:8px;font-weight:700}
+  .config-nav-item.ativo .badge{background:var(--laranja);color:white}
+
+  /* PAINEL */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px;letter-spacing:-.2px}
+  .painel h3 em{color:var(--laranja);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+
+  /* TAGS */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+
+  /* ALERT */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden}
+  .alert-marinho::before{content:"";position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .alert-marinho > *{position:relative}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert-verde{background:var(--verde-cl);border-left:3px solid var(--verde);color:var(--marinho)}
+  .alert-laranja{background:var(--laranja-cl);border-left:3px solid var(--laranja);color:var(--marinho)}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* CAMPOS */
+  .campo{margin-bottom:18px}
+  .campo label{display:block;font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--marinho-med);margin-bottom:6px;font-weight:600}
+  .campo input,.campo select,.campo textarea{width:100%;padding:11px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;color:var(--marinho);border-radius:2px;transition:all .15s}
+  .campo input:focus,.campo select:focus,.campo textarea:focus{outline:none;border-color:var(--laranja);box-shadow:0 0 0 3px rgba(232,99,58,.08)}
+  .campo .hint{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;line-height:1.5;letter-spacing:.3px}
+  .campo .hint strong{color:var(--marinho)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+  /* INFO LINE */
+  .info-linha{display:grid;grid-template-columns:200px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--cinza-cl);font-size:14px}
+  .info-linha:last-child{border:none}
+  .info-linha .rotulo{color:var(--cinza);font-family:var(--ui);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600}
+  .info-linha .valor{color:var(--marinho)}
+  .info-linha .valor.editavel{display:flex;align-items:center;gap:8px;cursor:pointer}
+
+  /* UPLOAD LOGO */
+  .upload-zone{padding:24px;border:2px dashed var(--cinza-cl);border-radius:2px;background:var(--cinza-fundo);text-align:center;cursor:pointer;transition:all .15s}
+  .upload-zone:hover{border-color:var(--laranja);background:var(--laranja-cl)}
+  .upload-zone .ic-up{font-size:32px;margin-bottom:8px;color:var(--cinza)}
+  .upload-zone .titulo-up{font-size:14px;font-weight:500;margin-bottom:4px}
+  .upload-zone .hint-up{font-family:var(--ui);font-size:11px;color:var(--cinza)}
+
+  /* ORGANOGRAMA */
+  .org-toolbar{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px 18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  .org-acoes{display:flex;gap:8px}
+  .org-stats{display:flex;gap:16px;font-family:var(--ui);font-size:11px;color:var(--cinza)}
+  .org-stats strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:16px;font-weight:400}
+
+  .org-canvas{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:30px;overflow-x:auto;margin-bottom:18px;position:relative;min-height:520px;background-image:radial-gradient(circle,var(--cinza-cl) 1px,transparent 1px);background-size:20px 20px;background-position:0 0}
+
+  .org-niveis{display:flex;flex-direction:column;gap:60px;align-items:center;position:relative;min-width:1000px}
+
+  .org-nivel{display:flex;gap:24px;justify-content:center;position:relative;z-index:2;flex-wrap:wrap}
+
+  .org-no{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px;width:200px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:grab;transition:all .15s;position:relative;box-shadow:0 2px 8px rgba(31,42,68,.06)}
+  .org-no:hover{border-color:var(--laranja);transform:translateY(-2px);box-shadow:0 6px 14px rgba(31,42,68,.1)}
+  .org-no.ceo{background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));border-color:var(--laranja);border-width:2px}
+  .org-no.diretoria{border-left:3px solid var(--marinho)}
+  .org-no.gerencia{border-left:3px solid var(--roxo)}
+  .org-no.coord{border-left:3px solid var(--verde)}
+  .org-no.vago{border:2px dashed var(--amarelo);background:var(--amarelo-cl);opacity:.7}
+
+  .org-av{width:48px;height:48px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:18px;font-weight:600}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .av-vago{background:var(--cinza-cl);color:var(--cinza);font-size:22px}
+
+  .org-no .nome-no{font-size:13px;font-weight:600;text-align:center;line-height:1.2;color:var(--marinho)}
+  .org-no .cargo-no{font-family:var(--ui);font-size:10.5px;color:var(--cinza);text-align:center;letter-spacing:.3px;line-height:1.4}
+  .org-no .meta-no{display:flex;gap:6px;align-items:center;font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:.5px;margin-top:4px;text-transform:uppercase;font-weight:600}
+  .org-no .meta-no .equipe{color:var(--marinho);font-weight:700}
+
+  /* Linhas conectoras simuladas com bordas */
+  .org-conector-vertical{position:absolute;left:50%;top:-30px;width:2px;height:30px;background:var(--cinza-cl);z-index:1}
+
+  /* Linha horizontal entre nós irmãos */
+  .org-grupo{position:relative}
+  .org-grupo::before{content:"";position:absolute;top:-30px;left:14%;right:14%;height:2px;background:var(--cinza-cl);z-index:1}
+  .org-grupo > .org-no{position:relative}
+
+  /* DEPARTAMENTOS LISTA */
+  .dept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .dept-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:16px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;border-left:3px solid var(--marinho);transition:all .15s}
+  .dept-card:hover{border-color:var(--marinho);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .dept-ic{width:42px;height:42px;border-radius:2px;background:var(--cinza-fundo);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--cinza-cl)}
+  .dept-info{min-width:0}
+  .dept-nome{font-size:14px;font-weight:500;color:var(--marinho)}
+  .dept-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .dept-stats{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+  .dept-acoes{display:flex;gap:4px}
+
+  /* CARGOS E SALÁRIOS */
+  .cargo-grid{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden}
+  .cargo-linha{padding:14px 22px;border-bottom:1px solid var(--cinza-cl);display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 90px;gap:14px;align-items:center;transition:background .15s;font-family:var(--ui);font-size:12.5px}
+  .cargo-linha:hover{background:var(--cinza-fundo)}
+  .cargo-linha:last-child{border:none}
+  .cargo-linha.head{background:var(--cinza-fundo);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700}
+  .cargo-linha.head:hover{background:var(--cinza-fundo)}
+  .cargo-titulo-celula{display:flex;flex-direction:column;gap:4px}
+  .cargo-nome{font-size:13px;font-weight:500;color:var(--marinho);font-family:var(--serif)}
+  .cargo-cbo{font-family:'SF Mono','Monaco',monospace;font-size:10px;color:var(--cinza)}
+  .cargo-faixa{font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:13px}
+  .cargo-faixa .min{color:var(--cinza);font-size:11px}
+  .cargo-headcount{display:flex;align-items:center;gap:4px}
+  .cargo-headcount .num-h{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)}
+  .cargo-headcount .barr{flex:1;height:4px;background:var(--cinza-fundo);border-radius:2px;overflow:hidden;max-width:50px}
+  .cargo-headcount .barr-f{height:100%;background:var(--laranja)}
+
+  /* FLUXOS DE APROVAÇÃO */
+  .fluxo-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;margin-bottom:14px;border-left:3px solid var(--marinho)}
+  .fluxo-card.ativo{border-left-color:var(--verde)}
+  .fluxo-card.inativo{border-left-color:var(--cinza);opacity:.7}
+  .fluxo-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:14px}
+  .fluxo-titulo{font-size:15px;font-weight:500;color:var(--marinho);display:flex;align-items:center;gap:8px}
+  .fluxo-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+
+  .fluxo-passos{display:flex;align-items:center;gap:8px;padding:14px;background:var(--cinza-fundo);border-radius:2px;overflow-x:auto}
+  .fluxo-passo{flex-shrink:0;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:10px 14px;display:flex;align-items:center;gap:10px;min-width:180px}
+  .fluxo-passo .num{width:24px;height:24px;border-radius:50%;background:var(--laranja);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:12px;font-weight:600;flex-shrink:0}
+  .fluxo-passo.condicional{background:var(--amarelo-cl);border-color:var(--amarelo)}
+  .fluxo-passo.condicional .num{background:var(--amarelo)}
+  .fluxo-passo-info{min-width:0;flex:1}
+  .fluxo-passo-nome{font-size:12.5px;font-weight:500;color:var(--marinho);line-height:1.2}
+  .fluxo-passo-cargo{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+  .fluxo-seta{font-size:18px;color:var(--cinza-cl);flex-shrink:0}
+
+  /* POLÍTICAS - TOGGLES */
+  .politica-item{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+  .politica-info h4{font-size:14px;font-weight:500;margin-bottom:4px;color:var(--marinho)}
+  .politica-info p{font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.55}
+  .politica-info p strong{color:var(--marinho);font-weight:600}
+  .toggle{position:relative;width:46px;height:24px;background:var(--cinza-cl);border-radius:12px;cursor:pointer;transition:background .2s;flex-shrink:0}
+  .toggle::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:50%;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+  .toggle.ativo{background:var(--verde)}
+  .toggle.ativo::after{transform:translateX(22px)}
+
+  /* CENTROS DE CUSTO */
+  .cc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cc-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:16px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+  .cc-card.ativo{border-left:3px solid var(--verde)}
+  .cc-card.inativo{border-left:3px solid var(--cinza);opacity:.6}
+  .cc-codigo{font-family:'SF Mono','Monaco',monospace;font-size:11px;color:var(--cinza);letter-spacing:.5px;font-weight:600}
+  .cc-nome{font-size:14px;font-weight:500;color:var(--marinho);margin-top:3px}
+  .cc-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
+  .cc-valor{font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:18px;text-align:right}
+  .cc-valor-meta{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+
+  /* RODAPÉ AÇÕES */
+  .acoes-rodape{position:sticky;bottom:0;background:var(--branco);border-top:1px solid var(--cinza-cl);padding:16px 36px;display:flex;justify-content:space-between;align-items:center;margin:24px -36px -60px;gap:14px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,.05);z-index:10}
+  .acoes-info{font-family:var(--ui);font-size:12px;color:var(--cinza)}
+  .acoes-info strong{color:var(--marinho)}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:88px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1100px){
+    .config-shell{grid-template-columns:1fr}
+    .config-nav{position:static}
+    .grid-2,.grid-3{grid-template-columns:1fr}
+    .dept-grid,.cc-grid{grid-template-columns:1fr}
+    .cargo-linha{grid-template-columns:1fr;gap:8px}
+    .info-linha{grid-template-columns:1fr;gap:4px}
+    .header-bar{grid-template-columns:1fr;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: DADOS DA EMPRESA -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-dados-empresa">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item ativo"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Configurações</a> &gt; <span style="color:var(--laranja)">Empresa &amp; Organização</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Empresa &amp; <em>Organização</em></h1>
+          <div class="meta">Configure a estrutura da <strong>Construtora Aurora</strong> · alterações disparam auditoria · plano Premium</div>
+          <div class="header-tags">
+            <span class="tag laranja">⭐ Premium</span>
+            <span class="tag verde">128 empregados</span>
+            <span class="tag marinho">5 departamentos</span>
+            <span class="tag">28 cargos · 12 centros de custo</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">📋 Histórico de alterações</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar configuração</button>
+        </div>
+      </div>
+
+      <div class="config-shell">
+        <!-- NAV LATERAL -->
+        <nav class="config-nav">
+          <div class="config-nav-titulo">Seções</div>
+          <div class="config-nav-item ativo"><span class="ic">🏢</span> Dados da Empresa</div>
+          <div class="config-nav-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma <span class="badge">5</span></div>
+          <div class="config-nav-item" onclick="irPara('t-cargos-salarios')"><span class="ic">💼</span> Cargos &amp; Salários <span class="badge">28</span></div>
+          <div class="config-nav-item" onclick="irPara('t-fluxos')"><span class="ic">⚡</span> Fluxos &amp; Aprovação <span class="badge">8</span></div>
+          <div class="config-nav-item" onclick="irPara('t-politicas')"><span class="ic">⚖</span> Políticas internas</div>
+          <div class="config-nav-item" onclick="irPara('t-centros-custo')"><span class="ic">💼</span> Centros de Custo <span class="badge">12</span></div>
+        </nav>
+
+        <!-- CONTEÚDO -->
+        <div>
+          <div class="painel">
+            <div class="painel-header">
+              <div><h3>Identidade da <em>empresa</em></h3><p class="sub-titulo">Razão social e dados cadastrais</p></div>
+              <button class="btn btn-primario btn-sm">✎ Editar</button>
+            </div>
+
+            <div class="grid-2" style="gap:24px">
+              <div>
+                <div class="campo">
+                  <label>Razão social <span style="color:var(--laranja)">*</span></label>
+                  <input value="Construtora Aurora Empreendimentos Ltda"/>
+                </div>
+                <div class="campo">
+                  <label>Nome fantasia</label>
+                  <input value="Construtora Aurora"/>
+                </div>
+                <div class="grid-2">
+                  <div class="campo">
+                    <label>CNPJ</label>
+                    <input value="12.345.678/0001-90"/>
+                  </div>
+                  <div class="campo">
+                    <label>Inscrição Estadual</label>
+                    <input value="001.234.567.890"/>
+                  </div>
+                </div>
+                <div class="campo">
+                  <label>CNAE Principal</label>
+                  <input value="41.20-4-00 · Construção de edifícios"/>
+                  <div class="hint">💡 Define o <strong>SAT/RAT</strong> (3%) e o adicional do <strong>Sistema S</strong> (5,8%) na folha</div>
+                </div>
+              </div>
+
+              <div>
+                <div class="campo">
+                  <label>Logo da empresa</label>
+                  <div class="upload-zone" style="padding:16px;text-align:left;display:flex;gap:14px;align-items:center">
+                    <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#E8633A,#C94E28);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:26px;font-weight:600">A</div>
+                    <div style="flex:1">
+                      <div style="font-size:13px;font-weight:500">logo_aurora.png</div>
+                      <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px">PNG · 256×256 · 84 KB</div>
+                    </div>
+                    <button class="btn btn-fantasma btn-xs">Trocar</button>
+                  </div>
+                  <div class="hint">📐 Recomendado: 512×512px · PNG ou SVG · fundo transparente</div>
+                </div>
+
+                <div class="campo">
+                  <label>Cor primária da marca</label>
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <div style="width:42px;height:42px;border-radius:2px;background:#1a4d3a;border:1px solid var(--cinza-cl)"></div>
+                    <input value="#1A4D3A" style="font-family:'SF Mono',monospace;font-size:12px"/>
+                  </div>
+                  <div class="hint">Aparece em e-mails, holerites e portal da empresa</div>
+                </div>
+
+                <div class="campo">
+                  <label>Setor</label>
+                  <select>
+                    <option>Construção Civil</option>
+                    <option>Engenharia</option>
+                    <option>Incorporação</option>
+                    <option>Indústria</option>
+                  </select>
+                </div>
+
+                <div class="campo">
+                  <label>Porte da empresa</label>
+                  <select>
+                    <option>Microempresa (até 19)</option>
+                    <option>Pequena (20 a 99)</option>
+                    <option selected>Média (100 a 499)</option>
+                    <option>Grande (500+)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>Endereço &amp; <em>Contato</em></h3>
+            <p class="sub-titulo">Sede e contatos institucionais</p>
+
+            <div class="info-linha">
+              <span class="rotulo">Endereço da sede</span>
+              <span class="valor">Av. Olegário Maciel, 2520 · 12º andar · Funcionários · BH/MG · 30180-110</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Outros locais (filiais)</span>
+              <div class="valor">
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <span class="tag marinho">🏗 Canteiro Sítio II · BR-040 km 538</span>
+                  <span class="tag marinho">🏗 Canteiro Vila Aurora · Nova Lima</span>
+                  <span class="tag marinho">🏢 Filial Contagem</span>
+                </div>
+              </div>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Telefone institucional</span>
+              <span class="valor">(31) 3271-4500</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">E-mail corporativo</span>
+              <span class="valor">contato@construtoraaurora.com.br</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Site institucional</span>
+              <span class="valor">construtoraaurora.com.br</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Página de carreiras</span>
+              <span class="valor">vagas.construtoraaurora.com.br <span class="tag laranja" style="font-size:9px;margin-left:6px">white-label</span></span>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>Convenção <em>coletiva</em> e tributação</h3>
+            <p class="sub-titulo">Bases para folha, ponto e benefícios</p>
+
+            <div class="info-linha">
+              <span class="rotulo">Sindicato laboral</span>
+              <span class="valor">SINTRAICCMG · Construção Civil MG · CCT vigente jul/2025 a jun/2026</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Regime tributário</span>
+              <span class="valor">Lucro Real</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">FAP (Fator Acidentário)</span>
+              <span class="valor">1,2317 · vigência 2026</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Adicional NR-18 (insalubridade)</span>
+              <span class="valor">30% · aplica a empregados de obra</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Banco de horas</span>
+              <span class="valor">Compensação em 12 meses · CCT vigente</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Data-base de reajuste</span>
+              <span class="valor">1º de abril · próxima 01/04/2027</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Adicional de periculosidade</span>
+              <span class="valor">Não aplicável</span>
+            </div>
+          </div>
+
+          <div class="alert alert-marinho">
+            <span class="ic-grande">🔒</span>
+            <div>
+              <strong>Mudanças trabalhistas requerem cautela</strong>
+              Alterações em sindicato, FAP, regime tributário ou data-base afetam toda a folha. <strong style="color:var(--laranja)">Recomendamos consultar Mariana Costa (Oi Nora)</strong> antes de mexer aqui.
+            </div>
+          </div>
+
+          <div class="acoes-rodape">
+            <div class="acoes-info">
+              <strong>1 alteração pendente</strong> · convênio Unimed atualizado · vigência 01/06
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-fantasma btn-sm">Cancelar</button>
+              <button class="btn btn-primario btn-sm">✓ Salvar alterações</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: ORGANOGRAMA -->
+<!-- ============================================== -->
+<div class="tela" id="t-organograma">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item ativo"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dados-empresa')">Empresa &amp; Org</a> &gt; <span style="color:var(--laranja)">Organograma</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Organograma · <em>Construtora Aurora</em></h1>
+          <div class="meta">Visualize e edite a estrutura · arraste e solte para reorganizar · is_leader é calculado automaticamente</div>
+          <div class="header-tags">
+            <span class="tag laranja">128 empregados · 5 níveis</span>
+            <span class="tag verde">14 líderes</span>
+            <span class="tag amarelo">2 posições vagas</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar PDF</button>
+          <button class="btn btn-fantasma btn-sm">📋 Vista lista</button>
+        </div>
+      </div>
+
+      <div class="config-shell">
+        <nav class="config-nav">
+          <div class="config-nav-titulo">Seções</div>
+          <div class="config-nav-item" onclick="irPara('t-dados-empresa')"><span class="ic">🏢</span> Dados da Empresa</div>
+          <div class="config-nav-item ativo"><span class="ic">🌳</span> Organograma <span class="badge">5</span></div>
+          <div class="config-nav-item" onclick="irPara('t-cargos-salarios')"><span class="ic">💼</span> Cargos &amp; Salários <span class="badge">28</span></div>
+          <div class="config-nav-item" onclick="irPara('t-fluxos')"><span class="ic">⚡</span> Fluxos &amp; Aprovação <span class="badge">8</span></div>
+          <div class="config-nav-item" onclick="irPara('t-politicas')"><span class="ic">⚖</span> Políticas internas</div>
+          <div class="config-nav-item" onclick="irPara('t-centros-custo')"><span class="ic">💼</span> Centros de Custo <span class="badge">12</span></div>
+        </nav>
+
+        <div>
+          <div class="org-toolbar">
+            <div class="org-stats">
+              <div><strong>128</strong> empregados</div>
+              <div><strong>5</strong> níveis</div>
+              <div><strong>14</strong> gestores</div>
+              <div><strong>5</strong> departamentos</div>
+            </div>
+            <div class="org-acoes">
+              <button class="btn btn-fantasma btn-sm">🔍 Buscar</button>
+              <button class="btn btn-fantasma btn-sm">+ Adicionar pessoa</button>
+              <button class="btn btn-fantasma btn-sm">🌳 Adicionar área</button>
+              <button class="btn btn-primario btn-sm">✎ Modo edição</button>
+            </div>
+          </div>
+
+          <!-- ORGANOGRAMA -->
+          <div class="org-canvas">
+            <div class="org-niveis">
+              <!-- NÍVEL 1: CEO -->
+              <div class="org-nivel">
+                <div class="org-no ceo">
+                  <div class="org-av av-b">AA</div>
+                  <div>
+                    <div class="nome-no">Alfredo Aurora</div>
+                    <div class="cargo-no">CEO &amp; Fundador</div>
+                  </div>
+                  <div class="meta-no"><span class="equipe">128</span> liderados (total)</div>
+                </div>
+              </div>
+
+              <!-- NÍVEL 2: DIRETORIA (4 cards) -->
+              <div class="org-nivel org-grupo">
+                <div class="org-no diretoria">
+                  <div class="org-conector-vertical"></div>
+                  <div class="org-av av-b">RA</div>
+                  <div>
+                    <div class="nome-no">Roberto Aurora</div>
+                    <div class="cargo-no">Diretor de RH</div>
+                  </div>
+                  <div class="meta-no"><span class="equipe">3</span> diretos · ⭐ Owner</div>
+                </div>
+
+                <div class="org-no diretoria">
+                  <div class="org-conector-vertical"></div>
+                  <div class="org-av av-b">LM</div>
+                  <div>
+                    <div class="nome-no">Luísa Mendonça</div>
+                    <div class="cargo-no">Diretora de Engenharia</div>
+                  </div>
+                  <div class="meta-no"><span class="equipe">22</span> diretos · is_leader</div>
+                </div>
+
+                <div class="org-no diretoria">
+                  <div class="org-conector-vertical"></div>
+                  <div class="org-av av-c">ES</div>
+                  <div>
+                    <div class="nome-no">Eduardo Santos</div>
+                    <div class="cargo-no">Diretor Financeiro</div>
+                  </div>
+                  <div class="meta-no"><span class="equipe">12</span> diretos · is_leader</div>
+                </div>
+
+                <div class="org-no diretoria">
+                  <div class="org-conector-vertical"></div>
+                  <div class="org-av av-f">CA</div>
+                  <div>
+                    <div class="nome-no">Carlos Aurora</div>
+                    <div class="cargo-no">Diretor de Operações</div>
+                  </div>
+                  <div class="meta-no"><span class="equipe">78</span> diretos · is_leader</div>
+                </div>
+              </div>
+
+              <!-- NÍVEL 3: COORDENAÇÕES (exemplos selecionados sob Luísa) -->
+              <div class="org-nivel org-grupo" style="margin-left:25%">
+                <div class="org-no coord">
+                  <div class="org-conector-vertical"></div>
+                  <div class="org-av av-a">F</div>
+                  <div>
+                    <div class="nome-no">Fernando Lacerda</div>
+                    <div class="cargo-no">Eng. Civil Sênior</div>
+                  </div>
+                  <div class="meta-no">★ Estrela 9-Box</div>
+                </div>
+
+                <div class="org-no coord">
+                  <div class="org-conector-vertical"></div>
+                  <div class="org-av av-d">PA</div>
+                  <div>
+                    <div class="nome-no">Pedro Aurélio Castro</div>
+                    <div class="cargo-no">Eng. Civil Pleno</div>
+                  </div>
+                  <div class="meta-no">+62h banco horas</div>
+                </div>
+
+                <div class="org-no coord">
+                  <div class="org-conector-vertical"></div>
+                  <div class="org-av av-f">AS</div>
+                  <div>
+                    <div class="nome-no">Ana Carolina Souza</div>
+                    <div class="cargo-no">Eng. Civil Júnior</div>
+                  </div>
+                  <div class="meta-no">2 anos casa</div>
+                </div>
+
+                <div class="org-no vago">
+                  <div class="org-conector-vertical"></div>
+                  <div class="org-av av-vago">+</div>
+                  <div>
+                    <div class="nome-no" style="color:#876715">Eng. Civil Pleno</div>
+                    <div class="cargo-no">vaga afirmativa · em curso</div>
+                  </div>
+                  <div class="meta-no" style="color:#876715">Wizard #2026-0042</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DEPARTAMENTOS -->
+          <div class="painel">
+            <h3>Departamentos <em>configurados</em></h3>
+            <p class="sub-titulo">5 áreas · todas com gestor ativo</p>
+
+            <div class="dept-grid">
+              <div class="dept-card" style="border-left-color:var(--marinho)">
+                <div class="dept-ic">🏗</div>
+                <div class="dept-info">
+                  <div class="dept-nome">Operações &amp; Obra</div>
+                  <div class="dept-meta">Carlos Aurora · 78 empregados · sigla OPS</div>
+                  <div class="dept-stats">
+                    <span class="tag" style="font-size:10px">centro custo OPS-001</span>
+                    <span class="tag verde" style="font-size:10px">61% folha</span>
+                  </div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="dept-card" style="border-left-color:var(--roxo)">
+                <div class="dept-ic">📐</div>
+                <div class="dept-info">
+                  <div class="dept-nome">Engenharia</div>
+                  <div class="dept-meta">Luísa Mendonça · 22 empregados · ENG</div>
+                  <div class="dept-stats">
+                    <span class="tag" style="font-size:10px">ENG-001 + ENG-002</span>
+                    <span class="tag verde" style="font-size:10px">17% folha</span>
+                  </div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="dept-card" style="border-left-color:var(--verde)">
+                <div class="dept-ic">💰</div>
+                <div class="dept-info">
+                  <div class="dept-nome">Financeiro &amp; Adm</div>
+                  <div class="dept-meta">Eduardo Santos · 12 empregados · FIN</div>
+                  <div class="dept-stats">
+                    <span class="tag" style="font-size:10px">FIN-001</span>
+                    <span class="tag verde" style="font-size:10px">9% folha</span>
+                  </div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="dept-card" style="border-left-color:var(--laranja)">
+                <div class="dept-ic">📊</div>
+                <div class="dept-info">
+                  <div class="dept-nome">Comercial</div>
+                  <div class="dept-meta">Carlos Aurora · 8 empregados · COM</div>
+                  <div class="dept-stats">
+                    <span class="tag" style="font-size:10px">COM-001</span>
+                    <span class="tag verde" style="font-size:10px">7% folha</span>
+                  </div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="dept-card" style="border-left-color:var(--amarelo)">
+                <div class="dept-ic">📦</div>
+                <div class="dept-info">
+                  <div class="dept-nome">Suprimentos</div>
+                  <div class="dept-meta">Gabriela Tavares · 5 empregados · SUP</div>
+                  <div class="dept-stats">
+                    <span class="tag" style="font-size:10px">SUP-001</span>
+                    <span class="tag verde" style="font-size:10px">4% folha</span>
+                  </div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="dept-card" style="border-left-color:var(--cinza)">
+                <div class="dept-ic">👥</div>
+                <div class="dept-info">
+                  <div class="dept-nome">Recursos Humanos</div>
+                  <div class="dept-meta">Roberto Aurora · 3 empregados · RH</div>
+                  <div class="dept-stats">
+                    <span class="tag" style="font-size:10px">RH-001</span>
+                    <span class="tag verde" style="font-size:10px">2% folha</span>
+                  </div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+            </div>
+
+            <button class="btn btn-fantasma btn-sm" style="margin-top:14px;width:100%;justify-content:center;border-style:dashed">+ Criar novo departamento</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: CARGOS & SALÁRIOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-cargos-salarios">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item ativo"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dados-empresa')">Empresa &amp; Org</a> &gt; <span style="color:var(--laranja)">Cargos &amp; Salários</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Plano de <em>cargos &amp; salários</em></h1>
+          <div class="meta">28 cargos distribuídos em <strong>5 famílias</strong> · cada faixa salarial tem mínimo e máximo definidos</div>
+          <div class="header-tags">
+            <span class="tag verde">28 cargos ativos</span>
+            <span class="tag laranja">5 famílias</span>
+            <span class="tag amarelo">2 em revisão</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">📊 Benchmark de mercado</button>
+          <button class="btn btn-primario btn-sm">+ Novo cargo</button>
+        </div>
+      </div>
+
+      <div class="config-shell">
+        <nav class="config-nav">
+          <div class="config-nav-titulo">Seções</div>
+          <div class="config-nav-item" onclick="irPara('t-dados-empresa')"><span class="ic">🏢</span> Dados da Empresa</div>
+          <div class="config-nav-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma <span class="badge">5</span></div>
+          <div class="config-nav-item ativo"><span class="ic">💼</span> Cargos &amp; Salários <span class="badge">28</span></div>
+          <div class="config-nav-item" onclick="irPara('t-fluxos')"><span class="ic">⚡</span> Fluxos &amp; Aprovação <span class="badge">8</span></div>
+          <div class="config-nav-item" onclick="irPara('t-politicas')"><span class="ic">⚖</span> Políticas internas</div>
+          <div class="config-nav-item" onclick="irPara('t-centros-custo')"><span class="ic">💼</span> Centros de Custo <span class="badge">12</span></div>
+        </nav>
+
+        <div>
+          <div class="alert alert-marinho">
+            <span class="ic-grande">📊</span>
+            <div>
+              <strong>Faixas calibradas com benchmark Oi Nora (28 clientes)</strong>
+              Cada cargo tem salário mínimo, mediana e máximo. Quando alguém é contratado fora da faixa, o sistema alerta. <strong style="color:var(--laranja)">A IA recomenda revisão anual após o dissídio.</strong>
+            </div>
+          </div>
+
+          <!-- FAMÍLIA: ENGENHARIA -->
+          <div class="painel">
+            <div class="painel-header">
+              <div>
+                <h3>📐 Família · <em>Engenharia Técnica</em></h3>
+                <p class="sub-titulo">7 cargos · 22 empregados</p>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-fantasma btn-xs">📊 Ver gráfico</button>
+                <button class="btn btn-fantasma btn-xs">+ Adicionar cargo</button>
+              </div>
+            </div>
+
+            <div class="cargo-grid">
+              <div class="cargo-linha head">
+                <div>Cargo · CBO</div>
+                <div>Faixa</div>
+                <div>Mediana</div>
+                <div>Headcount</div>
+                <div>Mercado</div>
+                <div></div>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Diretor de Engenharia</div>
+                  <div class="cargo-cbo">2142-05 · senioridade D</div>
+                </div>
+                <div class="cargo-faixa">R$ 22-32k <span class="min">/mês</span></div>
+                <div class="cargo-faixa">R$ 28.500</div>
+                <div class="cargo-headcount">
+                  <span class="num-h">1</span>
+                  <div class="barr"><div class="barr-f" style="width:10%"></div></div>
+                </div>
+                <div><span class="tag verde" style="font-size:10px">P55</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Engenheiro Especialista</div>
+                  <div class="cargo-cbo">2142-05 · senioridade SE</div>
+                </div>
+                <div class="cargo-faixa">R$ 15-18k</div>
+                <div class="cargo-faixa">R$ 16.500</div>
+                <div class="cargo-headcount">
+                  <span class="num-h">2</span>
+                  <div class="barr"><div class="barr-f" style="width:18%"></div></div>
+                </div>
+                <div><span class="tag verde" style="font-size:10px">P60</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha" style="background:var(--laranja-cl)">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Engenheiro Civil Sênior</div>
+                  <div class="cargo-cbo">2142-05 · SR-3 · Fernando Lacerda</div>
+                </div>
+                <div class="cargo-faixa">R$ 11-14k</div>
+                <div class="cargo-faixa">R$ 12.500</div>
+                <div class="cargo-headcount">
+                  <span class="num-h">5</span>
+                  <div class="barr"><div class="barr-f" style="width:45%"></div></div>
+                </div>
+                <div><span class="tag laranja" style="font-size:10px">P65</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Engenheiro Civil Pleno</div>
+                  <div class="cargo-cbo">2142-05 · PL-2</div>
+                </div>
+                <div class="cargo-faixa">R$ 8-11k</div>
+                <div class="cargo-faixa">R$ 9.500</div>
+                <div class="cargo-headcount">
+                  <span class="num-h">7</span>
+                  <div class="barr"><div class="barr-f" style="width:63%"></div></div>
+                </div>
+                <div><span class="tag verde" style="font-size:10px">P58</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Engenheiro Civil Júnior</div>
+                  <div class="cargo-cbo">2142-05 · JR-1</div>
+                </div>
+                <div class="cargo-faixa">R$ 5-7k</div>
+                <div class="cargo-faixa">R$ 6.200</div>
+                <div class="cargo-headcount">
+                  <span class="num-h">4</span>
+                  <div class="barr"><div class="barr-f" style="width:36%"></div></div>
+                </div>
+                <div><span class="tag" style="font-size:10px">P50</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Estagiário Engenharia</div>
+                  <div class="cargo-cbo">EST · CAT-3</div>
+                </div>
+                <div class="cargo-faixa">R$ 1.8-2.6k</div>
+                <div class="cargo-faixa">R$ 2.200</div>
+                <div class="cargo-headcount">
+                  <span class="num-h">2</span>
+                  <div class="barr"><div class="barr-f" style="width:18%"></div></div>
+                </div>
+                <div><span class="tag verde" style="font-size:10px">P55</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Técnico de Edificações</div>
+                  <div class="cargo-cbo">3121-05</div>
+                </div>
+                <div class="cargo-faixa">R$ 3.8-5.2k</div>
+                <div class="cargo-faixa">R$ 4.400</div>
+                <div class="cargo-headcount">
+                  <span class="num-h">1</span>
+                  <div class="barr"><div class="barr-f" style="width:9%"></div></div>
+                </div>
+                <div><span class="tag verde" style="font-size:10px">P52</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAMÍLIA: OPERAÇÕES (resumo) -->
+          <div class="painel">
+            <div class="painel-header">
+              <div>
+                <h3>🏗 Família · <em>Operações &amp; Obra</em></h3>
+                <p class="sub-titulo">8 cargos · 78 empregados</p>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-fantasma btn-xs">+ Adicionar cargo</button>
+              </div>
+            </div>
+
+            <div class="cargo-grid">
+              <div class="cargo-linha head">
+                <div>Cargo · CBO</div>
+                <div>Faixa</div>
+                <div>Mediana</div>
+                <div>Headcount</div>
+                <div>Mercado</div>
+                <div></div>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Diretor de Operações</div>
+                  <div class="cargo-cbo">1422-05</div>
+                </div>
+                <div class="cargo-faixa">R$ 22-30k</div>
+                <div class="cargo-faixa">R$ 26.000</div>
+                <div class="cargo-headcount"><span class="num-h">1</span></div>
+                <div><span class="tag verde" style="font-size:10px">P54</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Mestre de Obras</div>
+                  <div class="cargo-cbo">7102-25</div>
+                </div>
+                <div class="cargo-faixa">R$ 5-8k</div>
+                <div class="cargo-faixa">R$ 6.500</div>
+                <div class="cargo-headcount"><span class="num-h">8</span><div class="barr"><div class="barr-f" style="width:72%"></div></div></div>
+                <div><span class="tag verde" style="font-size:10px">P58</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Pedreiro</div>
+                  <div class="cargo-cbo">7152-10</div>
+                </div>
+                <div class="cargo-faixa">R$ 2.4-3.4k</div>
+                <div class="cargo-faixa">R$ 2.900</div>
+                <div class="cargo-headcount"><span class="num-h">22</span><div class="barr"><div class="barr-f" style="width:100%"></div></div></div>
+                <div><span class="tag verde" style="font-size:10px">P56 + insalubr.</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Servente de Obra</div>
+                  <div class="cargo-cbo">7170-20</div>
+                </div>
+                <div class="cargo-faixa">R$ 1.7-2.3k</div>
+                <div class="cargo-faixa">R$ 1.950</div>
+                <div class="cargo-headcount"><span class="num-h">31</span><div class="barr"><div class="barr-f" style="width:100%"></div></div></div>
+                <div><span class="tag verde" style="font-size:10px">P54 + insalubr.</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Carpinteiro</div>
+                  <div class="cargo-cbo">7155-15</div>
+                </div>
+                <div class="cargo-faixa">R$ 2.6-3.6k</div>
+                <div class="cargo-faixa">R$ 3.100</div>
+                <div class="cargo-headcount"><span class="num-h">12</span><div class="barr"><div class="barr-f" style="width:100%"></div></div></div>
+                <div><span class="tag verde" style="font-size:10px">P55</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+
+              <div class="cargo-linha">
+                <div class="cargo-titulo-celula">
+                  <div class="cargo-nome">Encarregado de Obra</div>
+                  <div class="cargo-cbo">7102-15</div>
+                </div>
+                <div class="cargo-faixa">R$ 3.5-5k</div>
+                <div class="cargo-faixa">R$ 4.100</div>
+                <div class="cargo-headcount"><span class="num-h">4</span><div class="barr"><div class="barr-f" style="width:36%"></div></div></div>
+                <div><span class="tag verde" style="font-size:10px">P52</span></div>
+                <button class="btn btn-fantasma btn-xs">⚙</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-laranja">
+            <span class="ic-grande">💡</span>
+            <div>
+              <strong>Outras 3 famílias configuradas</strong>
+              💰 Financeiro &amp; Adm (6 cargos · 12 empregados) · 📊 Comercial (4 cargos · 8 empregados) · 👥 RH (3 cargos · 3 empregados). Clique em "Ver todas" para expandir.
+            </div>
+          </div>
+
+          <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-bottom:14px">📋 Ver todas as 5 famílias</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: FLUXOS DE APROVAÇÃO -->
+<!-- ============================================== -->
+<div class="tela" id="t-fluxos">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item ativo"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dados-empresa')">Empresa &amp; Org</a> &gt; <span style="color:var(--laranja)">Fluxos &amp; Aprovação</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Fluxos de <em>aprovação</em></h1>
+          <div class="meta">8 fluxos configurados · cobertura completa para férias, contratações, gastos e mudanças contratuais</div>
+          <div class="header-tags">
+            <span class="tag verde">8 fluxos ativos</span>
+            <span class="tag laranja">2 em revisão</span>
+            <span class="tag">SLA padrão 48h</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">📋 Templates Oi Nora</button>
+          <button class="btn btn-primario btn-sm">+ Criar fluxo</button>
+        </div>
+      </div>
+
+      <div class="config-shell">
+        <nav class="config-nav">
+          <div class="config-nav-titulo">Seções</div>
+          <div class="config-nav-item" onclick="irPara('t-dados-empresa')"><span class="ic">🏢</span> Dados da Empresa</div>
+          <div class="config-nav-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma <span class="badge">5</span></div>
+          <div class="config-nav-item" onclick="irPara('t-cargos-salarios')"><span class="ic">💼</span> Cargos &amp; Salários <span class="badge">28</span></div>
+          <div class="config-nav-item ativo"><span class="ic">⚡</span> Fluxos &amp; Aprovação <span class="badge">8</span></div>
+          <div class="config-nav-item" onclick="irPara('t-politicas')"><span class="ic">⚖</span> Políticas internas</div>
+          <div class="config-nav-item" onclick="irPara('t-centros-custo')"><span class="ic">💼</span> Centros de Custo <span class="badge">12</span></div>
+        </nav>
+
+        <div>
+          <!-- FLUXO 1: FÉRIAS -->
+          <div class="fluxo-card ativo">
+            <div class="fluxo-head">
+              <div>
+                <div class="fluxo-titulo">🌴 Solicitação de férias <span class="tag verde" style="font-size:10px">Ativo</span></div>
+                <div class="fluxo-sub">Aplicado a: todos os empregados CLT · SLA 48h</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-fantasma btn-xs">📊 Estatísticas</button>
+                <button class="btn btn-fantasma btn-xs">✎ Editar</button>
+              </div>
+            </div>
+            <div class="fluxo-passos">
+              <div class="fluxo-passo">
+                <div class="num">1</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Empregado solicita</div>
+                  <div class="fluxo-passo-cargo">app · auto-preenchido</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">2</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Gestor direto aprova</div>
+                  <div class="fluxo-passo-cargo">is_leader · 48h SLA</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">3</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">RH valida e agenda</div>
+                  <div class="fluxo-passo-cargo">Bruna Lima · DP</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FLUXO 2: NOVA CONTRATAÇÃO -->
+          <div class="fluxo-card ativo">
+            <div class="fluxo-head">
+              <div>
+                <div class="fluxo-titulo">📋 Proposta de contratação (offer) <span class="tag verde" style="font-size:10px">Ativo</span></div>
+                <div class="fluxo-sub">Aplicado a: todas as vagas · com regra condicional por valor</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-fantasma btn-xs">📊 Estatísticas</button>
+                <button class="btn btn-fantasma btn-xs">✎ Editar</button>
+              </div>
+            </div>
+            <div class="fluxo-passos">
+              <div class="fluxo-passo">
+                <div class="num">1</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Recrutador envia</div>
+                  <div class="fluxo-passo-cargo">Mariana ou Tiago</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">2</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Gestor da vaga</div>
+                  <div class="fluxo-passo-cargo">Luísa, Carlos, Eduardo</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">3</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">RH aprova fit cultural</div>
+                  <div class="fluxo-passo-cargo">Roberto Aurora</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo condicional">
+                <div class="num">4</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Diretor Financeiro</div>
+                  <div class="fluxo-passo-cargo">só se &gt; R$ 10k</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FLUXO 3: AUMENTO SALARIAL -->
+          <div class="fluxo-card ativo">
+            <div class="fluxo-head">
+              <div>
+                <div class="fluxo-titulo">💰 Alteração salarial / promoção <span class="tag verde" style="font-size:10px">Ativo</span></div>
+                <div class="fluxo-sub">Disparado em mérito, dissídio ou promoção</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-fantasma btn-xs">✎ Editar</button>
+              </div>
+            </div>
+            <div class="fluxo-passos">
+              <div class="fluxo-passo">
+                <div class="num">1</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Gestor propõe</div>
+                  <div class="fluxo-passo-cargo">is_leader · com justif.</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">2</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">RH valida faixa</div>
+                  <div class="fluxo-passo-cargo">Roberto · plano cargos</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo condicional">
+                <div class="num">3</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Diretor Financeiro</div>
+                  <div class="fluxo-passo-cargo">se &gt; R$ 1k aumento</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">4</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">CEO ratifica</div>
+                  <div class="fluxo-passo-cargo">Alfredo · só promoções</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FLUXO 4: COMPRA / DESPESA -->
+          <div class="fluxo-card ativo">
+            <div class="fluxo-head">
+              <div>
+                <div class="fluxo-titulo">💳 Despesa / compra <span class="tag verde" style="font-size:10px">Ativo</span></div>
+                <div class="fluxo-sub">Reembolso, compra de material, despesa de viagem</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-fantasma btn-xs">✎ Editar</button>
+              </div>
+            </div>
+            <div class="fluxo-passos">
+              <div class="fluxo-passo">
+                <div class="num">1</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Solicitante</div>
+                  <div class="fluxo-passo-cargo">app · com NF</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo condicional">
+                <div class="num">2</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Gestor direto</div>
+                  <div class="fluxo-passo-cargo">até R$ 2k</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo condicional">
+                <div class="num">3</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Diretor área</div>
+                  <div class="fluxo-passo-cargo">R$ 2k a R$ 20k</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo condicional">
+                <div class="num">4</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">CEO + CFO</div>
+                  <div class="fluxo-passo-cargo">acima de R$ 20k</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FLUXO 5: HOME OFFICE EXTRA -->
+          <div class="fluxo-card ativo">
+            <div class="fluxo-head">
+              <div>
+                <div class="fluxo-titulo">🏠 Home office fora do padrão <span class="tag verde" style="font-size:10px">Ativo</span></div>
+                <div class="fluxo-sub">Quando empregado quer mais de 2 dias home/semana</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-fantasma btn-xs">✎ Editar</button>
+              </div>
+            </div>
+            <div class="fluxo-passos">
+              <div class="fluxo-passo">
+                <div class="num">1</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Empregado solicita</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">2</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Gestor aprova</div>
+                  <div class="fluxo-passo-cargo">is_leader</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">3</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">RH informativo</div>
+                  <div class="fluxo-passo-cargo">notificação</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FLUXO 6: DESLIGAMENTO -->
+          <div class="fluxo-card ativo" style="border-left-color:var(--vermelho)">
+            <div class="fluxo-head">
+              <div>
+                <div class="fluxo-titulo">📁 Desligamento / demissão <span class="tag vermelho" style="font-size:10px">Sensível</span></div>
+                <div class="fluxo-sub">Disparado por gestor · todas etapas obrigatórias · gera auditoria reforçada</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-fantasma btn-xs">✎ Editar</button>
+              </div>
+            </div>
+            <div class="fluxo-passos">
+              <div class="fluxo-passo">
+                <div class="num">1</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Gestor inicia</div>
+                  <div class="fluxo-passo-cargo">+ justificativa</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">2</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">RH avalia</div>
+                  <div class="fluxo-passo-cargo">Roberto · processos LGPD</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">3</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">Diretor área</div>
+                  <div class="fluxo-passo-cargo">Carlos, Luísa, Eduardo</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">4</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">CEO ratifica</div>
+                  <div class="fluxo-passo-cargo">Alfredo Aurora</div>
+                </div>
+              </div>
+              <div class="fluxo-seta">→</div>
+              <div class="fluxo-passo">
+                <div class="num">5</div>
+                <div class="fluxo-passo-info">
+                  <div class="fluxo-passo-nome">DP executa</div>
+                  <div class="fluxo-passo-cargo">Bruna · rescisão + eSocial</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza)">
+            <span><strong style="color:var(--marinho)">+ 2 fluxos ativos:</strong> Ajuste de ponto · Solicitação de equipamento</span>
+            <a style="color:var(--laranja);font-weight:600">Ver todos os 8 →</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: POLÍTICAS INTERNAS -->
+<!-- ============================================== -->
+<div class="tela" id="t-politicas">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item ativo"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dados-empresa')">Empresa &amp; Org</a> &gt; <span style="color:var(--laranja)">Políticas internas</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Políticas <em>internas</em></h1>
+          <div class="meta">Regras da empresa aplicadas automaticamente · cada toggle aciona uma regra do sistema</div>
+          <div class="header-tags">
+            <span class="tag verde">14 ativas</span>
+            <span class="tag">8 documentos vinculados</span>
+            <span class="tag laranja">2 vencendo</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">📋 Templates Oi Nora</button>
+          <button class="btn btn-primario btn-sm">+ Criar política</button>
+        </div>
+      </div>
+
+      <div class="config-shell">
+        <nav class="config-nav">
+          <div class="config-nav-titulo">Seções</div>
+          <div class="config-nav-item" onclick="irPara('t-dados-empresa')"><span class="ic">🏢</span> Dados da Empresa</div>
+          <div class="config-nav-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma <span class="badge">5</span></div>
+          <div class="config-nav-item" onclick="irPara('t-cargos-salarios')"><span class="ic">💼</span> Cargos &amp; Salários <span class="badge">28</span></div>
+          <div class="config-nav-item" onclick="irPara('t-fluxos')"><span class="ic">⚡</span> Fluxos &amp; Aprovação <span class="badge">8</span></div>
+          <div class="config-nav-item ativo"><span class="ic">⚖</span> Políticas internas</div>
+          <div class="config-nav-item" onclick="irPara('t-centros-custo')"><span class="ic">💼</span> Centros de Custo <span class="badge">12</span></div>
+        </nav>
+
+        <div>
+          <!-- JORNADAS -->
+          <div class="painel">
+            <h3>⏱ Jornada &amp; <em>Trabalho</em></h3>
+            <p class="sub-titulo">Quando e onde trabalhar</p>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Modalidade híbrida (3 presencial + 2 home)</h4>
+                <p>Aplicável a Engenharia, Financeiro, Comercial, RH. <strong>Operações &amp; Obra ficam 100% presenciais.</strong></p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Banco de horas (compensação 12 meses)</h4>
+                <p>Conforme CCT vigente · limite máximo individual: <strong>+80h</strong> · ponto noturno conta 1.2x.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Horário flexível</h4>
+                <p>Empregados da sede podem variar entrada entre 07:30 e 09:00 · 8h trabalhadas obrigatórias.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Tolerância de atraso (10min sem desconto)</h4>
+                <p>Padrão da CCT · após 10min começa a descontar do salário ou banco de horas.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Trabalho aos sábados (concretagens)</h4>
+                <p>Sábado opcional · paga 50% extra · obrigatório aviso na sexta · só para obras.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+          </div>
+
+          <!-- FÉRIAS -->
+          <div class="painel">
+            <h3>🌴 <em>Férias</em> &amp; Folgas</h3>
+            <p class="sub-titulo">Regras de descanso</p>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Fracionamento em até 3 períodos</h4>
+                <p>Permitido pela CLT · um período mínimo de 14 dias + outros 2 de no mínimo 5 dias cada.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Abono pecuniário (vender 1/3 das férias)</h4>
+                <p>Empregado pode vender até 10 dias · solicitação até 15 dias antes do início.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Bloqueio em fim de obra</h4>
+                <p>Cronograma de obra ativo bloqueia férias da equipe da obra · gestor pode liberar exceção.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Banco de folgas opcionais (4 dias/ano)</h4>
+                <p>Conforme proposta GPI 2026 · ainda em <strong>fase de teste</strong> · ativar para todos?</p>
+              </div>
+              <div class="toggle"></div>
+            </div>
+          </div>
+
+          <!-- BENEFICIOS -->
+          <div class="painel">
+            <h3>🎁 <em>Benefícios</em> &amp; Auxílios</h3>
+            <p class="sub-titulo">O que a empresa oferece</p>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>VR (vale-refeição) Flash · R$ 35/dia</h4>
+                <p>Aplicável a todos · contribuição empregado 6% · empresa 94%</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Plano de saúde Unimed BH (Master)</h4>
+                <p>Titular gratuito · dependentes R$ 220/cada · cobre 100% da empresa</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Auxílio educação (R$ 500/mês)</h4>
+                <p>Aprovação do gestor · só cursos da área · 1 ano mínimo de empresa</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Auxílio combustível (R$ 280/mês)</h4>
+                <p>Quem usa carro próprio para sede ou obra · cartão Ticket</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Gympass (Wellhub)</h4>
+                <p>100% empresa · adesão voluntária · usado por 34 empregados</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+          </div>
+
+          <!-- CONDUTA -->
+          <div class="painel">
+            <h3>⚖ <em>Conduta</em> &amp; Compliance</h3>
+            <p class="sub-titulo">Aspectos éticos e legais</p>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Código de Conduta vigente</h4>
+                <p>Versão 2.0 · revisado 01/06/2024 · 100% dos empregados aceitos · <a style="color:var(--laranja);font-weight:600">📄 Ver documento</a></p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Política LGPD v2.0</h4>
+                <p><strong style="color:var(--vermelho)">⚠ 8 empregados pendentes</strong> · vigência 01/05/2026 · Bruna está notificando.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Canal de denúncias anônimo</h4>
+                <p>Ético terceirizado · 2 denúncias no último trimestre · ambas resolvidas.</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+
+            <div class="politica-item">
+              <div class="politica-info">
+                <h4>Política antiassédio (programa CIPA)</h4>
+                <p>Capacitação anual · ✓ realizada em mar/2026 · próxima mar/2027</p>
+              </div>
+              <div class="toggle ativo"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 6: CENTROS DE CUSTO -->
+<!-- ============================================== -->
+<div class="tela" id="t-centros-custo">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item ativo"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-item outro"><span class="ic">💳</span> Plano &amp; Faturamento</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner do Tenant</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dados-empresa')">Empresa &amp; Org</a> &gt; <span style="color:var(--laranja)">Centros de Custo</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Centros de <em>custo</em></h1>
+          <div class="meta">12 centros ativos · alocação de pessoas para contabilidade gerencial e integração com Sienge/ERP</div>
+          <div class="header-tags">
+            <span class="tag verde">12 ativos</span>
+            <span class="tag laranja">R$ 2.789K alocados</span>
+            <span class="tag">Integra Sienge</span>
+          </div>
+        </div>
+        <div class="header-bar-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Excel</button>
+          <button class="btn btn-primario btn-sm">+ Criar CC</button>
+        </div>
+      </div>
+
+      <div class="config-shell">
+        <nav class="config-nav">
+          <div class="config-nav-titulo">Seções</div>
+          <div class="config-nav-item" onclick="irPara('t-dados-empresa')"><span class="ic">🏢</span> Dados da Empresa</div>
+          <div class="config-nav-item" onclick="irPara('t-organograma')"><span class="ic">🌳</span> Organograma <span class="badge">5</span></div>
+          <div class="config-nav-item" onclick="irPara('t-cargos-salarios')"><span class="ic">💼</span> Cargos &amp; Salários <span class="badge">28</span></div>
+          <div class="config-nav-item" onclick="irPara('t-fluxos')"><span class="ic">⚡</span> Fluxos &amp; Aprovação <span class="badge">8</span></div>
+          <div class="config-nav-item" onclick="irPara('t-politicas')"><span class="ic">⚖</span> Políticas internas</div>
+          <div class="config-nav-item ativo"><span class="ic">💼</span> Centros de Custo <span class="badge">12</span></div>
+        </nav>
+
+        <div>
+          <div class="alert alert-marinho">
+            <span class="ic-grande">📊</span>
+            <div>
+              <strong>Integração com Sienge ativa</strong>
+              Cada folha exporta totais por centro de custo para o Sienge (sistema ERP). Sincronização: <strong style="color:var(--laranja)">a cada 24h, 06:00</strong>.
+            </div>
+          </div>
+
+          <!-- OPERAÇÕES & OBRA -->
+          <div class="painel">
+            <h3>🏗 <em>Operações &amp; Obra</em></h3>
+            <p class="sub-titulo">4 centros · 78 empregados alocados</p>
+
+            <div class="cc-grid">
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">OPS-001 · Obra Sítio II</div>
+                  <div class="cc-nome">Canteiro Sítio II · BR-040</div>
+                  <div class="cc-meta">
+                    <span>42 empregados</span>
+                    <span>· orçamento 2026: R$ 12M</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 638k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">OPS-002 · Vila Aurora</div>
+                  <div class="cc-nome">Canteiro Vila Aurora · Nova Lima</div>
+                  <div class="cc-meta">
+                    <span>26 empregados</span>
+                    <span>· orçamento R$ 8M</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 392k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">OPS-003 · Apoio</div>
+                  <div class="cc-nome">Equipe volante &amp; emergências</div>
+                  <div class="cc-meta">
+                    <span>8 empregados</span>
+                    <span>· apoia ambas obras</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 124k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+
+              <div class="cc-card inativo">
+                <div>
+                  <div class="cc-codigo">OPS-004 · Obra Pampulha</div>
+                  <div class="cc-nome">Encerrado em 02/2026</div>
+                  <div class="cc-meta">
+                    <span>0 empregados ativos</span>
+                    <span>· histórico mantido</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="cc-valor" style="color:var(--cinza)">R$ 0</div>
+                  <div class="cc-valor-meta">arquivado</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ADMINISTRATIVO -->
+          <div class="painel">
+            <h3>💼 <em>Administrativo</em></h3>
+            <p class="sub-titulo">8 centros · 50 empregados</p>
+
+            <div class="cc-grid">
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">ENG-001 · Eng. Sede</div>
+                  <div class="cc-nome">Engenharia · Sede BH</div>
+                  <div class="cc-meta"><span>14 empregados</span><span>· Luísa Mendonça</span></div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 312k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">ENG-002 · Eng. Obra</div>
+                  <div class="cc-nome">Engenharia &amp; Planejamento de Obra</div>
+                  <div class="cc-meta"><span>8 empregados</span><span>· Fernando, Pedro</span></div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 186k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">FIN-001 · Financeiro</div>
+                  <div class="cc-nome">Financeiro &amp; Adm</div>
+                  <div class="cc-meta"><span>12 empregados</span><span>· Eduardo Santos</span></div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 248k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">COM-001 · Vendas</div>
+                  <div class="cc-nome">Comercial &amp; Captação</div>
+                  <div class="cc-meta"><span>8 empregados</span><span>· comissões variáveis</span></div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 167k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">SUP-001 · Suprimentos</div>
+                  <div class="cc-nome">Compras &amp; Logística</div>
+                  <div class="cc-meta"><span>5 empregados</span><span>· Gabriela Tavares</span></div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 92k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+
+              <div class="cc-card ativo">
+                <div>
+                  <div class="cc-codigo">RH-001 · RH &amp; DP</div>
+                  <div class="cc-nome">Recursos Humanos</div>
+                  <div class="cc-meta"><span>3 empregados</span><span>· Roberto, Carla, Bruna</span></div>
+                </div>
+                <div>
+                  <div class="cc-valor">R$ 50k</div>
+                  <div class="cc-valor-meta">folha/mês</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TOTAL -->
+          <div class="painel" style="background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border-color:var(--laranja)">
+            <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center">
+              <div>
+                <h3>Total <em>consolidado</em> · maio/2026</h3>
+                <p class="sub-titulo" style="margin-bottom:0">12 centros de custo · 128 empregados</p>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--serif);font-style:italic;font-size:42px;color:var(--laranja);line-height:1">R$ 2.789K</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-top:4px">custo total folha + encargos</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Configurações · Seção:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-dados-empresa">🏢 Dados da Empresa</option>
+    <option value="t-organograma">🌳 Organograma</option>
+    <option value="t-cargos-salarios">💼 Cargos &amp; Salários</option>
+    <option value="t-fluxos">⚡ Fluxos &amp; Aprovação</option>
+    <option value="t-politicas">⚖ Políticas internas</option>
+    <option value="t-centros-custo">💼 Centros de Custo</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+
+// Toggles
+document.querySelectorAll('.toggle').forEach(t=>{
+  t.addEventListener('click',function(){this.classList.toggle('ativo')});
+});
+</script>
+</body>
+</html>

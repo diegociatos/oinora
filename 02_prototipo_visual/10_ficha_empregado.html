@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Ficha do Empregado (Fernando Lacerda)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-perigo{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  /* HEADER PESSOA */
+  .pessoa-header{background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:18px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}
+  .pessoa-foto{width:96px;height:96px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:38px;font-weight:600;background:linear-gradient(135deg,#E8633A,#C94E28);flex-shrink:0;border:4px solid white;box-shadow:0 4px 14px rgba(31,42,68,.1)}
+  .pessoa-nome{font-size:30px;font-weight:400;letter-spacing:-.3px;line-height:1.1;margin-bottom:4px}
+  .pessoa-cargo-linha{font-family:var(--ui);font-size:13px;color:var(--cinza);letter-spacing:.3px;margin-bottom:12px}
+  .pessoa-cargo-linha strong{color:var(--marinho);font-family:var(--serif);font-weight:500}
+  .pessoa-tags{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* KPIS */
+  .kpis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .kpi-titulo{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .kpi-valor{font-size:24px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.3px}
+  .kpi-valor em{color:var(--laranja);font-style:italic}
+  .kpi-valor span{font-size:13px;color:var(--cinza)}
+  .kpi-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;letter-spacing:.3px}
+
+  /* ABAS */
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;overflow-x:auto;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:0 6px}
+  .aba{padding:14px 20px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .aba .ic{font-size:14px}
+  .aba .cnt{background:var(--cinza-fundo);font-size:10px;padding:1px 7px;border-radius:10px;letter-spacing:.3px;font-weight:700;color:var(--cinza)}
+  .aba.ativa .cnt{background:var(--laranja);color:white}
+
+  /* PAINEL */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px;letter-spacing:-.2px}
+  .painel h3 em{color:var(--laranja);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-2-2-1{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+
+  /* CAMPOS */
+  .info-linha{display:grid;grid-template-columns:180px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--cinza-cl);font-size:14px}
+  .info-linha:last-child{border:none}
+  .info-linha .rotulo{color:var(--cinza);font-family:var(--ui);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600}
+  .info-linha .valor{color:var(--marinho)}
+  .info-linha .valor.editavel{display:flex;align-items:center;gap:8px;cursor:pointer}
+  .info-linha .valor.editavel:hover{color:var(--laranja)}
+  .info-linha .valor.editavel::after{content:"✎";opacity:0;font-family:var(--ui);font-size:11px;transition:opacity .15s}
+  .info-linha .valor.editavel:hover::after{opacity:.5}
+  .info-linha .valor.mascarado{font-family:'SF Mono','Monaco',monospace;font-size:13px;color:var(--cinza);letter-spacing:1px}
+  .info-linha .valor .ver{font-family:var(--ui);font-size:10px;color:var(--laranja);text-transform:uppercase;letter-spacing:.5px;font-weight:600;cursor:pointer}
+
+  /* TAGS */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  /* ALERT */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden}
+  .alert-marinho::before{content:"";position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .alert-marinho > *{position:relative}
+  .alert-laranja{background:var(--laranja-cl);border-left:3px solid var(--laranja);color:var(--marinho)}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert-verde{background:var(--verde-cl);border-left:3px solid var(--verde);color:var(--marinho)}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* DOCUMENTOS */
+  .doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .doc-item{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;transition:all .15s}
+  .doc-item:hover{border-color:var(--marinho)}
+  .doc-ic{width:42px;height:42px;border-radius:2px;background:var(--cinza-fundo);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid var(--cinza-cl)}
+  .doc-ic.verde{background:var(--verde-cl);border-color:var(--verde);color:var(--verde)}
+  .doc-ic.amarelo{background:var(--amarelo-cl);border-color:var(--amarelo);color:#876715}
+  .doc-ic.vermelho{background:var(--vermelho-cl);border-color:var(--vermelho);color:var(--vermelho)}
+  .doc-titulo{font-size:13.5px;font-weight:500;line-height:1.2}
+  .doc-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .doc-acoes{display:flex;gap:4px}
+
+  /* TIMELINE */
+  .timeline{border-left:2px solid var(--cinza-cl);padding-left:24px;margin-left:8px;margin-top:14px}
+  .timeline-evento{position:relative;padding-bottom:24px}
+  .timeline-evento::before{content:"";position:absolute;left:-32px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--marinho);border:3px solid var(--branco);box-shadow:0 0 0 2px var(--marinho)}
+  .timeline-evento.laranja::before{background:var(--laranja);box-shadow:0 0 0 2px var(--laranja)}
+  .timeline-evento.verde::before{background:var(--verde);box-shadow:0 0 0 2px var(--verde)}
+  .timeline-evento.amarelo::before{background:var(--amarelo);box-shadow:0 0 0 2px var(--amarelo)}
+  .timeline-evento.roxo::before{background:var(--roxo);box-shadow:0 0 0 2px var(--roxo)}
+  .timeline-data{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:4px}
+  .timeline-titulo{font-size:14px;font-weight:500;margin-bottom:3px}
+  .timeline-desc{font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.55}
+  .timeline-desc strong{color:var(--marinho);font-weight:600}
+
+  /* DEPENDENTES */
+  .dep-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .dep-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:16px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+  .dep-av{width:42px;height:42px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:16px;font-weight:600;flex-shrink:0}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .dep-nome{font-size:14px;font-weight:500}
+  .dep-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+
+  /* BENEFICIO ITEM */
+  .ben-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .ben-item{padding:14px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+  .ben-info{display:flex;align-items:center;gap:12px}
+  .ben-ic{width:36px;height:36px;border-radius:2px;background:var(--cinza-fundo);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .ben-nome{font-size:13px;font-weight:500}
+  .ben-valor{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px}
+
+  /* HISTÓRICO DE CARGO */
+  .historico-cargo{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px}
+  .hc-linha{padding:14px 18px;border-bottom:1px solid var(--cinza-cl);display:grid;grid-template-columns:120px 1fr 120px auto;gap:14px;align-items:center;font-size:13px}
+  .hc-linha:last-child{border:none}
+  .hc-linha.atual{background:var(--laranja-cl)}
+  .hc-data{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px}
+  .hc-cargo{font-weight:500}
+  .hc-salario{font-family:var(--serif);font-style:italic;color:var(--laranja);font-size:15px}
+  .hc-delta{font-family:var(--ui);font-size:10px;color:var(--verde);letter-spacing:.3px;font-weight:600}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:260px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1000px){
+    .kpis-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2,.grid-2-2-1{grid-template-columns:1fr}
+    .doc-grid,.dep-grid,.ben-grid{grid-template-columns:1fr}
+    .info-linha{grid-template-columns:1fr;gap:4px}
+    .pessoa-header{grid-template-columns:1fr;text-align:center}
+    .pessoa-foto{margin:0 auto}
+    .pessoa-tags{justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: ABA RESUMO -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-resumo">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Empregados</a> &gt; <span style="color:var(--laranja)">Fernando Lacerda Costa</span></div>
+
+      <!-- HEADER PESSOA -->
+      <div class="pessoa-header">
+        <div class="pessoa-foto">F</div>
+        <div>
+          <h1 class="pessoa-nome">Fernando Lacerda Costa</h1>
+          <div class="pessoa-cargo-linha">
+            <strong>Engenheiro Civil Sênior</strong> · MAT 0112 · Engenharia · reporta a <strong>Luísa Mendonça</strong>
+          </div>
+          <div class="pessoa-tags">
+            <span class="tag verde">✓ Ativo</span>
+            <span class="tag laranja">★ 9-Box: Estrela</span>
+            <span class="tag marinho">4 anos de casa</span>
+            <span class="tag">CLT</span>
+            <span class="tag">R$ 12.500</span>
+            <span class="tag">Híbrido</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primario btn-sm">💬 Mensagem</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar ficha (PDF)</button>
+          <button class="btn btn-fantasma btn-sm">📋 Histórico de alterações</button>
+        </div>
+      </div>
+
+      <!-- ABAS -->
+      <div class="abas">
+        <div class="aba ativa"><span class="ic">📋</span> Resumo</div>
+        <div class="aba" onclick="irPara('t-dados-pessoais')"><span class="ic">👤</span> Dados Pessoais</div>
+        <div class="aba" onclick="irPara('t-vinculo')"><span class="ic">📃</span> Vínculo &amp; Contrato</div>
+        <div class="aba" onclick="irPara('t-cargo-salario')"><span class="ic">💼</span> Cargo &amp; Salário</div>
+        <div class="aba" onclick="irPara('t-documentos')"><span class="ic">📁</span> Documentos <span class="cnt">14</span></div>
+        <div class="aba" onclick="irPara('t-historico')"><span class="ic">📜</span> Histórico</div>
+        <div class="aba" onclick="irPara('t-dependentes')"><span class="ic">👨‍👩‍👧</span> Dependentes &amp; Benefícios</div>
+      </div>
+
+      <!-- KPIS -->
+      <div class="kpis-grid">
+        <div class="kpi">
+          <div class="kpi-titulo">Tempo de Casa</div>
+          <div class="kpi-valor"><em>4</em><span> anos</span></div>
+          <div class="kpi-meta">desde 22/04/2022</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Última Avaliação</div>
+          <div class="kpi-valor"><em>8,4</em><span>/10</span></div>
+          <div class="kpi-meta">Ciclo 2026-S1 · 360°</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Saldo Banco de Horas</div>
+          <div class="kpi-valor"><em>+12</em><span>h</span></div>
+          <div class="kpi-meta">vence em 28/06</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Dias de Férias</div>
+          <div class="kpi-valor"><em>20</em><span>/30</span></div>
+          <div class="kpi-meta">disponíveis · 10 usados</div>
+        </div>
+      </div>
+
+      <div class="grid-2-2-1">
+        <div>
+          <!-- INFO PRINCIPAL -->
+          <div class="painel">
+            <h3>Informações <em>principais</em></h3>
+            <p class="sub-titulo">Dados de identificação</p>
+
+            <div class="info-linha">
+              <span class="rotulo">Nome completo</span>
+              <span class="valor editavel">Fernando Lacerda Costa</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Matrícula</span>
+              <span class="valor">0112</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">E-mail corporativo</span>
+              <span class="valor editavel">fernando.lacerda@construtoraaurora.com.br</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">E-mail pessoal</span>
+              <span class="valor editavel">fernandolacerda@gmail.com</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Celular</span>
+              <span class="valor editavel">(31) 9 8765-4321</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">CPF</span>
+              <span class="valor mascarado">***.456.789-** <span class="ver">VER</span></span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Data de nascimento</span>
+              <span class="valor">14/03/1990 · 36 anos</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Gênero (auto-declarado)</span>
+              <span class="valor editavel">Masculino · ele/dele</span>
+            </div>
+          </div>
+
+          <!-- HISTÓRICO RECENTE -->
+          <div class="painel">
+            <h3>Atividade <em>recente</em></h3>
+            <p class="sub-titulo">Últimas movimentações na plataforma</p>
+
+            <div class="timeline">
+              <div class="timeline-evento verde">
+                <div class="timeline-data">HOJE · 09:14</div>
+                <div class="timeline-titulo">Bateu ponto · entrada</div>
+                <div class="timeline-desc">Geolocalização: <strong>Sede BH (Av. Olegário Maciel)</strong></div>
+              </div>
+              <div class="timeline-evento laranja">
+                <div class="timeline-data">ONTEM · 16:48</div>
+                <div class="timeline-titulo">Solicitou folga</div>
+                <div class="timeline-desc">02/07/2026 · motivo "consulta médica" · aprovado por Luísa</div>
+              </div>
+              <div class="timeline-evento roxo">
+                <div class="timeline-data">22/05/2026</div>
+                <div class="timeline-titulo">Avaliação 360° concluída · nota <strong>8,4</strong></div>
+                <div class="timeline-desc">Ciclo 2026-S1 · 9 avaliadores · subiu para "Estrela" no 9-Box</div>
+              </div>
+              <div class="timeline-evento">
+                <div class="timeline-data">15/05/2026</div>
+                <div class="timeline-titulo">PDI atualizado</div>
+                <div class="timeline-desc">Adicionada meta "Certificação BIM" · prazo 30/08/2026</div>
+              </div>
+              <div class="timeline-evento amarelo">
+                <div class="timeline-data">01/04/2026</div>
+                <div class="timeline-titulo">Reajuste salarial · <strong>+9,1%</strong></div>
+                <div class="timeline-desc">De R$ 11.450 para R$ 12.500 · mérito após avaliação · aprovado por Eduardo Santos</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR DIREITA -->
+        <div>
+          <!-- GESTOR -->
+          <div class="painel">
+            <h3 style="font-size:16px">Gestora direta</h3>
+            <div class="sub-titulo">Hierarquia</div>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="dep-av av-b">LM</div>
+              <div>
+                <div style="font-size:14px;font-weight:500">Luísa Mendonça</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Diretora de Engenharia</div>
+              </div>
+            </div>
+            <button class="btn btn-fantasma btn-xs" style="width:100%;justify-content:center;margin-top:14px">Ver organograma →</button>
+          </div>
+
+          <!-- EQUIPE -->
+          <div class="painel">
+            <h3 style="font-size:16px">Equipe direta</h3>
+            <div class="sub-titulo">Fernando não tem liderados ainda</div>
+            <div style="text-align:center;padding:18px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.6">
+              Quando Fernando virar Coordenador (set/2026, conforme PDI), o sistema atribui a propriedade <strong style="color:var(--marinho)">is_leader</strong> automaticamente.
+            </div>
+          </div>
+
+          <!-- COMPLIANCE -->
+          <div class="painel">
+            <h3 style="font-size:16px">Compliance &amp; <em>Saúde</em></h3>
+            <div class="sub-titulo">Status documental</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--verde-cl);border-radius:2px"><span>✓ Contrato CLT assinado</span><span style="color:var(--verde);font-weight:600">OK</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--verde-cl);border-radius:2px"><span>✓ ASO admissional</span><span style="color:var(--verde);font-weight:600">OK</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--amarelo-cl);border-radius:2px"><span>⚠ ASO periódico</span><span style="color:#876715;font-weight:600">vence 12/07</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--verde-cl);border-radius:2px"><span>✓ Treinamento NR-18</span><span style="color:var(--verde);font-weight:600">23/03/26</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--vermelho-cl);border-radius:2px"><span>✗ LGPD · termos</span><span style="color:var(--vermelho);font-weight:600">pendente</span></div>
+            </div>
+          </div>
+
+          <!-- ZONA PERIGOSA -->
+          <div class="painel" style="background:var(--vermelho-cl);border-color:var(--vermelho)">
+            <h3 style="font-size:15px;color:var(--vermelho)">⚠ Ações sensíveis</h3>
+            <div class="sub-titulo" style="color:var(--vermelho)">Geram auditoria automática</div>
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-bottom:8px;border-color:var(--vermelho);color:var(--vermelho)">⏸ Suspender acesso</button>
+            <button class="btn btn-perigo btn-sm" style="width:100%;justify-content:center">📁 Desligar empregado</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: DADOS PESSOAIS -->
+<!-- ============================================== -->
+<div class="tela" id="t-dados-pessoais">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Empregados</a> &gt; <a onclick="irPara('t-resumo')">Fernando Lacerda Costa</a> &gt; <span style="color:var(--laranja)">Dados Pessoais</span></div>
+
+      <div class="pessoa-header">
+        <div class="pessoa-foto">F</div>
+        <div>
+          <h1 class="pessoa-nome">Fernando Lacerda Costa</h1>
+          <div class="pessoa-cargo-linha"><strong>Engenheiro Civil Sênior</strong> · MAT 0112</div>
+          <div class="pessoa-tags">
+            <span class="tag verde">✓ Ativo</span>
+            <span class="tag marinho">4 anos de casa</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primario btn-sm">✎ Editar tudo</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar dados (LGPD)</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-resumo')"><span class="ic">📋</span> Resumo</div>
+        <div class="aba ativa"><span class="ic">👤</span> Dados Pessoais</div>
+        <div class="aba" onclick="irPara('t-vinculo')"><span class="ic">📃</span> Vínculo &amp; Contrato</div>
+        <div class="aba" onclick="irPara('t-cargo-salario')"><span class="ic">💼</span> Cargo &amp; Salário</div>
+        <div class="aba" onclick="irPara('t-documentos')"><span class="ic">📁</span> Documentos <span class="cnt">14</span></div>
+        <div class="aba" onclick="irPara('t-historico')"><span class="ic">📜</span> Histórico</div>
+        <div class="aba" onclick="irPara('t-dependentes')"><span class="ic">👨‍👩‍👧</span> Dependentes</div>
+      </div>
+
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🔒</span>
+        <div>
+          <strong>Dados sensíveis · LGPD</strong>
+          CPF, RG, dados bancários e endereço estão criptografados. Cada visualização gera registro de auditoria. Fernando pode pedir cópia de todos os seus dados a qualquer momento via área do empregado.
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- IDENTIFICAÇÃO -->
+        <div class="painel">
+          <h3>Identificação <em>oficial</em></h3>
+          <p class="sub-titulo">Documentos pessoais</p>
+
+          <div class="info-linha">
+            <span class="rotulo">Nome social</span>
+            <span class="valor editavel">— (não informado)</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Estado civil</span>
+            <span class="valor editavel">Casado</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">CPF</span>
+            <span class="valor mascarado">***.456.789-** <span class="ver">VER</span></span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">RG</span>
+            <span class="valor mascarado">MG-**.123.456 <span class="ver">VER</span></span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">CNH</span>
+            <span class="valor mascarado">cat. B · *****6789 <span class="ver">VER</span></span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Título de eleitor</span>
+            <span class="valor mascarado">****.5678.1234 <span class="ver">VER</span></span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Reservista</span>
+            <span class="valor editavel">123456789012-1</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">PIS/PASEP</span>
+            <span class="valor mascarado">***.*****.12-3 <span class="ver">VER</span></span>
+          </div>
+        </div>
+
+        <!-- ENDEREÇO -->
+        <div class="painel">
+          <h3>Endereço &amp; <em>Contato</em></h3>
+          <p class="sub-titulo">Onde Fernando mora</p>
+
+          <div class="info-linha">
+            <span class="rotulo">CEP</span>
+            <span class="valor editavel">30180-100</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Endereço</span>
+            <span class="valor editavel">Rua dos Inconfidentes, 1248 · ap 402</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Bairro</span>
+            <span class="valor editavel">Funcionários</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Cidade/UF</span>
+            <span class="valor editavel">Belo Horizonte/MG</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Celular principal</span>
+            <span class="valor editavel">(31) 9 8765-4321</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Telefone fixo</span>
+            <span class="valor editavel">—</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">E-mail pessoal</span>
+            <span class="valor editavel">fernandolacerda@gmail.com</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Contato de emergência</span>
+            <span class="valor editavel">Mariana Costa Lacerda · esposa · (31) 9 9123-4567</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- BANCÁRIOS -->
+        <div class="painel">
+          <h3>Dados <em>bancários</em></h3>
+          <p class="sub-titulo">Conta para depósito de salário · 🔒 super sensível</p>
+
+          <div class="info-linha">
+            <span class="rotulo">Banco</span>
+            <span class="valor">237 · Bradesco</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Agência</span>
+            <span class="valor mascarado">****-X <span class="ver">VER</span></span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Conta corrente</span>
+            <span class="valor mascarado">**.****-X <span class="ver">VER</span></span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Tipo</span>
+            <span class="valor">Conta corrente individual</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">PIX preferencial</span>
+            <span class="valor mascarado">CPF (***.456.789-**) <span class="ver">VER</span></span>
+          </div>
+
+          <div class="alert alert-amarelo" style="margin-top:14px;margin-bottom:0">
+            <span class="ic-grande">⚠</span>
+            <div><strong>Alteração de dados bancários</strong>Requer aprovação dupla: Roberto + Eduardo Santos · auditoria reforçada</div>
+          </div>
+        </div>
+
+        <!-- ESCOLARIDADE -->
+        <div class="painel">
+          <h3>Formação &amp; <em>Idiomas</em></h3>
+          <p class="sub-titulo">Escolaridade e qualificações</p>
+
+          <div class="info-linha">
+            <span class="rotulo">Escolaridade</span>
+            <span class="valor">Superior completo</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Graduação</span>
+            <span class="valor">Engenharia Civil · UFMG · 2012</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Pós-graduação</span>
+            <span class="valor">MBA Gestão de Projetos · FDC · 2019</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Certificações</span>
+            <div class="valor" style="display:flex;flex-wrap:wrap;gap:4px">
+              <span class="tag verde" style="font-size:10px">CREA-MG ativo</span>
+              <span class="tag verde" style="font-size:10px">PMP</span>
+              <span class="tag amarelo" style="font-size:10px">BIM em curso</span>
+            </div>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Idiomas</span>
+            <div class="valor" style="display:flex;flex-wrap:wrap;gap:4px">
+              <span class="tag" style="font-size:10px">Português · nativo</span>
+              <span class="tag" style="font-size:10px">Inglês · B1.5</span>
+              <span class="tag" style="font-size:10px">Espanhol · básico</span>
+            </div>
+          </div>
+
+          <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px">+ Adicionar formação ou certificação</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: VÍNCULO & CONTRATO -->
+<!-- ============================================== -->
+<div class="tela" id="t-vinculo">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Empregados</a> &gt; <a onclick="irPara('t-resumo')">Fernando Lacerda Costa</a> &gt; <span style="color:var(--laranja)">Vínculo &amp; Contrato</span></div>
+
+      <div class="pessoa-header">
+        <div class="pessoa-foto">F</div>
+        <div>
+          <h1 class="pessoa-nome">Fernando Lacerda Costa</h1>
+          <div class="pessoa-cargo-linha"><strong>Engenheiro Civil Sênior</strong> · MAT 0112</div>
+          <div class="pessoa-tags">
+            <span class="tag verde">✓ Ativo</span>
+            <span class="tag marinho">CLT</span>
+            <span class="tag">4 anos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-resumo')"><span class="ic">📋</span> Resumo</div>
+        <div class="aba" onclick="irPara('t-dados-pessoais')"><span class="ic">👤</span> Dados Pessoais</div>
+        <div class="aba ativa"><span class="ic">📃</span> Vínculo &amp; Contrato</div>
+        <div class="aba" onclick="irPara('t-cargo-salario')"><span class="ic">💼</span> Cargo &amp; Salário</div>
+        <div class="aba" onclick="irPara('t-documentos')"><span class="ic">📁</span> Documentos <span class="cnt">14</span></div>
+        <div class="aba" onclick="irPara('t-historico')"><span class="ic">📜</span> Histórico</div>
+        <div class="aba" onclick="irPara('t-dependentes')"><span class="ic">👨‍👩‍👧</span> Dependentes</div>
+      </div>
+
+      <div class="grid-2">
+        <!-- VINCULO -->
+        <div class="painel">
+          <h3>Vínculo <em>empregatício</em></h3>
+          <p class="sub-titulo">Informações do contrato</p>
+
+          <div class="info-linha">
+            <span class="rotulo">Tipo de vínculo</span>
+            <span class="valor">CLT · efetivo · prazo indeterminado</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Data de admissão</span>
+            <span class="valor">22/04/2022 (4 anos e 1 mês)</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Data de aniversário</span>
+            <span class="valor">22 de abril · próx. dia 22/04/2027 (5 anos)</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Fim do contrato de experiência</span>
+            <span class="valor"><span class="tag verde" style="font-size:10px">✓ Aprovado em 22/07/2022</span></span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Categoria CBO</span>
+            <span class="valor">2142-05 · Engenheiro civil</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Sindicato</span>
+            <span class="valor">SENGE-MG</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Contribuição sindical</span>
+            <span class="valor">Não autorizada · (opcional desde 2017)</span>
+          </div>
+        </div>
+
+        <!-- JORNADA -->
+        <div class="painel">
+          <h3>Jornada de <em>trabalho</em></h3>
+          <p class="sub-titulo">Horários e modalidade</p>
+
+          <div class="info-linha">
+            <span class="rotulo">Modalidade</span>
+            <span class="valor">Híbrida · 3 dias presencial + 2 home</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Local-base</span>
+            <span class="valor">Sede BH · Av. Olegário Maciel</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Carga horária</span>
+            <span class="valor">44h semanais · 220h/mês</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Horário padrão</span>
+            <span class="valor">08:00 – 18:00 · intervalo 1h</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Dias presenciais fixos</span>
+            <span class="valor">Segunda, terça, quinta</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Banco de horas</span>
+            <span class="valor"><span class="tag verde" style="font-size:10px">Ativo</span> · compensação 12 meses</span>
+          </div>
+          <div class="info-linha">
+            <span class="rotulo">Saldo atual</span>
+            <span class="valor" style="color:var(--verde);font-weight:600">+ 12h (vence 28/06)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTRATO ATIVO -->
+      <div class="painel">
+        <h3>Contrato <em>vigente</em></h3>
+        <p class="sub-titulo">Última versão assinada · D4Sign verificado</p>
+
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:18px;background:var(--cinza-fundo);border-radius:2px">
+          <div class="doc-ic verde" style="width:54px;height:54px;font-size:22px">📄</div>
+          <div>
+            <div style="font-size:15px;font-weight:500">Contrato de Trabalho CLT · Aditivo #3</div>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:4px">Assinado em 01/04/2026 · vigente · D4Sign · 14 páginas · 2.4 MB</div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <span class="tag verde" style="font-size:10px">✓ Assinado por Fernando</span>
+              <span class="tag verde" style="font-size:10px">✓ Assinado por Aurora (Roberto)</span>
+              <span class="tag" style="font-size:10px">🔒 ICP-Brasil</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn btn-fantasma btn-sm">👁 Ver contrato</button>
+            <button class="btn btn-fantasma btn-sm">⤓ Download PDF</button>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;font-weight:700">VERSÕES ANTERIORES</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="padding:10px 14px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;display:flex;justify-content:space-between;align-items:center;font-family:var(--ui);font-size:12.5px">
+              <span><strong style="color:var(--marinho)">Aditivo #2</strong> · reajuste salarial · 01/04/2025</span>
+              <a style="color:var(--laranja);font-weight:600">Ver →</a>
+            </div>
+            <div style="padding:10px 14px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;display:flex;justify-content:space-between;align-items:center;font-family:var(--ui);font-size:12.5px">
+              <span><strong style="color:var(--marinho)">Aditivo #1</strong> · promoção a Sênior · 15/08/2024</span>
+              <a style="color:var(--laranja);font-weight:600">Ver →</a>
+            </div>
+            <div style="padding:10px 14px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;display:flex;justify-content:space-between;align-items:center;font-family:var(--ui);font-size:12.5px">
+              <span><strong style="color:var(--marinho)">Contrato original</strong> · admissão · 22/04/2022</span>
+              <a style="color:var(--laranja);font-weight:600">Ver →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: CARGO & SALÁRIO -->
+<!-- ============================================== -->
+<div class="tela" id="t-cargo-salario">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Empregados</a> &gt; <a onclick="irPara('t-resumo')">Fernando Lacerda Costa</a> &gt; <span style="color:var(--laranja)">Cargo &amp; Salário</span></div>
+
+      <div class="pessoa-header">
+        <div class="pessoa-foto">F</div>
+        <div>
+          <h1 class="pessoa-nome">Fernando Lacerda Costa</h1>
+          <div class="pessoa-cargo-linha"><strong>Engenheiro Civil Sênior</strong> · MAT 0112</div>
+          <div class="pessoa-tags">
+            <span class="tag verde">✓ Ativo</span>
+            <span class="tag laranja">R$ 12.500</span>
+            <span class="tag marinho">★ Estrela 9-Box</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-resumo')"><span class="ic">📋</span> Resumo</div>
+        <div class="aba" onclick="irPara('t-dados-pessoais')"><span class="ic">👤</span> Dados Pessoais</div>
+        <div class="aba" onclick="irPara('t-vinculo')"><span class="ic">📃</span> Vínculo</div>
+        <div class="aba ativa"><span class="ic">💼</span> Cargo &amp; Salário</div>
+        <div class="aba" onclick="irPara('t-documentos')"><span class="ic">📁</span> Documentos <span class="cnt">14</span></div>
+        <div class="aba" onclick="irPara('t-historico')"><span class="ic">📜</span> Histórico</div>
+        <div class="aba" onclick="irPara('t-dependentes')"><span class="ic">👨‍👩‍👧</span> Dependentes</div>
+      </div>
+
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🔒</span>
+        <div>
+          <strong>Alteração de salário requer aprovação</strong>
+          Mudanças disparam fluxo: Gestor (Luísa) → RH (você, Roberto) → Diretor Financeiro (Eduardo) se &gt; R$ 1.000 de aumento. Tudo registrado em auditoria.
+        </div>
+      </div>
+
+      <div class="grid-2-2-1">
+        <div>
+          <!-- CARGO ATUAL -->
+          <div class="painel">
+            <h3>Cargo <em>atual</em></h3>
+            <p class="sub-titulo">Desde 15/08/2024 · promoção</p>
+
+            <div class="info-linha">
+              <span class="rotulo">Cargo</span>
+              <span class="valor editavel"><strong>Engenheiro Civil Sênior</strong></span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Nível</span>
+              <span class="valor">Sênior · faixa SR-3</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Família de cargos</span>
+              <span class="valor">Engenharia Técnica</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Departamento</span>
+              <span class="valor">Engenharia</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Centro de custo</span>
+              <span class="valor">ENG-001 · Obra Sítio II</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Gestora direta</span>
+              <span class="valor">Luísa Mendonça · Dir. Engenharia</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Próximo nível na trilha</span>
+              <span class="valor"><span class="tag laranja" style="font-size:10px">⭐ Engenheiro Especialista (Coord. Obra)</span> · prev. dez/2026</span>
+            </div>
+          </div>
+
+          <!-- SALÁRIO -->
+          <div class="painel">
+            <h3>Remuneração <em>atual</em></h3>
+            <p class="sub-titulo">Vigente desde 01/04/2026 · próx. revisão 04/2027</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px">
+              <div style="padding:18px;background:var(--cinza-fundo);border-radius:2px;text-align:center">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700;text-transform:uppercase;margin-bottom:6px">SALÁRIO BASE</div>
+                <div style="font-family:var(--serif);font-style:italic;font-size:24px;color:var(--marinho)">R$ 12.500</div>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:4px">/mês CLT</div>
+              </div>
+              <div style="padding:18px;background:var(--laranja-cl);border-radius:2px;text-align:center;border:1px solid var(--laranja)">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);letter-spacing:1.5px;font-weight:700;text-transform:uppercase;margin-bottom:6px">+ BENEFÍCIOS</div>
+                <div style="font-family:var(--serif);font-style:italic;font-size:24px;color:var(--laranja)">R$ 2.180</div>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:4px">VR + saúde + odonto</div>
+              </div>
+              <div style="padding:18px;background:var(--verde-cl);border-radius:2px;text-align:center;border:1px solid var(--verde)">
+                <div style="font-family:var(--ui);font-size:10px;color:var(--verde);letter-spacing:1.5px;font-weight:700;text-transform:uppercase;margin-bottom:6px">PACOTE TOTAL</div>
+                <div style="font-family:var(--serif);font-style:italic;font-size:24px;color:var(--verde)">R$ 14.680</div>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:4px">equivalente/mês</div>
+              </div>
+            </div>
+
+            <div class="info-linha">
+              <span class="rotulo">PLR/bônus elegível</span>
+              <span class="valor">Sim · até 2,5 salários/ano (R$ 31.250)</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Última PLR paga</span>
+              <span class="valor">R$ 24.500 · pago 28/02/2026 (1,96 salários)</span>
+            </div>
+            <div class="info-linha">
+              <span class="rotulo">Posição na faixa</span>
+              <span class="valor">P65 do mercado em BH · competitivo</span>
+            </div>
+
+            <button class="btn btn-marinho btn-sm" style="width:100%;justify-content:center;margin-top:14px">💸 Propor alteração salarial</button>
+          </div>
+
+          <!-- TRILHA -->
+          <div class="painel">
+            <h3>Histórico de <em>cargos &amp; salários</em></h3>
+            <p class="sub-titulo">4 anos na Aurora</p>
+
+            <div class="historico-cargo">
+              <div class="hc-linha atual">
+                <div class="hc-data">01/04/2026<br><span style="opacity:.6">atual</span></div>
+                <div>
+                  <div class="hc-cargo">Engenheiro Civil Sênior</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Reajuste por mérito após avaliação</div>
+                </div>
+                <div class="hc-salario">R$ 12.500</div>
+                <div class="hc-delta">+ 9,1%</div>
+              </div>
+              <div class="hc-linha">
+                <div class="hc-data">01/04/2025</div>
+                <div>
+                  <div class="hc-cargo">Engenheiro Civil Sênior</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Dissídio coletivo + mérito</div>
+                </div>
+                <div class="hc-salario">R$ 11.450</div>
+                <div class="hc-delta">+ 6,2%</div>
+              </div>
+              <div class="hc-linha">
+                <div class="hc-data">15/08/2024</div>
+                <div>
+                  <div class="hc-cargo">Engenheiro Civil Sênior <span class="tag laranja" style="font-size:9px;margin-left:6px">★ PROMOÇÃO</span></div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Promoção de Pleno → Sênior</div>
+                </div>
+                <div class="hc-salario">R$ 10.780</div>
+                <div class="hc-delta">+ 18,5%</div>
+              </div>
+              <div class="hc-linha">
+                <div class="hc-data">01/04/2024</div>
+                <div>
+                  <div class="hc-cargo">Engenheiro Civil Pleno</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Dissídio</div>
+                </div>
+                <div class="hc-salario">R$ 9.100</div>
+                <div class="hc-delta">+ 5,8%</div>
+              </div>
+              <div class="hc-linha">
+                <div class="hc-data">01/04/2023</div>
+                <div>
+                  <div class="hc-cargo">Engenheiro Civil Pleno</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Dissídio + mérito</div>
+                </div>
+                <div class="hc-salario">R$ 8.600</div>
+                <div class="hc-delta">+ 13,2%</div>
+              </div>
+              <div class="hc-linha">
+                <div class="hc-data">22/04/2022</div>
+                <div>
+                  <div class="hc-cargo">Engenheiro Civil Pleno</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Admissão</div>
+                </div>
+                <div class="hc-salario">R$ 7.600</div>
+                <div class="hc-delta">início</div>
+              </div>
+            </div>
+
+            <div class="alert alert-verde" style="margin-top:14px;margin-bottom:0">
+              <span class="ic-grande">📈</span>
+              <div>
+                <strong>Crescimento total: +64% em 4 anos</strong>
+                Acima da média Aurora (+38% em 4a). Reflete reconhecimento consistente da performance.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- BENCHMARK -->
+          <div class="painel">
+            <h3 style="font-size:16px">Benchmark</h3>
+            <div class="sub-titulo">Eng. Civil Sr em BH/MG</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12px">
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>P25</span><strong>R$ 9.800</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>Mediana (P50)</span><strong>R$ 11.500</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--laranja-cl);border-radius:2px;border:1px solid var(--laranja)"><span style="color:var(--laranja);font-weight:600">Fernando (P65)</span><strong style="color:var(--laranja)">R$ 12.500</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>P75</span><strong>R$ 13.200</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>P90</span><strong>R$ 15.800</strong></div>
+            </div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:12px;line-height:1.55;font-style:italic">Dados da Oi Nora · 28 clientes · construção/eng. · maio/2026</div>
+          </div>
+
+          <!-- METAS -->
+          <div class="painel">
+            <h3 style="font-size:16px">Próximas marcos</h3>
+            <div class="sub-titulo">Trilha de carreira</div>
+
+            <div style="padding:12px;background:var(--laranja-cl);border-left:3px solid var(--laranja);border-radius:2px;margin-bottom:10px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--laranja);font-weight:700;letter-spacing:.5px">DEZ/2026 · 7 meses</div>
+              <div style="font-size:13px;font-weight:500;margin-top:4px">Promoção a Eng. Especialista</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Faixa salarial alvo: R$ 15-18k</div>
+            </div>
+
+            <div style="padding:12px;background:var(--cinza-fundo);border-left:3px solid var(--marinho);border-radius:2px;margin-bottom:10px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:700;letter-spacing:.5px">ABR/2027 · 11 meses</div>
+              <div style="font-size:13px;font-weight:500;margin-top:4px">Revisão anual de salário</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Ciclo regular + dissídio</div>
+            </div>
+
+            <div style="padding:12px;background:var(--cinza-fundo);border-left:3px solid var(--verde);border-radius:2px">
+              <div style="font-family:var(--ui);font-size:10px;color:var(--verde);font-weight:700;letter-spacing:.5px">FEV/2027</div>
+              <div style="font-size:13px;font-weight:500;margin-top:4px">PLR 2026</div>
+              <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px">Estimativa: ~R$ 28-31k</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: DOCUMENTOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-documentos">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Empregados</a> &gt; <a onclick="irPara('t-resumo')">Fernando Lacerda Costa</a> &gt; <span style="color:var(--laranja)">Documentos</span></div>
+
+      <div class="pessoa-header">
+        <div class="pessoa-foto">F</div>
+        <div>
+          <h1 class="pessoa-nome">Fernando Lacerda Costa</h1>
+          <div class="pessoa-cargo-linha"><strong>Engenheiro Civil Sênior</strong> · MAT 0112 · 14 documentos</div>
+          <div class="pessoa-tags">
+            <span class="tag verde">12 OK</span>
+            <span class="tag amarelo">1 vence em breve</span>
+            <span class="tag vermelho">1 pendente</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primario btn-sm">+ Adicionar documento</button>
+          <button class="btn btn-fantasma btn-sm">📧 Solicitar do Fernando</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-resumo')"><span class="ic">📋</span> Resumo</div>
+        <div class="aba" onclick="irPara('t-dados-pessoais')"><span class="ic">👤</span> Dados Pessoais</div>
+        <div class="aba" onclick="irPara('t-vinculo')"><span class="ic">📃</span> Vínculo</div>
+        <div class="aba" onclick="irPara('t-cargo-salario')"><span class="ic">💼</span> Cargo &amp; Salário</div>
+        <div class="aba ativa"><span class="ic">📁</span> Documentos <span class="cnt">14</span></div>
+        <div class="aba" onclick="irPara('t-historico')"><span class="ic">📜</span> Histórico</div>
+        <div class="aba" onclick="irPara('t-dependentes')"><span class="ic">👨‍👩‍👧</span> Dependentes</div>
+      </div>
+
+      <!-- DOCS ADMISSIONAIS -->
+      <div class="painel">
+        <h3>Documentos <em>admissionais</em></h3>
+        <p class="sub-titulo">Obrigatórios na admissão (CLT)</p>
+
+        <div class="doc-grid">
+          <div class="doc-item">
+            <div class="doc-ic verde">📄</div>
+            <div>
+              <div class="doc-titulo">RG (frente e verso)</div>
+              <div class="doc-meta">Enviado 22/04/2022 · 2 páginas · 1.2 MB</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+              <button class="btn btn-fantasma btn-xs">⤓</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">📄</div>
+            <div>
+              <div class="doc-titulo">CPF</div>
+              <div class="doc-meta">Enviado 22/04/2022 · 1 página · 380 KB</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+              <button class="btn btn-fantasma btn-xs">⤓</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">📋</div>
+            <div>
+              <div class="doc-titulo">Carteira de Trabalho (CTPS digital)</div>
+              <div class="doc-meta">Vinculada via Gov.br · 22/04/2022</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">🎓</div>
+            <div>
+              <div class="doc-titulo">Diploma de Graduação</div>
+              <div class="doc-meta">Eng. Civil · UFMG · 2012 · 1.8 MB</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+              <button class="btn btn-fantasma btn-xs">⤓</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">🎓</div>
+            <div>
+              <div class="doc-titulo">MBA · FDC</div>
+              <div class="doc-meta">Gestão de Projetos · 2019 · 1.4 MB</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+              <button class="btn btn-fantasma btn-xs">⤓</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">⚖</div>
+            <div>
+              <div class="doc-titulo">CREA-MG · ativo</div>
+              <div class="doc-meta">Carteira profissional · renovação automática</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+              <button class="btn btn-fantasma btn-xs">⤓</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASO E SAÚDE -->
+      <div class="painel">
+        <h3>Saúde <em>ocupacional</em></h3>
+        <p class="sub-titulo">ASO e exames obrigatórios</p>
+
+        <div class="doc-grid">
+          <div class="doc-item">
+            <div class="doc-ic verde">🩺</div>
+            <div>
+              <div class="doc-titulo">ASO Admissional</div>
+              <div class="doc-meta">22/04/2022 · Apto · Dr. Marcos Coelho · MEDOCC</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+            </div>
+          </div>
+
+          <div class="doc-item" style="border-left:3px solid var(--amarelo);background:var(--amarelo-cl)">
+            <div class="doc-ic amarelo">⚠</div>
+            <div>
+              <div class="doc-titulo">ASO Periódico <span class="tag amarelo" style="font-size:9px;margin-left:6px">VENCE 12/07/26</span></div>
+              <div class="doc-meta">Último: 12/07/2025 · agendar exame em breve</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-primario btn-xs">📅 Agendar</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">📜</div>
+            <div>
+              <div class="doc-titulo">Treinamento NR-18 · Construção Civil</div>
+              <div class="doc-meta">Concluído 23/03/2026 · válido por 2 anos</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+              <button class="btn btn-fantasma btn-xs">⤓</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">📜</div>
+            <div>
+              <div class="doc-titulo">Treinamento NR-35 · Trabalho em Altura</div>
+              <div class="doc-meta">Concluído 18/05/2025 · válido por 2 anos</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+              <button class="btn btn-fantasma btn-xs">⤓</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LGPD -->
+      <div class="painel">
+        <h3>Termos &amp; <em>LGPD</em></h3>
+        <p class="sub-titulo">Consentimentos e políticas</p>
+
+        <div class="doc-grid">
+          <div class="doc-item" style="border-left:3px solid var(--vermelho);background:var(--vermelho-cl)">
+            <div class="doc-ic vermelho">✗</div>
+            <div>
+              <div class="doc-titulo">Política LGPD · versão 2.0 (2026) <span class="tag vermelho" style="font-size:9px;margin-left:6px">PENDENTE</span></div>
+              <div class="doc-meta">Atualizada em 01/05/2026 · Fernando ainda não aceitou</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-primario btn-xs">📧 Lembrar</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">✓</div>
+            <div>
+              <div class="doc-titulo">Política LGPD · versão 1.0 (2022)</div>
+              <div class="doc-meta">Aceita 22/04/2022 · histórico</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">✓</div>
+            <div>
+              <div class="doc-titulo">Código de Conduta Aurora</div>
+              <div class="doc-meta">Aceito 22/04/2022 · revisado 01/06/2024</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+            </div>
+          </div>
+
+          <div class="doc-item">
+            <div class="doc-ic verde">✓</div>
+            <div>
+              <div class="doc-titulo">Termo de uso de equipamentos</div>
+              <div class="doc-meta">Notebook Dell + celular corporativo · 15/08/2024</div>
+            </div>
+            <div class="doc-acoes">
+              <button class="btn btn-fantasma btn-xs">👁</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 6: HISTÓRICO -->
+<!-- ============================================== -->
+<div class="tela" id="t-historico">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Empregados</a> &gt; <a onclick="irPara('t-resumo')">Fernando Lacerda Costa</a> &gt; <span style="color:var(--laranja)">Histórico</span></div>
+
+      <div class="pessoa-header">
+        <div class="pessoa-foto">F</div>
+        <div>
+          <h1 class="pessoa-nome">Fernando Lacerda Costa</h1>
+          <div class="pessoa-cargo-linha"><strong>Engenheiro Civil Sênior</strong> · MAT 0112</div>
+          <div class="pessoa-tags">
+            <span class="tag marinho">4 anos de história</span>
+            <span class="tag verde">42 eventos registrados</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-resumo')"><span class="ic">📋</span> Resumo</div>
+        <div class="aba" onclick="irPara('t-dados-pessoais')"><span class="ic">👤</span> Dados Pessoais</div>
+        <div class="aba" onclick="irPara('t-vinculo')"><span class="ic">📃</span> Vínculo</div>
+        <div class="aba" onclick="irPara('t-cargo-salario')"><span class="ic">💼</span> Cargo &amp; Salário</div>
+        <div class="aba" onclick="irPara('t-documentos')"><span class="ic">📁</span> Documentos <span class="cnt">14</span></div>
+        <div class="aba ativa"><span class="ic">📜</span> Histórico</div>
+        <div class="aba" onclick="irPara('t-dependentes')"><span class="ic">👨‍👩‍👧</span> Dependentes</div>
+      </div>
+
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🔒</span>
+        <div>
+          <strong>Linha do tempo completa · auditoria</strong>
+          Todo evento na vida profissional do Fernando está registrado. Filtro padrão: eventos marcantes. Use os filtros para ver tudo (ponto, presença, etc).
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+        <span class="tag laranja" style="cursor:pointer">★ Marcantes</span>
+        <span class="tag" style="cursor:pointer">Cargo &amp; Salário</span>
+        <span class="tag" style="cursor:pointer">Avaliações</span>
+        <span class="tag" style="cursor:pointer">Documentos</span>
+        <span class="tag" style="cursor:pointer">Treinamentos</span>
+        <span class="tag" style="cursor:pointer">Férias &amp; Solicitações</span>
+        <span class="tag" style="cursor:pointer">Acessos</span>
+        <span class="tag" style="cursor:pointer">Tudo</span>
+      </div>
+
+      <div class="painel">
+        <h3>Linha do tempo · <em>4 anos na Aurora</em></h3>
+        <p class="sub-titulo">22/04/2022 · ainda ativo</p>
+
+        <div class="timeline">
+
+          <div class="timeline-evento laranja">
+            <div class="timeline-data">22/05/2026 · há 4 dias</div>
+            <div class="timeline-titulo">★ Avaliação 360° concluída · <strong>nota 8,4</strong></div>
+            <div class="timeline-desc">Ciclo 2026-S1 · 9 avaliadores · subiu para "Estrela" no 9-Box · feedback de Luísa: <em>"profissional consistente e em ascensão"</em></div>
+          </div>
+
+          <div class="timeline-evento amarelo">
+            <div class="timeline-data">01/04/2026</div>
+            <div class="timeline-titulo">💰 Reajuste salarial · de R$ 11.450 para <strong>R$ 12.500</strong> (+9,1%)</div>
+            <div class="timeline-desc">Mérito após avaliação · aprovado por <strong>Eduardo Santos</strong> · Aditivo Contratual #3 assinado em D4Sign</div>
+          </div>
+
+          <div class="timeline-evento">
+            <div class="timeline-data">23/03/2026</div>
+            <div class="timeline-titulo">🎓 Treinamento NR-18 concluído</div>
+            <div class="timeline-desc">8h de carga · nota final 9,2 · certificado emitido · válido por 2 anos</div>
+          </div>
+
+          <div class="timeline-evento verde">
+            <div class="timeline-data">28/02/2026</div>
+            <div class="timeline-titulo">💰 PLR 2025 paga · <strong>R$ 24.500</strong> (1,96 salários)</div>
+            <div class="timeline-desc">Meta individual: 96% · Meta empresa: 110%</div>
+          </div>
+
+          <div class="timeline-evento">
+            <div class="timeline-data">15/01/2026</div>
+            <div class="timeline-titulo">🌴 Férias · 15 dias</div>
+            <div class="timeline-desc">15/01 a 29/01/2026 · aprovado por Luísa</div>
+          </div>
+
+          <div class="timeline-evento laranja">
+            <div class="timeline-data">12/12/2025</div>
+            <div class="timeline-titulo">★ Avaliação 360° · ciclo 2025-S2 · nota <strong>8,1</strong></div>
+            <div class="timeline-desc">9-Box: "Alto Desempenho" · primeiro PDI criado</div>
+          </div>
+
+          <div class="timeline-evento">
+            <div class="timeline-data">15/08/2024</div>
+            <div class="timeline-titulo">⭐ <strong>Promoção a Sênior</strong> · de R$ 9.100 para R$ 10.780 (+18,5%)</div>
+            <div class="timeline-desc">Promoção de Engenheiro Pleno → Sênior · aprovada por Luísa, Roberto, Eduardo · novo Aditivo #1</div>
+          </div>
+
+          <div class="timeline-evento">
+            <div class="timeline-data">18/05/2024</div>
+            <div class="timeline-titulo">🎓 Treinamento NR-35 concluído</div>
+            <div class="timeline-desc">12h de carga · trabalho em altura · válido por 2 anos</div>
+          </div>
+
+          <div class="timeline-evento">
+            <div class="timeline-data">22/04/2023</div>
+            <div class="timeline-titulo">🎂 1 ano de Aurora</div>
+            <div class="timeline-desc">Encerrado período de adaptação · evento interno comemorativo</div>
+          </div>
+
+          <div class="timeline-evento verde">
+            <div class="timeline-data">22/07/2022</div>
+            <div class="timeline-titulo">✓ Contrato de experiência aprovado</div>
+            <div class="timeline-desc">90 dias concluídos com sucesso · efetivação confirmada · feedback positivo da Luísa</div>
+          </div>
+
+          <div class="timeline-evento laranja">
+            <div class="timeline-data">22/04/2022</div>
+            <div class="timeline-titulo">🎉 <strong>Admissão na Aurora</strong></div>
+            <div class="timeline-desc">Eng. Civil Pleno · R$ 7.600 · vaga indicada por <strong>Mariana Costa (Oi Nora)</strong> · candidatou-se em 12/03 · contratado em 28 dias</div>
+          </div>
+
+        </div>
+
+        <div style="text-align:center;padding:14px;font-family:var(--ui);font-size:11px;color:var(--cinza)">Mostrando 11 de 42 eventos · <a style="color:var(--laranja);font-weight:600">Carregar todos →</a></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 7: DEPENDENTES & BENEFÍCIOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-dependentes">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Empregados</a> &gt; <a onclick="irPara('t-resumo')">Fernando Lacerda Costa</a> &gt; <span style="color:var(--laranja)">Dependentes &amp; Benefícios</span></div>
+
+      <div class="pessoa-header">
+        <div class="pessoa-foto">F</div>
+        <div>
+          <h1 class="pessoa-nome">Fernando Lacerda Costa</h1>
+          <div class="pessoa-cargo-linha"><strong>Engenheiro Civil Sênior</strong> · 3 dependentes · 5 benefícios ativos</div>
+          <div class="pessoa-tags">
+            <span class="tag verde">✓ Plano saúde completo</span>
+            <span class="tag marinho">R$ 2.180 em benefícios</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-resumo')"><span class="ic">📋</span> Resumo</div>
+        <div class="aba" onclick="irPara('t-dados-pessoais')"><span class="ic">👤</span> Dados Pessoais</div>
+        <div class="aba" onclick="irPara('t-vinculo')"><span class="ic">📃</span> Vínculo</div>
+        <div class="aba" onclick="irPara('t-cargo-salario')"><span class="ic">💼</span> Cargo &amp; Salário</div>
+        <div class="aba" onclick="irPara('t-documentos')"><span class="ic">📁</span> Documentos <span class="cnt">14</span></div>
+        <div class="aba" onclick="irPara('t-historico')"><span class="ic">📜</span> Histórico</div>
+        <div class="aba ativa"><span class="ic">👨‍👩‍👧</span> Dependentes</div>
+      </div>
+
+      <!-- DEPENDENTES -->
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>Dependentes <em>cadastrados</em></h3><p class="sub-titulo">Família declarada · base do plano de saúde e IR</p></div>
+          <button class="btn btn-primario btn-sm">+ Adicionar dependente</button>
+        </div>
+
+        <div class="dep-grid">
+          <div class="dep-card">
+            <div class="dep-av av-d">MC</div>
+            <div>
+              <div class="dep-nome">Mariana Costa Lacerda</div>
+              <div class="dep-meta">Cônjuge · 34 anos · CPF ***.***.***-** · plano saúde</div>
+            </div>
+            <button class="btn btn-fantasma btn-xs">✎</button>
+          </div>
+
+          <div class="dep-card">
+            <div class="dep-av av-c">SL</div>
+            <div>
+              <div class="dep-nome">Sofia Lacerda Costa</div>
+              <div class="dep-meta">Filha · 7 anos · plano saúde + escola conveniada</div>
+            </div>
+            <button class="btn btn-fantasma btn-xs">✎</button>
+          </div>
+
+          <div class="dep-card">
+            <div class="dep-av av-c">BL</div>
+            <div>
+              <div class="dep-nome">Bento Lacerda Costa</div>
+              <div class="dep-meta">Filho · 4 anos · plano saúde + creche conveniada</div>
+            </div>
+            <button class="btn btn-fantasma btn-xs">✎</button>
+          </div>
+
+          <div class="dep-card" style="background:var(--cinza-fundo);border-style:dashed;justify-content:center">
+            <button class="btn btn-fantasma btn-sm" style="background:transparent;border:none">+ Adicionar dependente</button>
+          </div>
+        </div>
+
+        <div class="alert alert-amarelo" style="margin-top:18px;margin-bottom:0">
+          <span class="ic-grande">⚠</span>
+          <div>
+            <strong>Dependentes legais para IR (2 limite)</strong>
+            Sofia e Bento são dependentes para fins de IR. Mariana só conta como dependente do plano de saúde (não IR — ela trabalha).
+          </div>
+        </div>
+      </div>
+
+      <!-- BENEFÍCIOS -->
+      <div class="painel">
+        <div class="painel-header">
+          <div><h3>Benefícios <em>ativos</em></h3><p class="sub-titulo">R$ 2.180/mês em valor agregado</p></div>
+          <button class="btn btn-fantasma btn-sm">⚙ Gerenciar pacote</button>
+        </div>
+
+        <div class="ben-grid">
+          <div class="ben-item">
+            <div class="ben-info">
+              <div class="ben-ic">🍽</div>
+              <div>
+                <div class="ben-nome">Vale-refeição · Flash</div>
+                <div class="ben-valor">R$ 35/dia útil · ~R$ 770/mês</div>
+              </div>
+            </div>
+            <span class="tag verde" style="font-size:10px">✓ Ativo</span>
+          </div>
+
+          <div class="ben-item">
+            <div class="ben-info">
+              <div class="ben-ic">🚌</div>
+              <div>
+                <div class="ben-nome">Vale-transporte</div>
+                <div class="ben-valor">Conforme CCT · ~R$ 0 (auxílio combustível)</div>
+              </div>
+            </div>
+            <span class="tag" style="font-size:10px">Não utilizado</span>
+          </div>
+
+          <div class="ben-item">
+            <div class="ben-info">
+              <div class="ben-ic">🏥</div>
+              <div>
+                <div class="ben-nome">Plano de saúde · Unimed BH</div>
+                <div class="ben-valor">Titular + 3 dep · R$ 980 (empresa) + R$ 220 (Fernando)</div>
+              </div>
+            </div>
+            <span class="tag verde" style="font-size:10px">✓ Ativo · plano Master</span>
+          </div>
+
+          <div class="ben-item">
+            <div class="ben-info">
+              <div class="ben-ic">🦷</div>
+              <div>
+                <div class="ben-nome">Plano odontológico · Uniodonto</div>
+                <div class="ben-valor">Titular + 3 dep · R$ 150 (100% empresa)</div>
+              </div>
+            </div>
+            <span class="tag verde" style="font-size:10px">✓ Ativo</span>
+          </div>
+
+          <div class="ben-item">
+            <div class="ben-info">
+              <div class="ben-ic">📚</div>
+              <div>
+                <div class="ben-nome">Auxílio educação</div>
+                <div class="ben-valor">Até R$ 500/mês · usado: R$ 380 (curso BIM)</div>
+              </div>
+            </div>
+            <span class="tag verde" style="font-size:10px">✓ Em uso</span>
+          </div>
+
+          <div class="ben-item">
+            <div class="ben-info">
+              <div class="ben-ic">⛽</div>
+              <div>
+                <div class="ben-nome">Auxílio combustível</div>
+                <div class="ben-valor">R$ 280/mês · cartão Ticket</div>
+              </div>
+            </div>
+            <span class="tag verde" style="font-size:10px">✓ Ativo</span>
+          </div>
+
+          <div class="ben-item" style="opacity:.6">
+            <div class="ben-info">
+              <div class="ben-ic">💪</div>
+              <div>
+                <div class="ben-nome">Gympass</div>
+                <div class="ben-valor">Disponível · 100% empresa</div>
+              </div>
+            </div>
+            <span class="tag" style="font-size:10px">Não aderiu</span>
+          </div>
+
+          <div class="ben-item" style="opacity:.6">
+            <div class="ben-info">
+              <div class="ben-ic">💳</div>
+              <div>
+                <div class="ben-nome">Vale-cultura</div>
+                <div class="ben-valor">Disponível · R$ 100/mês</div>
+              </div>
+            </div>
+            <span class="tag" style="font-size:10px">Não aderiu</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PESSOAS DE EMERGÊNCIA -->
+      <div class="painel">
+        <h3>Contatos de <em>emergência</em></h3>
+        <p class="sub-titulo">Quem chamar em caso de necessidade</p>
+
+        <div class="dep-grid">
+          <div class="dep-card">
+            <div class="dep-av av-d">MC</div>
+            <div>
+              <div class="dep-nome">Mariana Costa Lacerda</div>
+              <div class="dep-meta">Esposa · (31) 9 9123-4567 · principal</div>
+            </div>
+            <button class="btn btn-fantasma btn-xs">✎</button>
+          </div>
+
+          <div class="dep-card">
+            <div class="dep-av av-c">RL</div>
+            <div>
+              <div class="dep-nome">Rosângela Lacerda</div>
+              <div class="dep-meta">Mãe · (31) 9 8765-1234 · secundário</div>
+            </div>
+            <button class="btn btn-fantasma btn-xs">✎</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Ficha Empregado — Aba:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-resumo">📋 Resumo</option>
+    <option value="t-dados-pessoais">👤 Dados Pessoais</option>
+    <option value="t-vinculo">📃 Vínculo &amp; Contrato</option>
+    <option value="t-cargo-salario">💼 Cargo &amp; Salário</option>
+    <option value="t-documentos">📁 Documentos</option>
+    <option value="t-historico">📜 Histórico</option>
+    <option value="t-dependentes">👨‍👩‍👧 Dependentes &amp; Benefícios</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+</script>
+</body>
+</html>

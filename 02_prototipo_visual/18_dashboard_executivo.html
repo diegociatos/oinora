@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Dashboard Executivo</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --juridico:#5B3FA0;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* APP SHELL · sidebar marinho */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+
+  /* HEADER DE BOAS-VINDAS · executivo */
+  .header-exec{background:linear-gradient(135deg,var(--marinho) 0%,var(--marinho-esc) 100%);color:var(--papel);border-radius:4px;padding:28px 32px;margin-bottom:22px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;position:relative;overflow:hidden}
+  .header-exec::before{content:"";position:absolute;top:-30%;right:-10%;width:480px;height:480px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .header-exec > *{position:relative}
+  .header-foto{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:32px;color:var(--papel);font-weight:600;border:4px solid rgba(232,99,58,.3);flex-shrink:0}
+  .header-greeting{font-family:var(--ui);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,99,58,.9);font-weight:700;margin-bottom:6px}
+  .header-greeting strong{color:var(--laranja)}
+  .header-exec h1{font-size:32px;font-weight:400;color:var(--papel);line-height:1.2;letter-spacing:-.3px;margin-bottom:6px}
+  .header-exec h1 em{color:var(--laranja);font-style:italic}
+  .header-meta{font-family:var(--ui);font-size:12px;color:rgba(250,247,242,.65);letter-spacing:.3px;line-height:1.55}
+  .header-meta strong{color:var(--papel)}
+  .header-acoes{display:flex;flex-direction:column;gap:8px}
+  .btn-claro{background:rgba(255,255,255,.1);color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:8px 18px;font-family:var(--serif);font-size:13px;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;letter-spacing:.3px}
+  .btn-claro:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35)}
+
+  /* ALERT URGENTE · audiência hoje */
+  .alert-urgente{background:linear-gradient(90deg,var(--vermelho) 0%,#8E2B2B 100%);color:white;padding:16px 22px;border-radius:2px;margin-bottom:22px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;position:relative;overflow:hidden;border:none}
+  .alert-urgente::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:rgba(255,255,255,.4)}
+  .alert-urg-ic{font-size:24px;flex-shrink:0;animation:pulse 2s infinite;padding-left:8px}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+  .alert-urg-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.85);margin-bottom:3px}
+  .alert-urg-msg{font-size:14px;font-weight:500;line-height:1.4}
+  .alert-urg-msg strong{color:#FFE5E0}
+
+  /* GRID DE KPIs · 6 colunas */
+  .kpis-grid-exec{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:22px}
+  .kpi-exec{background:var(--branco);border:1px solid var(--cinza-cl);padding:16px;border-radius:2px;position:relative;cursor:pointer;transition:all .15s}
+  .kpi-exec:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(31,42,68,.06);border-color:var(--marinho-med)}
+  .kpi-exec.destaque{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border-color:var(--laranja)}
+  .kpi-exec.verde{border-top:3px solid var(--verde)}
+  .kpi-exec.amarelo{border-top:3px solid var(--amarelo)}
+  .kpi-exec.vermelho{border-top:3px solid var(--vermelho);background:linear-gradient(135deg,var(--branco) 50%,var(--vermelho-cl))}
+  .kpi-exec.marinho{border-top:3px solid var(--marinho)}
+  .kpi-exec.laranja{border-top:3px solid var(--laranja)}
+  .kpi-exec.roxo{border-top:3px solid var(--juridico)}
+
+  .kpi-exec-cat{font-family:var(--ui);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+  .kpi-exec-cat .ic-mod{font-size:11px}
+  .kpi-exec-valor{font-size:28px;color:var(--marinho);line-height:1;font-family:var(--serif);font-style:italic}
+  .kpi-exec-valor em{color:var(--laranja)}
+  .kpi-exec-valor.verde{color:var(--verde)}
+  .kpi-exec-valor.vermelho{color:var(--vermelho)}
+  .kpi-exec-valor.amarelo{color:#876715}
+  .kpi-exec-valor.roxo{color:var(--juridico)}
+  .kpi-exec-valor span{font-size:13px;color:var(--cinza);font-style:normal;font-family:var(--ui)}
+  .kpi-exec-meta{font-family:var(--ui);font-size:10.5px;color:var(--cinza);margin-top:6px;line-height:1.4;letter-spacing:.2px}
+  .kpi-exec-meta strong{color:var(--marinho)}
+  .kpi-exec-trend{font-family:var(--ui);font-size:10.5px;margin-top:4px;display:flex;align-items:center;gap:3px}
+  .kpi-exec-trend.up{color:var(--verde)}
+  .kpi-exec-trend.down{color:var(--vermelho)}
+  .kpi-exec-trend.neutro{color:var(--cinza)}
+
+  /* GRID 2 COLUNAS */
+  .grid-2-exec{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-bottom:22px}
+
+  /* BLOCOS DE MÓDULO */
+  .bloco-mod{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:22px;margin-bottom:18px;cursor:pointer;transition:all .15s}
+  .bloco-mod:hover{box-shadow:0 4px 12px rgba(31,42,68,.05)}
+  .bloco-mod-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:14px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--cinza-cl)}
+  .bloco-mod-head .titulo-grupo{display:flex;align-items:center;gap:12px}
+  .bloco-mod-ic{width:42px;height:42px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid var(--cinza-cl);background:var(--cinza-fundo)}
+  .bloco-mod-ic.laranja{background:var(--laranja-cl);border-color:var(--laranja)}
+  .bloco-mod-ic.verde{background:var(--verde-cl);border-color:var(--verde)}
+  .bloco-mod-ic.amarelo{background:var(--amarelo-cl);border-color:var(--amarelo)}
+  .bloco-mod-ic.vermelho{background:var(--vermelho-cl);border-color:var(--vermelho)}
+  .bloco-mod-ic.roxo{background:#EFE9FB;border-color:var(--juridico)}
+  .bloco-mod-ic.marinho{background:#EEF1F6;border-color:var(--marinho)}
+  .bloco-mod h3{font-size:17px;font-weight:400;line-height:1.2;letter-spacing:-.2px}
+  .bloco-mod h3 em{color:var(--laranja);font-style:italic}
+  .bloco-mod-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px;margin-top:3px}
+  .bloco-mod-acao{font-family:var(--ui);font-size:10.5px;color:var(--laranja);font-weight:700;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:4px}
+
+  /* LINHAS DE INDICADOR DENTRO DO BLOCO */
+  .linha-ind{display:grid;grid-template-columns:1fr auto;gap:14px;padding:10px 0;border-bottom:1px dashed var(--cinza-cl);align-items:center;font-family:var(--ui);font-size:12.5px}
+  .linha-ind:last-child{border:none}
+  .linha-ind-nome{color:var(--marinho);display:flex;align-items:center;gap:8px}
+  .linha-ind-nome .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot.verde{background:var(--verde)}
+  .dot.amarelo{background:var(--amarelo)}
+  .dot.vermelho{background:var(--vermelho)}
+  .dot.laranja{background:var(--laranja)}
+  .dot.roxo{background:var(--juridico)}
+  .dot.cinza{background:var(--cinza)}
+  .linha-ind-val{font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:14px;font-weight:400;text-align:right}
+  .linha-ind-val.verde{color:var(--verde)}
+  .linha-ind-val.vermelho{color:var(--vermelho)}
+  .linha-ind-val.amarelo{color:#876715}
+  .linha-ind-val.laranja{color:var(--laranja)}
+
+  /* MINI BARRA DE PROGRESSO */
+  .mini-prog{margin-top:6px;height:5px;background:var(--cinza-fundo);border-radius:3px;overflow:hidden}
+  .mini-prog-fill{height:100%;background:linear-gradient(90deg,var(--verde),#1F5740);border-radius:3px}
+  .mini-prog-fill.laranja{background:linear-gradient(90deg,var(--laranja),var(--laranja-esc))}
+  .mini-prog-fill.amarelo{background:linear-gradient(90deg,var(--amarelo),#A37614)}
+  .mini-prog-fill.vermelho{background:linear-gradient(90deg,var(--vermelho),#8E2B2B)}
+
+  /* AGENDA · próximos eventos */
+  .agenda{background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:22px;margin-bottom:18px}
+  .agenda-evento{display:grid;grid-template-columns:60px 1fr auto;gap:14px;padding:12px 0;border-bottom:1px dashed var(--cinza-cl);align-items:center}
+  .agenda-evento:last-child{border:none}
+  .agenda-data{text-align:center;font-family:var(--serif);font-style:italic;color:var(--marinho);font-weight:500;flex-shrink:0;padding:6px;background:var(--cinza-fundo);border-radius:2px}
+  .agenda-data.hoje{background:var(--vermelho);color:white}
+  .agenda-data.semana{background:var(--amarelo);color:#876715}
+  .agenda-dia{font-size:20px;line-height:1;font-weight:500}
+  .agenda-mes{font-family:var(--ui);font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-top:2px}
+  .agenda-hora{font-family:var(--ui);font-size:9.5px;margin-top:3px;letter-spacing:.5px;font-weight:600}
+  .agenda-titulo{font-size:13.5px;font-weight:500;color:var(--marinho);line-height:1.2}
+  .agenda-desc{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .agenda-tag{font-family:var(--ui);font-size:9.5px;padding:3px 8px;border-radius:2px;font-weight:700;letter-spacing:.5px}
+  .agenda-tag.vermelho{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .agenda-tag.laranja{background:var(--laranja-cl);color:var(--laranja);border:1px solid var(--laranja)}
+  .agenda-tag.verde{background:var(--verde-cl);color:var(--verde);border:1px solid var(--verde)}
+  .agenda-tag.amarelo{background:var(--amarelo-cl);color:#876715;border:1px solid var(--amarelo)}
+
+  /* NORA·IA INSIGHTS */
+  .ia-insights{background:linear-gradient(135deg,var(--marinho) 0%,var(--marinho-esc) 100%);color:var(--papel);border-radius:4px;padding:24px;position:relative;overflow:hidden;margin-bottom:22px}
+  .ia-insights::before{content:"";position:absolute;top:-30%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(126,91,204,.25) 0%,transparent 65%);pointer-events:none}
+  .ia-insights > *{position:relative}
+  .ia-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .ia-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--juridico),#3F2C7A);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 14px rgba(126,91,204,.3)}
+  .ia-eyebrow{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,99,58,.85);font-weight:700;margin-bottom:3px}
+  .ia-eyebrow em{color:var(--laranja);font-style:italic}
+  .ia-titulo{font-size:18px;color:var(--papel);font-weight:400;line-height:1.2}
+  .ia-titulo em{color:var(--laranja);font-style:italic}
+  .ia-insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .ia-card-insight{background:rgba(255,255,255,.06);border-radius:2px;padding:14px;border-left:3px solid rgba(232,99,58,.5)}
+  .ia-card-insight.alerta{border-left-color:var(--vermelho);background:rgba(196,69,69,.15)}
+  .ia-card-insight.oportunidade{border-left-color:var(--verde);background:rgba(45,125,90,.15)}
+  .ia-card-insight.atencao{border-left-color:var(--amarelo);background:rgba(212,160,44,.15)}
+  .ia-card-tipo{font-family:var(--ui);font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,99,58,.85);font-weight:700;margin-bottom:6px}
+  .ia-card-insight.alerta .ia-card-tipo{color:#FFB5B5}
+  .ia-card-insight.oportunidade .ia-card-tipo{color:#9DDCB5}
+  .ia-card-insight.atencao .ia-card-tipo{color:#F0D88C}
+  .ia-card-msg{font-family:var(--ui);font-size:12.5px;color:rgba(250,247,242,.95);line-height:1.55;letter-spacing:.2px}
+  .ia-card-msg strong{color:var(--papel);font-weight:600}
+  .ia-card-acao{margin-top:10px;font-family:var(--ui);font-size:11px;color:rgba(232,99,58,.95);font-weight:700;letter-spacing:.5px;cursor:pointer}
+  .ia-card-acao:hover{color:var(--laranja)}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1200px){
+    .kpis-grid-exec{grid-template-columns:repeat(3,1fr)}
+    .grid-2-exec{grid-template-columns:1fr}
+    .ia-insights-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:700px){
+    .kpis-grid-exec{grid-template-columns:repeat(2,1fr)}
+    .header-exec{grid-template-columns:1fr;text-align:center}
+    .header-foto{margin:0 auto}
+    .agenda-evento{grid-template-columns:1fr;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<div class="tela ativa" id="t-dash-exec">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Visão Geral</div>
+      <div class="sidebar-item ativo"><span class="ic">⌂</span> Dashboard Executivo</div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Headcount</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">🎓</span> Onboarding</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">📚</span> Treinamentos</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Jurídico</div>
+      <div class="sidebar-item outro"><span class="ic">⚖</span> Processos</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil">
+        <div class="av">RA</div>
+        <div>
+          <div class="nome">Roberto Aurora</div>
+          <div class="cargo">⭐ Owner · Dir. RH</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+
+      <!-- HEADER EXECUTIVO -->
+      <div class="header-exec">
+        <div class="header-foto">RA</div>
+        <div>
+          <div class="header-greeting">Terça · <strong>26 de maio de 2026</strong> · 08:42</div>
+          <h1>Bom dia, <em>Roberto</em></h1>
+          <div class="header-meta">
+            Aurora hoje: <strong>128 empregados ativos</strong> · folha em fechamento · <strong>1 audiência em 4h</strong> · Paula em <strong>DIA 1</strong> · 3 NRs vencidas · Mariana com 142% de meta
+          </div>
+        </div>
+        <div class="header-acoes">
+          <button class="btn-claro">📨 5 mensagens</button>
+          <button class="btn-claro">🔔 12 notificações</button>
+          <button class="btn-claro">📊 Relatórios</button>
+        </div>
+      </div>
+
+      <!-- ALERTA URGENTE · audiência hoje -->
+      <div class="alert-urgente">
+        <div class="alert-urg-ic">🚨</div>
+        <div>
+          <div class="alert-urg-titulo">Audiência trabalhista em 5h 48min · ação requerida</div>
+          <div class="alert-urg-msg">Processo <strong>0011234-56.2024.5.03.0021</strong> · José Roberto Pinheiro vs Aurora · <strong>1ª VT BH · 14:30</strong> · valor causa R$ 248k · Dr. Henrique aguarda confirmação do preposto (você)</div>
+        </div>
+        <button class="btn btn-fantasma btn-sm" style="background:rgba(255,255,255,.15);color:white;border-color:rgba(255,255,255,.3)">Ver processo →</button>
+      </div>
+
+      <!-- KPIs · 12 indicadores principais em 2 linhas de 6 -->
+      <div class="kpis-grid-exec">
+        <div class="kpi-exec destaque">
+          <div class="kpi-exec-cat"><span class="ic-mod">👥</span> Headcount</div>
+          <div class="kpi-exec-valor"><em>128</em><span>/135</span></div>
+          <div class="kpi-exec-meta">95% preenchido</div>
+          <div class="kpi-exec-trend up">▲ Paula admitida hoje</div>
+        </div>
+        <div class="kpi-exec verde">
+          <div class="kpi-exec-cat"><span class="ic-mod">💰</span> Folha · maio</div>
+          <div class="kpi-exec-valor verde">R$ 2.789K</div>
+          <div class="kpi-exec-meta">▼ R$ 151K vs orçado</div>
+          <div class="kpi-exec-trend up">5% de slack disponível</div>
+        </div>
+        <div class="kpi-exec laranja">
+          <div class="kpi-exec-cat"><span class="ic-mod">📋</span> Recrutamento</div>
+          <div class="kpi-exec-valor laranja"><em>5</em><span> vagas</span></div>
+          <div class="kpi-exec-meta">142 candidatos · pipeline</div>
+          <div class="kpi-exec-trend up">▲ Letícia em proposta</div>
+        </div>
+        <div class="kpi-exec amarelo">
+          <div class="kpi-exec-cat"><span class="ic-mod">🎓</span> Onboarding</div>
+          <div class="kpi-exec-valor amarelo"><em>3</em><span> em curso</span></div>
+          <div class="kpi-exec-meta">Paula DIA 1 hoje</div>
+          <div class="kpi-exec-trend neutro">Daniel 74% · Fernanda 96%</div>
+        </div>
+        <div class="kpi-exec vermelho">
+          <div class="kpi-exec-cat"><span class="ic-mod">⚠</span> NRs vencidas</div>
+          <div class="kpi-exec-valor vermelho"><em>3</em></div>
+          <div class="kpi-exec-meta">Marcelo, Henrique, Roberto A.</div>
+          <div class="kpi-exec-trend down">⚠ Risco trabalhista</div>
+        </div>
+        <div class="kpi-exec roxo">
+          <div class="kpi-exec-cat"><span class="ic-mod">⚖</span> Jurídico</div>
+          <div class="kpi-exec-valor roxo">R$ 1.86M</div>
+          <div class="kpi-exec-meta">12 proc Aurora · prov R$ 842k</div>
+          <div class="kpi-exec-trend down">▲ 2 novos em maio</div>
+        </div>
+      </div>
+
+      <div class="kpis-grid-exec">
+        <div class="kpi-exec marinho">
+          <div class="kpi-exec-cat"><span class="ic-mod">⏱</span> Ponto · maio</div>
+          <div class="kpi-exec-valor"><em>R$ 22K</em></div>
+          <div class="kpi-exec-meta">312h banco horas · 18 atrasos</div>
+          <div class="kpi-exec-trend neutro">Fernando 213h trabalhadas</div>
+        </div>
+        <div class="kpi-exec verde">
+          <div class="kpi-exec-cat"><span class="ic-mod">📚</span> Treinamentos</div>
+          <div class="kpi-exec-valor verde">96%</div>
+          <div class="kpi-exec-meta">conformidade NR</div>
+          <div class="kpi-exec-trend up">+312h treinadas em maio</div>
+        </div>
+        <div class="kpi-exec amarelo">
+          <div class="kpi-exec-cat"><span class="ic-mod">⭐</span> Avaliação Q1</div>
+          <div class="kpi-exec-valor amarelo"><em>87%</em></div>
+          <div class="kpi-exec-meta">avaliações concluídas</div>
+          <div class="kpi-exec-trend neutro">13 pendentes · calibrar até 31/05</div>
+        </div>
+        <div class="kpi-exec">
+          <div class="kpi-exec-cat"><span class="ic-mod">😊</span> eNPS · Q1</div>
+          <div class="kpi-exec-valor"><em>+52</em></div>
+          <div class="kpi-exec-meta">82 respondentes (64%)</div>
+          <div class="kpi-exec-trend up">▲ +8 vs Q4/2025</div>
+        </div>
+        <div class="kpi-exec verde">
+          <div class="kpi-exec-cat"><span class="ic-mod">📊</span> Turnover 12m</div>
+          <div class="kpi-exec-valor verde">8.2%</div>
+          <div class="kpi-exec-meta">setor médio: 14%</div>
+          <div class="kpi-exec-trend up">▼ -2.1 pp · ano</div>
+        </div>
+        <div class="kpi-exec laranja">
+          <div class="kpi-exec-cat"><span class="ic-mod">💼</span> Plano · Oi Nora</div>
+          <div class="kpi-exec-valor laranja">Premium</div>
+          <div class="kpi-exec-meta">R$ 4.990/mês · ativo 5/2026</div>
+          <div class="kpi-exec-trend up">17/18 módulos ativos</div>
+        </div>
+      </div>
+
+      <!-- NORA·IA · INSIGHTS DO DIA -->
+      <div class="ia-insights">
+        <div class="ia-head">
+          <div class="ia-avatar">🤖</div>
+          <div>
+            <div class="ia-eyebrow">Bom dia · análise da <em>Nora·IA</em></div>
+            <div class="ia-titulo">3 <em>insights</em> que merecem sua atenção hoje</div>
+          </div>
+        </div>
+        <div class="ia-insights-grid">
+          <div class="ia-card-insight alerta">
+            <div class="ia-card-tipo">🚨 Alerta crítico</div>
+            <div class="ia-card-msg"><strong>Marcelo Andrade (NR-18 vencida há 14 dias)</strong> bateu ponto hoje em Sítio II às 7h12. O sistema permitiu por questão de continuidade mas <strong>juridicamente a Aurora está exposta</strong>. Sugiro afastá-lo até completar curso (16h restantes da NR).</div>
+            <div class="ia-card-acao">→ Afastar e agendar curso</div>
+          </div>
+          <div class="ia-card-insight oportunidade">
+            <div class="ia-card-tipo">💡 Oportunidade</div>
+            <div class="ia-card-msg">Você tem <strong>R$ 151K/mês de slack orçamentário</strong> e a obra Vila Aurora começa em outubro. Sugiro <strong>antecipar contratação de 4 pedreiros + 2 carpinteiros</strong> em julho para garantir NRs antes do pico. Custo extra ago-set: R$ 84K (absorvido).</div>
+            <div class="ia-card-acao">→ Abrir vagas com a Mariana</div>
+          </div>
+          <div class="ia-card-insight atencao">
+            <div class="ia-card-tipo">⚠ Audiência hoje 14:30</div>
+            <div class="ia-card-msg"><strong>Dr. Henrique recomendou aceitar acordo R$ 80-110k</strong> (vs cenário realista R$ 186k). Economia ~R$ 106K. Eduardo (CFO) já aprovou faixa. <strong>Você precisa confirmar como preposto até 12h</strong> e levar procuração impressa.</div>
+            <div class="ia-card-acao">→ Confirmar para Dr. Henrique</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID 2 COLUNAS · status dos módulos + agenda -->
+      <div class="grid-2-exec">
+        <div>
+          <!-- STATUS DOS MÓDULOS -->
+          <div class="bloco-mod">
+            <div class="bloco-mod-head">
+              <div class="titulo-grupo">
+                <div class="bloco-mod-ic verde">💰</div>
+                <div>
+                  <h3>Folha de <em>pagamento</em> · maio/2026</h3>
+                  <div class="bloco-mod-sub">Fechamento dia 31/05 · 5 dias úteis</div>
+                </div>
+              </div>
+              <div class="bloco-mod-acao">Abrir folha →</div>
+            </div>
+
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot verde"></span> Cálculo concluído · 128 holerites</div>
+              <div class="linha-ind-val verde">R$ 2.789.000</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot amarelo"></span> Conferência pela Carla (4-eyes)</div>
+              <div class="linha-ind-val amarelo">em curso · 78%</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot cinza"></span> Fechamento por você</div>
+              <div class="linha-ind-val">aguardando · 31/05</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot cinza"></span> Envio S-1200 eSocial</div>
+              <div class="linha-ind-val">até 15/06</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot cinza"></span> Holerites liberados ao app</div>
+              <div class="linha-ind-val">02/06</div>
+            </div>
+          </div>
+
+          <!-- RECRUTAMENTO -->
+          <div class="bloco-mod">
+            <div class="bloco-mod-head">
+              <div class="titulo-grupo">
+                <div class="bloco-mod-ic laranja">📋</div>
+                <div>
+                  <h3>Recrutamento · <em>vagas em curso</em></h3>
+                  <div class="bloco-mod-sub">5 vagas ativas · Mariana 142% meta · pipeline saudável</div>
+                </div>
+              </div>
+              <div class="bloco-mod-acao">Ver pipeline →</div>
+            </div>
+
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot laranja"></span> #2026-0042 · Eng. Civil Pleno (afirmativa)</div>
+              <div class="linha-ind-val laranja">Letícia em proposta · admissão 01/07</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot verde"></span> #2026-0043 · 2 Pedreiros · Sítio II</div>
+              <div class="linha-ind-val verde">em triagem · 18 candidatos</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot verde"></span> #2026-0044 · Eng. Civil Sr</div>
+              <div class="linha-ind-val verde">em entrevista · 5 finalistas</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot amarelo"></span> #2026-0045 · Almoxarife · Vila Aurora</div>
+              <div class="linha-ind-val amarelo">aplicações · 32 candidatos</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot cinza"></span> #2026-0046 · Servente · pendente publicar</div>
+              <div class="linha-ind-val">rascunho · você assina</div>
+            </div>
+          </div>
+
+          <!-- ONBOARDING -->
+          <div class="bloco-mod">
+            <div class="bloco-mod-head">
+              <div class="titulo-grupo">
+                <div class="bloco-mod-ic amarelo">🎓</div>
+                <div>
+                  <h3>Onboarding · <em>3 em curso</em></h3>
+                  <div class="bloco-mod-sub">Paula DIA 1 hoje · Daniel D+22 · Fernanda finalizando</div>
+                </div>
+              </div>
+              <div class="bloco-mod-acao">Ver detalhes →</div>
+            </div>
+
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot vermelho"></span> Paula Marques Souza · Coord. RH</div>
+              <div class="linha-ind-val laranja">DIA 1 hoje</div>
+            </div>
+            <div class="mini-prog"><div class="mini-prog-fill laranja" style="width:8%"></div></div>
+
+            <div class="linha-ind" style="margin-top:10px">
+              <div class="linha-ind-nome"><span class="dot amarelo"></span> Daniel Pereira Lima · Eng. Civil Pleno</div>
+              <div class="linha-ind-val amarelo">D+22 · 74%</div>
+            </div>
+            <div class="mini-prog"><div class="mini-prog-fill amarelo" style="width:74%"></div></div>
+
+            <div class="linha-ind" style="margin-top:10px">
+              <div class="linha-ind-nome"><span class="dot verde"></span> Fernanda Toledo · Analista R&amp;S Jr</div>
+              <div class="linha-ind-val verde">D+85 · 96%</div>
+            </div>
+            <div class="mini-prog"><div class="mini-prog-fill" style="width:96%"></div></div>
+          </div>
+
+          <!-- TREINAMENTOS · alerta NR -->
+          <div class="bloco-mod" style="border:2px solid var(--vermelho);background:linear-gradient(135deg,var(--branco) 70%,var(--vermelho-cl))">
+            <div class="bloco-mod-head">
+              <div class="titulo-grupo">
+                <div class="bloco-mod-ic vermelho">⚠</div>
+                <div>
+                  <h3>NRs <em>vencidas</em> · risco trabalhista</h3>
+                  <div class="bloco-mod-sub" style="color:var(--vermelho)">3 empregados sem NR válida · alto risco</div>
+                </div>
+              </div>
+              <div class="bloco-mod-acao" style="color:var(--vermelho)">Agendar treinamentos →</div>
+            </div>
+
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot vermelho"></span> Marcelo Andrade · Eng. Civil · Sítio II</div>
+              <div class="linha-ind-val vermelho">NR-18 venceu 12/05 · 14 dias atraso</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot vermelho"></span> Henrique Lopes · Mestre Obras · Sítio II</div>
+              <div class="linha-ind-val vermelho">NR-35 venceu 18/05 · 8 dias atraso</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot amarelo"></span> Roberto Almeida · Pedreiro · Vila</div>
+              <div class="linha-ind-val amarelo">NR-18 vence amanhã 27/05</div>
+            </div>
+
+            <div style="margin-top:14px;padding:10px 12px;background:var(--vermelho-cl);border-radius:2px;font-family:var(--ui);font-size:11px;color:var(--vermelho);font-weight:600;letter-spacing:.2px">
+              💡 Sistema bloqueia ponto desses 3 a partir de amanhã 28/05 · obrigatório renovar até lá
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUNA DIREITA · AGENDA + JURÍDICO -->
+        <div>
+          <!-- AGENDA · próximos 30 dias -->
+          <div class="agenda">
+            <div class="bloco-mod-head" style="border-bottom:1px solid var(--cinza-cl);padding-bottom:12px;margin-bottom:0">
+              <div class="titulo-grupo">
+                <div class="bloco-mod-ic laranja">📅</div>
+                <div>
+                  <h3 style="font-size:16px">Sua <em>agenda</em></h3>
+                  <div class="bloco-mod-sub">Próximas 4 semanas</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="agenda-evento">
+              <div class="agenda-data hoje">
+                <div class="agenda-dia">26</div>
+                <div class="agenda-mes">MAI</div>
+                <div class="agenda-hora">14:30</div>
+              </div>
+              <div>
+                <div class="agenda-titulo">Audiência José Roberto · 1ª VT BH</div>
+                <div class="agenda-desc">Você é o preposto · sair daqui 13:30 · acordo R$ 80-110k</div>
+              </div>
+              <span class="agenda-tag vermelho">🚨 HOJE</span>
+            </div>
+
+            <div class="agenda-evento">
+              <div class="agenda-data semana">
+                <div class="agenda-dia">02</div>
+                <div class="agenda-mes">JUN</div>
+                <div class="agenda-hora">10:00</div>
+              </div>
+              <div>
+                <div class="agenda-titulo">Revisão semestral com CFO Eduardo</div>
+                <div class="agenda-desc">Headcount, projeção 12m, ratificar slack R$ 151K/mês</div>
+              </div>
+              <span class="agenda-tag amarelo">7d</span>
+            </div>
+
+            <div class="agenda-evento">
+              <div class="agenda-data semana">
+                <div class="agenda-dia">02</div>
+                <div class="agenda-mes">JUN</div>
+                <div class="agenda-hora">14:00</div>
+              </div>
+              <div>
+                <div class="agenda-titulo">Perícia Antônio Teixeira · NR-15</div>
+                <div class="agenda-desc">3ª VT Contagem · Dr. Henrique conduz</div>
+              </div>
+              <span class="agenda-tag amarelo">7d</span>
+            </div>
+
+            <div class="agenda-evento">
+              <div class="agenda-data">
+                <div class="agenda-dia">05</div>
+                <div class="agenda-mes">JUN</div>
+                <div class="agenda-hora">10:00</div>
+              </div>
+              <div>
+                <div class="agenda-titulo">Audiência Carlos Mendes · acidente NR-35</div>
+                <div class="agenda-desc">4ª VT BH · instrução com testemunhas</div>
+              </div>
+              <span class="agenda-tag laranja">10d</span>
+            </div>
+
+            <div class="agenda-evento">
+              <div class="agenda-data">
+                <div class="agenda-dia">15</div>
+                <div class="agenda-mes">JUN</div>
+                <div class="agenda-hora">—</div>
+              </div>
+              <div>
+                <div class="agenda-titulo">Envio S-1200 ao eSocial</div>
+                <div class="agenda-desc">Folha de maio · prazo legal</div>
+              </div>
+              <span class="agenda-tag verde">20d</span>
+            </div>
+
+            <div class="agenda-evento">
+              <div class="agenda-data">
+                <div class="agenda-dia">20</div>
+                <div class="agenda-mes">JUN</div>
+                <div class="agenda-hora">—</div>
+              </div>
+              <div>
+                <div class="agenda-titulo">Fechamento vaga afirmativa #2026-0042</div>
+                <div class="agenda-desc">Letícia admitida 01/07 · Engenharia (Luísa)</div>
+              </div>
+              <span class="agenda-tag verde">25d</span>
+            </div>
+          </div>
+
+          <!-- JURÍDICO RESUMIDO -->
+          <div class="bloco-mod" style="background:linear-gradient(135deg,var(--branco) 60%,#EFE9FB);border-color:var(--juridico)">
+            <div class="bloco-mod-head">
+              <div class="titulo-grupo">
+                <div class="bloco-mod-ic roxo">⚖</div>
+                <div>
+                  <h3>Jurídico <em>trabalhista</em></h3>
+                  <div class="bloco-mod-sub">Dr. Henrique · Vasconcellos &amp; Associados</div>
+                </div>
+              </div>
+              <div class="bloco-mod-acao" style="color:var(--juridico)">Ver processos →</div>
+            </div>
+
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot roxo"></span> Processos ativos contra Aurora</div>
+              <div class="linha-ind-val">12 · 8 prováveis</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot vermelho"></span> Valor total em risco</div>
+              <div class="linha-ind-val vermelho">R$ 1.86M</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot amarelo"></span> Provisão obrigatória CPC 25</div>
+              <div class="linha-ind-val amarelo">R$ 842K</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot verde"></span> Acordos fechados em 2026</div>
+              <div class="linha-ind-val verde">5 · economia R$ 312K</div>
+            </div>
+            <div class="linha-ind">
+              <div class="linha-ind-nome"><span class="dot laranja"></span> Audiências em 30 dias</div>
+              <div class="linha-ind-val laranja">7 · 1 hoje</div>
+            </div>
+
+            <div style="margin-top:14px;padding:10px 12px;background:#EFE9FB;border-radius:2px;font-family:var(--ui);font-size:11px;color:var(--juridico);letter-spacing:.2px">
+              💡 Relatório de maio do Dr. Henrique chega amanhã · economia R$ 156K em acordos
+            </div>
+          </div>
+
+          <!-- USO DA PLATAFORMA · Oi Nora -->
+          <div class="bloco-mod" style="background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);border:none;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none"></div>
+            <div style="position:relative">
+              <div class="bloco-mod-head" style="border-color:rgba(255,255,255,.1);color:var(--papel)">
+                <div class="titulo-grupo">
+                  <div style="width:42px;height:42px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(232,99,58,.2);border:1px solid var(--laranja);color:var(--laranja)">💼</div>
+                  <div>
+                    <h3 style="color:var(--papel)">Plano <em style="color:var(--laranja)">Premium</em></h3>
+                    <div class="bloco-mod-sub" style="color:rgba(250,247,242,.55)">Ativo desde 02/01/2026 · R$ 4.990/mês</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12px;margin-top:6px">
+                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.1)">
+                  <span style="opacity:.7">Empregados</span>
+                  <strong>128 / 500</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.1)">
+                  <span style="opacity:.7">Módulos ativos</span>
+                  <strong>17 de 18</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.1)">
+                  <span style="opacity:.7">Storage usado</span>
+                  <strong>78 GB / 500 GB</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:6px 0">
+                  <span style="opacity:.7">Custo IA · mês</span>
+                  <strong style="color:var(--laranja)">R$ 1.842 incluso</strong>
+                </div>
+              </div>
+
+              <div style="margin-top:14px;padding:10px 12px;background:rgba(232,99,58,.15);border-radius:2px;font-family:var(--ui);font-size:11px;color:#FBD3C5">
+                💡 Próxima renovação 02/01/2027 · você pode adicionar Avaliação 360 (já incluso · ative em Configurações)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="proto-bar">
+  <span class="proto-label">Dashboard Executivo · você é Roberto Aurora</span>
+</div>
+
+<script>
+function irPara(idTela){
+  alert('Em produção navega para: ' + idTela);
+}
+</script>
+</body>
+</html>

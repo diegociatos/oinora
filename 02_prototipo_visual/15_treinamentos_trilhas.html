@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Treinamentos &amp; Trilhas</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3B4A6B,#1F2A44);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  /* TopBar empregado */
+  .empregado-shell{min-height:100vh;background:linear-gradient(180deg,var(--cinza-fundo) 0%,var(--papel) 100%)}
+  .empregado-topbar{background:var(--marinho);color:var(--papel);padding:16px 30px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50}
+  .empregado-topbar .logo{font-size:22px}
+  .empregado-topbar .logo .nora{color:var(--papel)}
+  .empregado-topbar-nav{display:flex;align-items:center;gap:20px;font-family:var(--ui);font-size:12.5px}
+  .empregado-topbar-nav a{padding:6px 10px;color:rgba(250,247,242,.7);border-bottom:2px solid transparent}
+  .empregado-topbar-nav a.ativo{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .topbar-av{width:38px;height:38px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:15px;font-weight:600}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  .header-bar{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:24px 28px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+  .header-bar h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .header-bar h1 em{color:var(--laranja);font-style:italic}
+  .header-bar .meta{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px}
+  .header-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:0 6px}
+  .aba{padding:14px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .aba .cnt{background:var(--cinza-fundo);font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700;color:var(--cinza)}
+  .aba.ativa .cnt{background:var(--laranja);color:white}
+  .aba .alerta{background:var(--vermelho);color:white;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700}
+
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px}
+  .painel h3 em{color:var(--laranja);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+
+  .kpis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .kpi.destaque{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border-color:var(--laranja)}
+  .kpi.alerta{background:linear-gradient(135deg,var(--branco) 50%,var(--vermelho-cl));border-color:var(--vermelho)}
+  .kpi-titulo{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .kpi-valor{font-size:28px;color:var(--marinho);line-height:1;font-family:var(--serif);font-style:italic}
+  .kpi-valor em{color:var(--laranja)}
+  .kpi-valor span{font-size:13px;color:var(--cinza);font-style:normal}
+  .kpi-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px}
+
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-vermelho{background:var(--vermelho-cl);border-left:3px solid var(--vermelho);color:var(--marinho)}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  .trilha-card{background:linear-gradient(135deg,var(--branco) 60%,var(--roxo-cl));border:1px solid var(--cinza-cl);border-radius:4px;padding:24px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;margin-bottom:14px;border-left:4px solid var(--roxo);cursor:pointer}
+  .trilha-card.obrigatoria{border-left-color:var(--vermelho);background:linear-gradient(135deg,var(--branco) 60%,var(--vermelho-cl))}
+  .trilha-card.recomendada{border-left-color:var(--laranja);background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl))}
+  .trilha-card.opcional{border-left-color:var(--verde);background:linear-gradient(135deg,var(--branco) 60%,var(--verde-cl))}
+  .trilha-ic{width:64px;height:64px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;background:var(--branco);border:1px solid var(--cinza-cl)}
+  .trilha-info{flex:1}
+  .trilha-nome{font-size:18px;font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .trilha-desc{font-family:var(--ui);font-size:12.5px;color:var(--cinza);margin-top:6px;line-height:1.55}
+  .trilha-meta{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;font-family:var(--ui);font-size:11px;color:var(--cinza)}
+  .trilha-meta strong{color:var(--marinho)}
+  .trilha-stats{display:flex;flex-direction:column;gap:6px;text-align:right;font-family:var(--ui);font-size:11px;color:var(--cinza);min-width:140px}
+  .trilha-stats strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:18px;display:block}
+
+  .progresso-bar{margin-top:10px;height:8px;background:var(--cinza-fundo);border-radius:4px;overflow:hidden}
+  .progresso-fill{height:100%;background:linear-gradient(90deg,var(--verde),#1F5740);border-radius:4px}
+  .progresso-fill.obrigatoria{background:linear-gradient(90deg,var(--vermelho),#8E2B2B)}
+  .progresso-fill.laranja{background:linear-gradient(90deg,var(--laranja),var(--laranja-esc))}
+
+  .emp-linha{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:12px 18px;display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 90px;gap:14px;align-items:center;margin-bottom:8px;font-family:var(--ui);font-size:12.5px}
+  .emp-linha.atraso{border-left:3px solid var(--vermelho);background:var(--vermelho-cl)}
+  .emp-linha.atencao{border-left:3px solid var(--amarelo);background:var(--amarelo-cl)}
+  .emp-pessoa{display:flex;align-items:center;gap:10px}
+  .emp-av{width:34px;height:34px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;flex-shrink:0;font-weight:600}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .emp-nome{font-size:13px;font-weight:500;color:var(--marinho);font-family:var(--serif)}
+  .emp-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:2px}
+  .emp-valid strong{display:block;font-family:var(--serif);font-style:italic;font-size:13px;color:var(--marinho)}
+  .emp-valid.atraso strong{color:var(--vermelho)}
+  .emp-valid.atencao strong{color:#876715}
+
+  .grid-2-1{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  /* CATÁLOGO - cards de curso */
+  .curso-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .curso-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden;cursor:pointer;transition:all .15s;display:flex;flex-direction:column}
+  .curso-card:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.06);border-color:var(--marinho)}
+  .curso-thumb{height:140px;display:flex;align-items:center;justify-content:center;font-size:56px;color:rgba(255,255,255,.85);position:relative;overflow:hidden}
+  .curso-thumb::before{content:"";position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .curso-thumb.eng{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .curso-thumb.seg{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .curso-thumb.sis{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .curso-thumb.gest{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .curso-thumb.idi{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .curso-thumb.cult{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .curso-badge-canto{position:absolute;top:12px;right:12px;font-size:10px;color:white;padding:3px 8px;border-radius:2px;letter-spacing:1px;font-weight:700;font-family:var(--ui)}
+  .curso-corpo{padding:16px;flex:1;display:flex;flex-direction:column}
+  .curso-titulo{font-size:14px;font-weight:500;line-height:1.3;margin-bottom:6px;color:var(--marinho)}
+  .curso-titulo em{color:var(--laranja);font-style:italic}
+  .curso-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.3px;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .curso-desc{font-family:var(--ui);font-size:11.5px;color:var(--cinza);line-height:1.55;margin-top:4px;flex:1}
+  .curso-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--cinza-cl)}
+  .curso-prov{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px;text-transform:uppercase;font-weight:700}
+
+  .filtros-bar{background:var(--branco);border:1px solid var(--cinza-cl);padding:14px 18px;border-radius:2px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .filtros-bar input,.filtros-bar select{padding:8px 12px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:13px;color:var(--marinho);border-radius:2px}
+  .filtros-bar .busca{flex:1;min-width:240px;position:relative}
+  .filtros-bar .busca input{width:100%;padding-left:34px}
+  .filtros-bar .busca span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--cinza)}
+
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .chip-filtro{font-family:var(--ui);font-size:11px;padding:6px 12px;border:1px solid var(--cinza-cl);background:var(--branco);color:var(--cinza);border-radius:14px;cursor:pointer;font-weight:500}
+  .chip-filtro.ativo{background:var(--laranja);border-color:var(--laranja);color:white}
+
+  @media (max-width:1050px){
+    .kpis-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2-1{grid-template-columns:1fr}
+    .trilha-card{grid-template-columns:1fr;text-align:center}
+    .header-bar{grid-template-columns:1fr;text-align:center}
+    .emp-linha{grid-template-columns:1fr;gap:8px}
+    .curso-grid{grid-template-columns:1fr 1fr}
+  }
+  /* PESSOA HEADER (trilha do Fernando) */
+  .pessoa-header{background:linear-gradient(135deg,var(--branco) 60%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:18px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}
+  .pessoa-foto{width:96px;height:96px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:38px;font-weight:600;background:linear-gradient(135deg,#E8633A,#C94E28);border:4px solid white;box-shadow:0 4px 14px rgba(31,42,68,.1)}
+  .pessoa-nome{font-size:30px;font-weight:400;letter-spacing:-.3px;line-height:1.1;margin-bottom:4px}
+  .pessoa-nome em{color:var(--laranja);font-style:italic}
+  .pessoa-cargo-linha{font-family:var(--ui);font-size:13px;color:var(--cinza);margin-bottom:12px}
+  .pessoa-cargo-linha strong{color:var(--marinho);font-family:var(--serif);font-weight:500}
+  .pessoa-tags{display:flex;gap:6px;flex-wrap:wrap}
+
+  /* Cards de progresso trilha */
+  .prog-trilha-card{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);padding:28px;border-radius:4px;margin-bottom:18px;position:relative;overflow:hidden}
+  .prog-trilha-card::before{content:"";position:absolute;top:-30%;right:-15%;width:380px;height:380px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .prog-trilha-card > *{position:relative}
+  .prog-trilha-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+  .prog-trilha-head h2{font-size:22px;font-weight:400;color:var(--papel)}
+  .prog-trilha-head h2 em{color:var(--laranja);font-style:italic}
+  .prog-trilha-sub{font-family:var(--ui);font-size:12px;opacity:.6;margin-top:4px}
+  .prog-trilha-num{font-family:var(--serif);font-style:italic;font-size:54px;color:var(--laranja);line-height:1}
+  .prog-trilha-num span{font-size:16px;color:rgba(255,255,255,.4);font-style:normal}
+
+  /* Lista de cursos da trilha */
+  .curso-trilha-item{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;transition:all .15s}
+  .curso-trilha-item.feito{background:linear-gradient(135deg,var(--branco) 70%,var(--verde-cl));border-left:3px solid var(--verde)}
+  .curso-trilha-item.atual{background:linear-gradient(135deg,var(--branco) 70%,var(--laranja-cl));border-left:3px solid var(--laranja);box-shadow:0 2px 8px rgba(232,99,58,.06);cursor:pointer}
+  .curso-trilha-item.bloqueado{opacity:.55;background:var(--cinza-fundo)}
+
+  .curso-num{width:42px;height:42px;border-radius:50%;background:var(--cinza-fundo);color:var(--cinza);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:16px;font-weight:600;flex-shrink:0;border:2px solid var(--cinza-cl)}
+  .curso-num.feito{background:var(--verde);border-color:var(--verde);color:white}
+  .curso-num.atual{background:var(--laranja);border-color:var(--laranja);color:white;box-shadow:0 0 0 4px rgba(232,99,58,.15)}
+  .curso-num.bloq::before{content:"🔒";font-size:16px;font-style:normal}
+  .curso-num.bloq{font-size:0}
+
+  .curso-trilha-info{min-width:0}
+  .curso-trilha-titulo{font-size:14px;font-weight:500;color:var(--marinho);line-height:1.2;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .curso-trilha-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
+  .curso-trilha-meta strong{color:var(--marinho)}
+
+  .curso-trilha-status{font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:right;min-width:90px}
+  .curso-trilha-status strong{display:block;font-family:var(--serif);font-style:italic;font-size:14px}
+  .curso-trilha-status.feito strong{color:var(--verde)}
+  .curso-trilha-status.atual strong{color:var(--laranja)}
+
+  /* Badges/Conquistas */
+  .badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  .badge-card{padding:16px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;text-align:center}
+  .badge-card.ganha{background:linear-gradient(135deg,var(--branco) 50%,var(--amarelo-cl));border-color:var(--amarelo);box-shadow:0 4px 12px rgba(212,160,44,.1)}
+  .badge-card.pendente{opacity:.55}
+  .badge-ic{font-size:36px;margin-bottom:6px}
+  .badge-titulo{font-family:var(--ui);font-size:11px;letter-spacing:.5px;font-weight:700;text-transform:uppercase;color:var(--marinho);margin-bottom:3px}
+  .badge-sub{font-family:var(--ui);font-size:10px;color:var(--cinza);line-height:1.4}
+  .badge-card.ganha .badge-sub{color:#876715;font-weight:600}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+  /* PLAYER DE VÍDEO */
+  .player-card{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);border-radius:4px;padding:36px;position:relative;overflow:hidden;text-align:center;margin-bottom:18px;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .player-card::before{content:"";position:absolute;top:-30%;right:-15%;width:480px;height:480px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .player-card > *{position:relative}
+  .player-eyebrow{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--laranja);font-weight:700;margin-bottom:10px}
+  .player-titulo{font-size:28px;font-weight:400;color:var(--papel);margin-bottom:6px}
+  .player-titulo em{color:var(--laranja);font-style:italic}
+  .player-meta{font-family:var(--ui);font-size:12px;opacity:.6;margin-bottom:28px}
+  .player-btn-grande{width:88px;height:88px;border-radius:50%;background:var(--laranja);color:white;display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;transition:all .2s;border:none;margin-bottom:18px;box-shadow:0 8px 24px rgba(232,99,58,.3)}
+  .player-btn-grande:hover{background:var(--laranja-esc);transform:scale(1.05)}
+  .player-prog-info{font-family:var(--ui);font-size:11px;opacity:.7;letter-spacing:.5px;margin-bottom:10px}
+  .player-prog-bar{width:300px;max-width:100%;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;margin:0 auto}
+  .player-prog-fill{height:100%;background:var(--laranja);border-radius:2px}
+
+  /* Módulos do curso */
+  .modulo-item{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:16px 18px;margin-bottom:8px;display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;transition:all .15s}
+  .modulo-item.feito{background:linear-gradient(135deg,var(--branco) 70%,var(--verde-cl));border-left:3px solid var(--verde)}
+  .modulo-item.atual{background:linear-gradient(135deg,var(--branco) 70%,var(--laranja-cl));border-left:3px solid var(--laranja);box-shadow:0 2px 8px rgba(232,99,58,.06);cursor:pointer}
+  .modulo-item.bloq{opacity:.55;background:var(--cinza-fundo)}
+  .mod-num-pq{width:34px;height:34px;border-radius:50%;background:var(--cinza-fundo);color:var(--cinza);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;font-weight:600;border:2px solid var(--cinza-cl)}
+  .mod-num-pq.feito{background:var(--verde);border-color:var(--verde);color:white}
+  .mod-num-pq.atual{background:var(--laranja);border-color:var(--laranja);color:white}
+  .mod-num-pq.bloq::before{content:"🔒";font-size:12px}
+  .mod-num-pq.bloq{font-size:0}
+  .mod-info{min-width:0}
+  .mod-titulo{font-size:13.5px;font-weight:500;color:var(--marinho);line-height:1.2}
+  .mod-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+  .mod-meta strong{color:var(--marinho)}
+  .mod-duracao{font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:13px;min-width:50px;text-align:right}
+  .mod-acao{min-width:80px;text-align:right}
+
+  /* Instrutor */
+  .instrutor-card{background:linear-gradient(135deg,var(--branco) 60%,var(--roxo-cl));border:1px solid var(--roxo);border-radius:2px;padding:18px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+  .instrutor-av{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#7E5BCC,#5B3FA0);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:20px;font-weight:600;flex-shrink:0}
+  .instrutor-titulo{font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--roxo);font-weight:700}
+  .instrutor-nome{font-size:16px;font-weight:500;margin-top:3px}
+  .instrutor-cargo{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px}
+
+  /* Certificado mockup */
+  .cert-card{background:linear-gradient(135deg,var(--branco) 60%,var(--amarelo-cl));border:2px solid var(--amarelo);border-radius:4px;padding:24px;text-align:center;position:relative}
+  .cert-medalha{font-size:54px;margin-bottom:10px}
+  .cert-eyebrow{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+  .cert-titulo{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--marinho);margin-bottom:6px;line-height:1.2}
+  .cert-meta{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px;padding-top:12px;border-top:1px dashed var(--amarelo);margin-top:12px}
+
+  @media (max-width:1050px){
+    .pessoa-header{grid-template-columns:1fr;text-align:center}
+    .pessoa-foto{margin:0 auto}
+    .curso-trilha-item{grid-template-columns:auto 1fr;gap:12px}
+    .curso-trilha-status{grid-column:2;text-align:left}
+    .badges-grid{grid-template-columns:1fr 1fr}
+    .grid-2{grid-template-columns:1fr}
+    .modulo-item{grid-template-columns:auto 1fr;gap:10px}
+    .mod-duracao,.mod-acao{grid-column:2}
+  }
+</style>
+</head>
+<body>
+
+<!-- TELA 1: DASHBOARD RH -->
+<div class="tela ativa" id="t-treina-rh">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">🎓</span> Onboarding</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item ativo"><span class="ic">📚</span> Treinamentos</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresa &amp; Org</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">⭐ Owner · Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Desenvolvimento</a> &gt; <span style="color:var(--laranja)">Treinamentos &amp; Trilhas</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Treinamentos &amp; <em>Trilhas</em></h1>
+          <div class="meta">128 empregados · 24 cursos no catálogo · integração Alura/Udemy/FDC · obrigações NR ativas</div>
+          <div class="header-tags">
+            <span class="tag verde">✓ 96% conformidade NR</span>
+            <span class="tag vermelho">⚠ 3 vencidos</span>
+            <span class="tag amarelo">⏰ 8 vencem 30d</span>
+            <span class="tag laranja">+ 312h treinadas em maio</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm">📤 Enviar S-2210 eSocial</button>
+          <button class="btn btn-fantasma btn-sm">⚙ Configurar trilhas</button>
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-catalogo')">+ Atribuir curso</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa"><span>📊</span> Dashboard</div>
+        <div class="aba" onclick="irPara('t-catalogo')"><span>📚</span> Catálogo <span class="cnt">24</span></div>
+        <div class="aba"><span>⚖</span> NRs &amp; Compliance <span class="alerta">3</span></div>
+        <div class="aba"><span>🏆</span> Certificados <span class="cnt">142</span></div>
+      </div>
+
+      <div class="kpis-grid">
+        <div class="kpi destaque">
+          <div class="kpi-titulo">Em curso agora</div>
+          <div class="kpi-valor"><em>42</em><span> empregados</span></div>
+          <div class="kpi-meta">33% do quadro engajado</div>
+        </div>
+        <div class="kpi alerta">
+          <div class="kpi-titulo">Treinamentos vencidos</div>
+          <div class="kpi-valor" style="color:var(--vermelho)"><em>3</em></div>
+          <div class="kpi-meta">NR-18 e NR-35 · ação urgente</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Horas treinadas · 2026</div>
+          <div class="kpi-valor"><em>1.842h</em></div>
+          <div class="kpi-meta">▲ 18% vs 2025</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Investimento · ano</div>
+          <div class="kpi-valor"><em>R$ 38k</em></div>
+          <div class="kpi-meta">R$ 297/empregado · meta R$ 480</div>
+        </div>
+      </div>
+
+      <div class="alert alert-vermelho">
+        <span class="ic-grande">🚨</span>
+        <div>
+          <strong>3 NRs vencidos · risco trabalhista imediato</strong>
+          <strong style="color:var(--vermelho)">Marcelo Andrade (NR-18 venceu 12/05) · Henrique Lopes (NR-35 venceu 18/05) · Roberto Almeida (NR-18 vence amanhã 27/05)</strong>. Empregado sem NR válida não pode entrar no canteiro.
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div>
+          <div class="painel">
+            <h3>Trilhas <em>configuradas</em></h3>
+            <p class="sub-titulo">8 trilhas ativas · 4 obrigatórias por cargo</p>
+
+            <div class="trilha-card obrigatoria">
+              <div class="trilha-ic">🏗</div>
+              <div class="trilha-info">
+                <div class="trilha-nome">Trilha Eng. Civil Sr → Especialista <span class="tag laranja" style="font-size:10px">Obrigatória</span></div>
+                <div class="trilha-desc">Caminho de evolução para Coordenador de Obra · BIM, Lean Construction e gestão de equipes</div>
+                <div class="trilha-meta">
+                  <span>📚 <strong>5 cursos</strong></span>
+                  <span>⏱ <strong>108h</strong> totais</span>
+                  <span>👥 <strong>5 empregados</strong></span>
+                  <span>📅 <strong>6 meses</strong></span>
+                </div>
+                <div class="progresso-bar"><div class="progresso-fill obrigatoria" style="width:34%"></div></div>
+              </div>
+              <div class="trilha-stats">
+                <strong>34%</strong>
+                <span>progresso médio</span>
+                <span style="color:var(--vermelho);font-weight:600">⚠ Marcelo atrasado</span>
+              </div>
+            </div>
+
+            <div class="trilha-card recomendada">
+              <div class="trilha-ic">👷</div>
+              <div class="trilha-info">
+                <div class="trilha-nome">Onboarding técnico · canteiro <span class="tag vermelho" style="font-size:10px">Obrigatória legal</span></div>
+                <div class="trilha-desc">NRs essenciais para qualquer empregado de obra · bloqueia acesso ao canteiro</div>
+                <div class="trilha-meta">
+                  <span>📚 <strong>4 cursos</strong> · NR-18, NR-35, NR-6, NR-12</span>
+                  <span>⏱ <strong>32h</strong></span>
+                  <span>👥 <strong>78 empregados</strong></span>
+                </div>
+                <div class="progresso-bar"><div class="progresso-fill laranja" style="width:92%"></div></div>
+              </div>
+              <div class="trilha-stats">
+                <strong>92%</strong>
+                <span>conformidade</span>
+                <span>3 pendentes</span>
+              </div>
+            </div>
+
+            <div class="trilha-card recomendada">
+              <div class="trilha-ic">⭐</div>
+              <div class="trilha-info">
+                <div class="trilha-nome">Liderança &amp; Gestão <span class="tag laranja" style="font-size:10px">Recomendada</span></div>
+                <div class="trilha-desc">Para coordenadores e gerentes · feedback, OKRs, gestão financeira básica</div>
+                <div class="trilha-meta">
+                  <span>📚 <strong>6 cursos</strong></span>
+                  <span>⏱ <strong>72h</strong></span>
+                  <span>👥 <strong>14 líderes</strong></span>
+                </div>
+                <div class="progresso-bar"><div class="progresso-fill laranja" style="width:58%"></div></div>
+              </div>
+              <div class="trilha-stats">
+                <strong>58%</strong>
+                <span>progresso</span>
+              </div>
+            </div>
+
+            <div class="trilha-card opcional">
+              <div class="trilha-ic">💻</div>
+              <div class="trilha-info">
+                <div class="trilha-nome">Domínio Sienge · ERP <span class="tag verde" style="font-size:10px">Opcional</span></div>
+                <div class="trilha-desc">Para quem trabalha com ERP da construtora</div>
+                <div class="trilha-meta">
+                  <span>📚 <strong>3 cursos</strong></span>
+                  <span>⏱ <strong>24h</strong></span>
+                  <span>👥 <strong>18 empregados</strong></span>
+                </div>
+                <div class="progresso-bar"><div class="progresso-fill" style="width:71%"></div></div>
+              </div>
+              <div class="trilha-stats">
+                <strong>71%</strong>
+                <span>progresso</span>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding:14px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza);display:flex;justify-content:space-between">
+              <span><strong style="color:var(--marinho)">+ 4 trilhas:</strong> Operacional Adm · Saúde Mental · Inglês · LGPD</span>
+              <a style="color:var(--laranja);font-weight:600">Ver todas →</a>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3>NRs · <em>vencimentos próximos</em></h3>
+            <p class="sub-titulo">3 vencidos + 8 vencem em 30 dias</p>
+
+            <div class="emp-linha atraso">
+              <div class="emp-pessoa">
+                <div class="emp-av av-b">MA</div>
+                <div>
+                  <div class="emp-nome">Marcelo Andrade Lima</div>
+                  <div class="emp-meta">Eng. Civil Sr · canteiro Sítio II</div>
+                </div>
+              </div>
+              <div>📜 NR-18 · Construção Civil</div>
+              <div>⚠ <strong style="color:var(--vermelho)">14 dias atrasado</strong></div>
+              <div class="emp-valid atraso"><strong>12/05/2026</strong><span>vencido</span></div>
+              <button class="btn btn-primario btn-xs">📅 Agendar</button>
+            </div>
+
+            <div class="emp-linha atraso">
+              <div class="emp-pessoa">
+                <div class="emp-av av-d">HL</div>
+                <div>
+                  <div class="emp-nome">Henrique Lopes</div>
+                  <div class="emp-meta">Mestre de Obras · Sítio II</div>
+                </div>
+              </div>
+              <div>📜 NR-35 · Trabalho em Altura</div>
+              <div>⚠ <strong style="color:var(--vermelho)">8 dias atrasado</strong></div>
+              <div class="emp-valid atraso"><strong>18/05/2026</strong><span>vencido</span></div>
+              <button class="btn btn-primario btn-xs">📅 Agendar</button>
+            </div>
+
+            <div class="emp-linha atencao">
+              <div class="emp-pessoa">
+                <div class="emp-av av-e">RA</div>
+                <div>
+                  <div class="emp-nome">Roberto Almeida</div>
+                  <div class="emp-meta">Pedreiro · canteiro Vila Aurora</div>
+                </div>
+              </div>
+              <div>📜 NR-18 · Construção Civil</div>
+              <div>⏰ <strong style="color:#876715">vence amanhã</strong></div>
+              <div class="emp-valid atencao"><strong>27/05/2026</strong><span>1 dia</span></div>
+              <button class="btn btn-fantasma btn-xs" style="border-color:var(--amarelo);color:#876715">📧 Lembrar</button>
+            </div>
+
+            <div class="emp-linha atencao">
+              <div class="emp-pessoa">
+                <div class="emp-av av-a">F</div>
+                <div>
+                  <div class="emp-nome">Fernando Lacerda Costa</div>
+                  <div class="emp-meta">Eng. Civil Sr · Engenharia</div>
+                </div>
+              </div>
+              <div>🩺 ASO Periódico</div>
+              <div>⏰ vence em <strong>47d</strong></div>
+              <div class="emp-valid atencao"><strong>12/07/2026</strong><span>período</span></div>
+              <button class="btn btn-fantasma btn-xs">📅 Agendar</button>
+            </div>
+
+            <div class="emp-linha">
+              <div class="emp-pessoa">
+                <div class="emp-av av-f">VS</div>
+                <div>
+                  <div class="emp-nome">Vinícius Soares</div>
+                  <div class="emp-meta">Carpinteiro · Sítio II</div>
+                </div>
+              </div>
+              <div>📜 NR-6 · EPIs</div>
+              <div>⏰ vence em <strong>22 dias</strong></div>
+              <div class="emp-valid"><strong>17/06/2026</strong><span>3 semanas</span></div>
+              <button class="btn btn-fantasma btn-xs">📅 Agendar</button>
+            </div>
+
+            <div style="margin-top:14px;padding:12px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza);text-align:center">
+              <strong style="color:var(--marinho)">+ 6 empregados</strong> com NRs vencendo em 30-60 dias · <a style="color:var(--laranja);font-weight:600">Ver todos →</a>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:16px">Conformidade <em>geral</em></h3>
+            <div class="sub-titulo">Visão dashboard</div>
+            <div style="position:relative;width:160px;height:160px;margin:0 auto 14px">
+              <svg width="160" height="160" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="68" fill="none" stroke="#F2EEE6" stroke-width="14"/>
+                <circle cx="80" cy="80" r="68" fill="none" stroke="#2D7D5A" stroke-width="14"
+                  stroke-dasharray="427" stroke-dashoffset="17" stroke-linecap="round"
+                  transform="rotate(-90 80 80)"/>
+              </svg>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+                <div style="font-family:var(--serif);font-style:italic;font-size:36px;color:var(--verde);line-height:1">96%</div>
+                <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;font-weight:600">Conformidade</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12px">
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--verde-cl);border-radius:2px;border-left:3px solid var(--verde)"><span>✓ Em dia</span><strong style="color:var(--verde)">123 emp</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--amarelo-cl);border-radius:2px;border-left:3px solid var(--amarelo)"><span>⏰ Vence 30d</span><strong style="color:#876715">8 emp</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--vermelho-cl);border-radius:2px;border-left:3px solid var(--vermelho)"><span>✕ Vencido</span><strong style="color:var(--vermelho)">3 emp</strong></div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:16px">Mais <em>concluídos</em></h3>
+            <div class="sub-titulo">Top cursos em 2026</div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;font-family:var(--ui);font-size:12px">
+              <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <strong style="color:var(--marinho);font-size:12.5px">📜 NR-18 · Construção</strong>
+                  <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">42</span>
+                </div>
+                <div style="color:var(--cinza);font-size:10.5px;margin-top:2px">8h · concluintes em 2026</div>
+              </div>
+              <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <strong style="color:var(--marinho);font-size:12.5px">📜 NR-35 · Altura</strong>
+                  <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">28</span>
+                </div>
+                <div style="color:var(--cinza);font-size:10.5px;margin-top:2px">12h · canteiros</div>
+              </div>
+              <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <strong style="color:var(--marinho);font-size:12.5px">💻 Sienge · ERP</strong>
+                  <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">14</span>
+                </div>
+                <div style="color:var(--cinza);font-size:10.5px;margin-top:2px">8h · Eng + Adm</div>
+              </div>
+              <div style="padding:10px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <strong style="color:var(--marinho);font-size:12.5px">⚖ LGPD</strong>
+                  <span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--marinho)">120</span>
+                </div>
+                <div style="color:var(--cinza);font-size:10.5px;margin-top:2px">2h · obrigatório global</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="painel" style="background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none"></div>
+            <h3 style="font-size:16px;color:var(--papel);position:relative">📤 Enviar S-2210 <em style="color:var(--laranja)">eSocial</em></h3>
+            <div class="sub-titulo" style="color:rgba(255,255,255,.5);position:relative">Eventos SST · obrigação mensal</div>
+            <p style="font-family:var(--ui);font-size:12px;line-height:1.55;opacity:.85;position:relative">42 eventos de SST gerados em maio · NR-18, NR-35, NR-12 · arquivo pronto.</p>
+            <button class="btn btn-primario btn-sm" style="width:100%;justify-content:center;margin-top:14px;position:relative">📤 Enviar agora</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- TELA 2: CATÁLOGO DE CURSOS (visão Fernando empregado) -->
+<div class="tela" id="t-catalogo">
+  <div class="empregado-shell">
+    <div class="empregado-topbar">
+      <div style="display:flex;align-items:center;gap:32px">
+        <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+        <div class="empregado-topbar-nav">
+          <a>🏠 Início</a>
+          <a>⏱ Ponto</a>
+          <a>🌴 Férias</a>
+          <a class="ativo">📚 Treinamentos</a>
+          <a>⭐ Avaliação</a>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:var(--ui);font-size:11px;opacity:.7">Fernando Lacerda</span>
+        <div class="topbar-av av-a">F</div>
+      </div>
+    </div>
+
+    <main class="app-main" style="max-width:1280px;margin:0 auto">
+      <div class="breadcrumb"><a onclick="irPara('t-treina-rh')">Treinamentos</a> &gt; <span style="color:var(--laranja)">Catálogo</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Catálogo de <em>cursos</em></h1>
+          <div class="meta">24 cursos disponíveis · Sienge, NRs, MBAs, idiomas · Alura, Udemy, FDC, Coursera</div>
+          <div class="header-tags">
+            <span class="tag verde">5 atribuídos a você</span>
+            <span class="tag laranja">3 em curso</span>
+            <span class="tag marinho">2 concluídos</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-trilha-fernando')">📊 Meu progresso</button>
+          <button class="btn btn-primario btn-sm">+ Sugerir curso</button>
+        </div>
+      </div>
+
+      <div class="filtros-bar">
+        <div class="busca">
+          <span>⌕</span>
+          <input placeholder="Buscar curso... ex: 'Sienge', 'BIM', 'liderança'"/>
+        </div>
+        <select><option>Todas as categorias</option><option>NRs e Segurança</option><option>Engenharia</option><option>Sistemas</option><option>Gestão</option><option>Idiomas</option></select>
+        <select><option>Todas as durações</option><option>até 4h</option><option>4-16h</option><option>16h+</option></select>
+        <select><option>Todos os provedores</option><option>Aurora interna</option><option>Alura</option><option>Udemy</option><option>FDC</option><option>Coursera</option></select>
+      </div>
+
+      <div class="chips">
+        <span class="chip-filtro ativo">Todos (24)</span>
+        <span class="chip-filtro">📜 NRs (8)</span>
+        <span class="chip-filtro">🏗 Engenharia (5)</span>
+        <span class="chip-filtro">💻 Sistemas (4)</span>
+        <span class="chip-filtro">⭐ Gestão (4)</span>
+        <span class="chip-filtro">🌎 Idiomas (2)</span>
+        <span class="chip-filtro">⚖ Compliance (1)</span>
+      </div>
+
+      <div class="curso-grid">
+
+        <div class="curso-card" onclick="irPara('t-trilha-fernando')" style="border:2px solid var(--laranja);box-shadow:0 4px 14px rgba(232,99,58,.1)">
+          <div class="curso-thumb eng">📐<span class="curso-badge-canto" style="background:var(--laranja)">EM CURSO</span></div>
+          <div class="curso-corpo">
+            <div class="curso-titulo">Certificação <em>BIM</em> · Modelagem em Revit</div>
+            <div class="curso-meta">
+              <span>⏱ 48h</span>
+              <span>📚 8 módulos</span>
+              <span>⭐ 4.8</span>
+            </div>
+            <p class="curso-desc">Modelagem 3D, gestão de obras com BIM, integração com Sienge. Trilha Eng. Civil Sr → Especialista.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">Alura</span>
+              <span class="tag laranja" style="font-size:9px">Trilha</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="curso-card">
+          <div class="curso-thumb seg">⚠️<span class="curso-badge-canto" style="background:var(--vermelho)">OBRIGATÓRIO</span></div>
+          <div class="curso-corpo">
+            <div class="curso-titulo"><em>NR-18</em> · Segurança em Construção Civil</div>
+            <div class="curso-meta">
+              <span>⏱ 8h</span>
+              <span>📚 4 módulos</span>
+              <span>⚖ Legal</span>
+            </div>
+            <p class="curso-desc">Norma obrigatória para empregados de canteiro de obras. Validade: 2 anos. Inclui certificado.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">Aurora interna</span>
+              <span class="tag vermelho" style="font-size:9px">NR</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="curso-card">
+          <div class="curso-thumb seg">🪜<span class="curso-badge-canto" style="background:var(--vermelho)">OBRIGATÓRIO</span></div>
+          <div class="curso-corpo">
+            <div class="curso-titulo"><em>NR-35</em> · Trabalho em Altura</div>
+            <div class="curso-meta">
+              <span>⏱ 12h</span>
+              <span>📚 5 módulos</span>
+              <span>⚖ Legal</span>
+            </div>
+            <p class="curso-desc">Obrigatória para trabalho acima de 2m. Inclui prática presencial.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">Aurora interna</span>
+              <span class="tag vermelho" style="font-size:9px">NR</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="curso-card">
+          <div class="curso-thumb sis">💻</div>
+          <div class="curso-corpo">
+            <div class="curso-titulo">Sienge ERP · <em>Operação básica</em></div>
+            <div class="curso-meta">
+              <span>⏱ 8h</span>
+              <span>📚 6 módulos</span>
+              <span>⭐ 4.6</span>
+            </div>
+            <p class="curso-desc">Domine a operação básica do Sienge: cadastros, planejamento, suprimentos e medições.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">Sienge Academy</span>
+              <span class="tag marinho" style="font-size:9px">Sistemas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="curso-card">
+          <div class="curso-thumb gest">📊</div>
+          <div class="curso-corpo">
+            <div class="curso-titulo"><em>Lean Construction</em> · Produção enxuta na obra</div>
+            <div class="curso-meta">
+              <span>⏱ 24h</span>
+              <span>📚 6 módulos</span>
+              <span>⭐ 4.9</span>
+            </div>
+            <p class="curso-desc">Aplicação de Lean em obras. Last Planner, Kanban, A3, controle visual.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">FDC</span>
+              <span class="tag verde" style="font-size:9px">Trilha</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="curso-card">
+          <div class="curso-thumb gest">⭐</div>
+          <div class="curso-corpo">
+            <div class="curso-titulo">Liderança e <em>Gestão de Equipes</em></div>
+            <div class="curso-meta">
+              <span>⏱ 16h</span>
+              <span>📚 5 módulos</span>
+              <span>⭐ 4.7</span>
+            </div>
+            <p class="curso-desc">Comunicação não-violenta, feedback construtivo, condução de 1:1s, ciclos de avaliação.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">FDC</span>
+              <span class="tag laranja" style="font-size:9px">Liderança</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="curso-card">
+          <div class="curso-thumb cult">⚖<span class="curso-badge-canto" style="background:var(--vermelho)">OBRIGATÓRIO</span></div>
+          <div class="curso-corpo">
+            <div class="curso-titulo"><em>LGPD</em> · Proteção de Dados Pessoais</div>
+            <div class="curso-meta">
+              <span>⏱ 2h</span>
+              <span>📚 3 módulos</span>
+              <span>⚖ Legal</span>
+            </div>
+            <p class="curso-desc">Lei Geral de Proteção de Dados no dia-a-dia. Obrigatório para todos os empregados.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">Aurora interna</span>
+              <span class="tag" style="font-size:9px">Compliance</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="curso-card">
+          <div class="curso-thumb idi">🌎</div>
+          <div class="curso-corpo">
+            <div class="curso-titulo"><em>Inglês</em> Técnico para Engenharia</div>
+            <div class="curso-meta">
+              <span>⏱ 60h</span>
+              <span>📚 12 módulos</span>
+              <span>⭐ 4.5</span>
+            </div>
+            <p class="curso-desc">Inglês para profissionais de engenharia. Vocabulário técnico, leitura de specs.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">Voxy + Aurora</span>
+              <span class="tag" style="font-size:9px">Idiomas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="curso-card">
+          <div class="curso-thumb gest">🎓</div>
+          <div class="curso-corpo">
+            <div class="curso-titulo">Preparatório <em>PMP</em></div>
+            <div class="curso-meta">
+              <span>⏱ 80h</span>
+              <span>📚 14 módulos</span>
+              <span>⭐ 4.6</span>
+            </div>
+            <p class="curso-desc">Project Management Professional · preparação para certificação internacional do PMI.</p>
+            <div class="curso-footer">
+              <span class="curso-prov">Coursera</span>
+              <span class="tag verde" style="font-size:9px">Certificação</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;padding:24px;font-family:var(--ui);font-size:12px;color:var(--cinza)">
+        Mostrando 9 de 24 cursos · <a style="color:var(--laranja);font-weight:600">Carregar mais →</a>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- TELA 3: TRILHA DO FERNANDO (BIM) -->
+<div class="tela" id="t-trilha-fernando">
+  <div class="empregado-shell">
+    <div class="empregado-topbar">
+      <div style="display:flex;align-items:center;gap:32px">
+        <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+        <div class="empregado-topbar-nav">
+          <a>🏠 Início</a>
+          <a>⏱ Ponto</a>
+          <a>🌴 Férias</a>
+          <a class="ativo">📚 Treinamentos</a>
+          <a>⭐ Avaliação</a>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:var(--ui);font-size:11px;opacity:.7">Fernando Lacerda</span>
+        <div class="topbar-av av-a">F</div>
+      </div>
+    </div>
+
+    <main class="app-main" style="max-width:1280px;margin:0 auto">
+      <div class="breadcrumb"><a onclick="irPara('t-catalogo')">Catálogo</a> &gt; <span style="color:var(--laranja)">Minhas Trilhas</span></div>
+
+      <!-- HEADER PESSOA -->
+      <div class="pessoa-header">
+        <div class="pessoa-foto">F</div>
+        <div>
+          <h1 class="pessoa-nome">Suas <em>trilhas</em></h1>
+          <div class="pessoa-cargo-linha">
+            <strong>Fernando Lacerda Costa</strong> · Eng. Civil Sênior · MAT 0112 · Engenharia
+          </div>
+          <div class="pessoa-tags">
+            <span class="tag laranja">3 em curso</span>
+            <span class="tag verde">2 concluídos · 2026</span>
+            <span class="tag marinho">+ 48h treinadas este ano</span>
+            <span class="tag amarelo">2 badges ganhos</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-curso-bim')">▶ Continuar BIM</button>
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-catalogo')">📚 Catálogo</button>
+        </div>
+      </div>
+
+      <!-- TRILHA EM DESTAQUE: BIM -->
+      <div class="prog-trilha-card">
+        <div class="prog-trilha-head">
+          <div>
+            <h2>🎯 Trilha · <em>Eng. Civil Sr → Especialista</em></h2>
+            <div class="prog-trilha-sub">Iniciada 02/02/2026 · término previsto 02/08/2026 · 5 cursos · 108h totais</div>
+            <div style="margin-top:14px;display:flex;gap:14px;font-family:var(--ui);font-size:11px;opacity:.75">
+              <span>📚 <strong style="color:var(--laranja)">5 cursos</strong></span>
+              <span>⏱ <strong style="color:var(--laranja)">108h totais</strong></span>
+              <span>📅 <strong style="color:var(--laranja)">68 dias restantes</strong></span>
+              <span>👥 com a Luísa (gestora)</span>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="prog-trilha-num">42<span>%</span></div>
+            <div style="font-family:var(--ui);font-size:11px;opacity:.5;margin-top:4px">2 cursos concluídos · 1 em curso · 2 a iniciar</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CURSOS DA TRILHA -->
+      <div class="painel">
+        <h3>Cursos da <em>trilha BIM</em></h3>
+        <p class="sub-titulo">Sequência sugerida para a evolução</p>
+
+        <div class="curso-trilha-item feito">
+          <div class="curso-num feito">✓</div>
+          <div class="curso-trilha-info">
+            <div class="curso-trilha-titulo">1. Fundamentos do BIM <span class="tag verde" style="font-size:10px">Concluído</span></div>
+            <div class="curso-trilha-meta">
+              <span>⏱ <strong>12h</strong></span>
+              <span>📚 4 módulos</span>
+              <span>🏆 Concluído em <strong>14/03</strong></span>
+              <span>📊 Nota final: <strong>9.2</strong></span>
+            </div>
+          </div>
+          <div class="curso-trilha-status feito">
+            <strong>✓</strong>
+            <span>14/03/2026</span>
+          </div>
+        </div>
+
+        <div class="curso-trilha-item feito">
+          <div class="curso-num feito">✓</div>
+          <div class="curso-trilha-info">
+            <div class="curso-trilha-titulo">2. Lean Construction <span class="tag verde" style="font-size:10px">Concluído</span></div>
+            <div class="curso-trilha-meta">
+              <span>⏱ <strong>24h</strong></span>
+              <span>📚 6 módulos · FDC</span>
+              <span>🏆 Concluído em <strong>22/04</strong></span>
+              <span>📊 Nota: <strong>8.7</strong></span>
+            </div>
+          </div>
+          <div class="curso-trilha-status feito">
+            <strong>✓</strong>
+            <span>22/04/2026</span>
+          </div>
+        </div>
+
+        <div class="curso-trilha-item atual" onclick="irPara('t-curso-bim')">
+          <div class="curso-num atual">3</div>
+          <div class="curso-trilha-info">
+            <div class="curso-trilha-titulo">3. Certificação BIM · Modelagem em Revit <span class="tag laranja" style="font-size:10px">▶ Em curso · 65%</span></div>
+            <div class="curso-trilha-meta">
+              <span>⏱ <strong>48h</strong></span>
+              <span>📚 8 módulos · Alura</span>
+              <span>📅 Iniciado 28/04 · 5 de 8 módulos</span>
+              <span>👨‍🏫 Instrutor: Eng. Ricardo Souza</span>
+            </div>
+          </div>
+          <div class="curso-trilha-status atual">
+            <strong>65%</strong>
+            <span>continuar →</span>
+          </div>
+        </div>
+
+        <div class="curso-trilha-item bloqueado">
+          <div class="curso-num bloq">🔒</div>
+          <div class="curso-trilha-info">
+            <div class="curso-trilha-titulo">4. Gestão de Projetos · MS Project</div>
+            <div class="curso-trilha-meta">
+              <span>⏱ <strong>16h</strong></span>
+              <span>📚 5 módulos · Udemy</span>
+              <span>🔒 Desbloqueia após BIM</span>
+            </div>
+          </div>
+          <div class="curso-trilha-status">
+            <strong style="color:var(--cinza)">—</strong>
+            <span>bloqueado</span>
+          </div>
+        </div>
+
+        <div class="curso-trilha-item bloqueado">
+          <div class="curso-num bloq">🔒</div>
+          <div class="curso-trilha-info">
+            <div class="curso-trilha-titulo">5. Liderança Técnica para Engenheiros</div>
+            <div class="curso-trilha-meta">
+              <span>⏱ <strong>8h</strong></span>
+              <span>📚 4 módulos · FDC</span>
+              <span>🔒 Desbloqueia após MS Project</span>
+            </div>
+          </div>
+          <div class="curso-trilha-status">
+            <strong style="color:var(--cinza)">—</strong>
+            <span>bloqueado</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- OUTRAS TRILHAS -->
+        <div class="painel">
+          <h3 style="font-size:16px">Outras <em>trilhas</em></h3>
+          <p class="sub-titulo">Inscrições ativas</p>
+
+          <div class="trilha-card" style="border-left-color:var(--verde);background:linear-gradient(135deg,var(--branco) 60%,var(--verde-cl));margin-bottom:0">
+            <div class="trilha-ic">💻</div>
+            <div class="trilha-info">
+              <div class="trilha-nome" style="font-size:15px">Domínio Sienge ERP</div>
+              <div class="trilha-meta" style="margin-top:6px">
+                <span>📚 <strong>2/3</strong> cursos</span>
+                <span>⏱ <strong>16/24h</strong></span>
+              </div>
+              <div class="progresso-bar" style="margin-top:8px"><div class="progresso-fill" style="width:67%"></div></div>
+            </div>
+            <div class="trilha-stats">
+              <strong style="font-size:14px">67%</strong>
+              <span>1 curso falta</span>
+            </div>
+          </div>
+
+          <div class="trilha-card" style="margin-top:10px;margin-bottom:0;background:linear-gradient(135deg,var(--branco) 60%,var(--roxo-cl));border-left-color:var(--roxo)">
+            <div class="trilha-ic">⚖</div>
+            <div class="trilha-info">
+              <div class="trilha-nome" style="font-size:15px">LGPD &amp; Compliance</div>
+              <div class="trilha-meta" style="margin-top:6px">
+                <span>📚 <strong>1/2</strong> cursos</span>
+                <span>⏱ <strong>2/4h</strong></span>
+              </div>
+              <div class="progresso-bar" style="margin-top:8px"><div class="progresso-fill" style="width:50%"></div></div>
+            </div>
+            <div class="trilha-stats">
+              <strong style="font-size:14px">50%</strong>
+              <span>obrigatório</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BADGES / CONQUISTAS -->
+        <div class="painel">
+          <h3 style="font-size:16px">🏆 Suas <em>conquistas</em></h3>
+          <p class="sub-titulo">2 badges ganhos · 6 a conquistar</p>
+
+          <div class="badges-grid">
+            <div class="badge-card ganha">
+              <div class="badge-ic">🎓</div>
+              <div class="badge-titulo">BIM Foundation</div>
+              <div class="badge-sub">14/03/2026</div>
+            </div>
+            <div class="badge-card ganha">
+              <div class="badge-ic">⚡</div>
+              <div class="badge-titulo">Lean Master</div>
+              <div class="badge-sub">22/04/2026</div>
+            </div>
+            <div class="badge-card pendente">
+              <div class="badge-ic">🏛</div>
+              <div class="badge-titulo">BIM Specialist</div>
+              <div class="badge-sub">em curso 65%</div>
+            </div>
+            <div class="badge-card pendente">
+              <div class="badge-ic">📊</div>
+              <div class="badge-titulo">PM Pro</div>
+              <div class="badge-sub">após módulo 4</div>
+            </div>
+            <div class="badge-card pendente">
+              <div class="badge-ic">⭐</div>
+              <div class="badge-titulo">Líder Técnico</div>
+              <div class="badge-sub">após módulo 5</div>
+            </div>
+            <div class="badge-card pendente">
+              <div class="badge-ic">🎯</div>
+              <div class="badge-titulo">Trilha completa</div>
+              <div class="badge-sub">final · 02/08</div>
+            </div>
+            <div class="badge-card pendente">
+              <div class="badge-ic">💻</div>
+              <div class="badge-titulo">Sienge Expert</div>
+              <div class="badge-sub">trilha paralela</div>
+            </div>
+            <div class="badge-card pendente">
+              <div class="badge-ic">🌟</div>
+              <div class="badge-titulo">100h em 2026</div>
+              <div class="badge-sub">52h restantes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- TELA 4: CURSO BIM INDIVIDUAL -->
+<div class="tela" id="t-curso-bim">
+  <div class="empregado-shell">
+    <div class="empregado-topbar">
+      <div style="display:flex;align-items:center;gap:32px">
+        <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+        <div class="empregado-topbar-nav">
+          <a>🏠 Início</a>
+          <a>⏱ Ponto</a>
+          <a>🌴 Férias</a>
+          <a class="ativo">📚 Treinamentos</a>
+          <a>⭐ Avaliação</a>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:var(--ui);font-size:11px;opacity:.7">Fernando Lacerda</span>
+        <div class="topbar-av av-a">F</div>
+      </div>
+    </div>
+
+    <main class="app-main" style="max-width:1280px;margin:0 auto">
+      <div class="breadcrumb"><a onclick="irPara('t-catalogo')">Catálogo</a> &gt; <a onclick="irPara('t-trilha-fernando')">Trilha BIM</a> &gt; <span style="color:var(--laranja)">Modelagem em Revit</span></div>
+
+      <!-- HEADER DO CURSO -->
+      <div class="header-bar">
+        <div>
+          <h1>Certificação <em>BIM</em> · Modelagem em Revit</h1>
+          <div class="meta">48h · 8 módulos · Alura · trilha Eng. Civil Sr → Especialista</div>
+          <div class="header-tags">
+            <span class="tag laranja">▶ Em curso · 65%</span>
+            <span class="tag marinho">5 de 8 módulos</span>
+            <span class="tag verde">+ 24h estudadas</span>
+            <span class="tag">⭐ 4.8 avaliação</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-trilha-fernando')">← Voltar trilha</button>
+          <button class="btn btn-fantasma btn-sm">📥 Material apoio</button>
+          <button class="btn btn-fantasma btn-sm">💬 Tirar dúvida</button>
+        </div>
+      </div>
+
+      <!-- PLAYER -->
+      <div class="player-card">
+        <div class="player-eyebrow">📺 Continuar de onde você parou</div>
+        <div class="player-titulo">Módulo 6 · <em>Famílias paramétricas no Revit</em></div>
+        <div class="player-meta">Vídeo 3 de 5 · Aula "Criando famílias customizadas para a construção civil brasileira"</div>
+        <button class="player-btn-grande">▶</button>
+        <div class="player-prog-info">⏱ 18min restantes deste vídeo · 4h 32min do módulo</div>
+        <div class="player-prog-bar"><div class="player-prog-fill" style="width:45%"></div></div>
+      </div>
+
+      <div class="grid-2-1">
+        <div>
+          <!-- LISTA DE MÓDULOS -->
+          <div class="painel">
+            <h3>Módulos do <em>curso</em></h3>
+            <p class="sub-titulo">8 módulos · sequencial</p>
+
+            <div class="modulo-item feito">
+              <div class="mod-num-pq feito">✓</div>
+              <div class="mod-info">
+                <div class="mod-titulo">1. Introdução ao BIM e Revit</div>
+                <div class="mod-meta">
+                  <span>📹 8 vídeos</span>
+                  <span>⏱ <strong>4h</strong></span>
+                  <span>📝 Quiz: <strong>9.5</strong></span>
+                </div>
+              </div>
+              <div class="mod-duracao">4h</div>
+              <div class="mod-acao"><span class="tag verde" style="font-size:9px">✓ 02/05</span></div>
+            </div>
+
+            <div class="modulo-item feito">
+              <div class="mod-num-pq feito">✓</div>
+              <div class="mod-info">
+                <div class="mod-titulo">2. Interface e ferramentas básicas</div>
+                <div class="mod-meta">
+                  <span>📹 12 vídeos</span>
+                  <span>⏱ <strong>6h</strong></span>
+                  <span>📝 Quiz: <strong>8.8</strong></span>
+                </div>
+              </div>
+              <div class="mod-duracao">6h</div>
+              <div class="mod-acao"><span class="tag verde" style="font-size:9px">✓ 09/05</span></div>
+            </div>
+
+            <div class="modulo-item feito">
+              <div class="mod-num-pq feito">✓</div>
+              <div class="mod-info">
+                <div class="mod-titulo">3. Modelagem arquitetônica</div>
+                <div class="mod-meta">
+                  <span>📹 14 vídeos</span>
+                  <span>⏱ <strong>8h</strong></span>
+                  <span>📝 Projeto entregue</span>
+                </div>
+              </div>
+              <div class="mod-duracao">8h</div>
+              <div class="mod-acao"><span class="tag verde" style="font-size:9px">✓ 16/05</span></div>
+            </div>
+
+            <div class="modulo-item feito">
+              <div class="mod-num-pq feito">✓</div>
+              <div class="mod-info">
+                <div class="mod-titulo">4. Modelagem estrutural</div>
+                <div class="mod-meta">
+                  <span>📹 10 vídeos</span>
+                  <span>⏱ <strong>6h</strong></span>
+                  <span>📝 Quiz: <strong>9.0</strong></span>
+                </div>
+              </div>
+              <div class="mod-duracao">6h</div>
+              <div class="mod-acao"><span class="tag verde" style="font-size:9px">✓ 22/05</span></div>
+            </div>
+
+            <div class="modulo-item feito">
+              <div class="mod-num-pq feito">✓</div>
+              <div class="mod-info">
+                <div class="mod-titulo">5. Sistemas MEP (hidráulica/elétrica)</div>
+                <div class="mod-meta">
+                  <span>📹 9 vídeos</span>
+                  <span>⏱ <strong>5h</strong></span>
+                  <span>📝 Quiz pendente</span>
+                </div>
+              </div>
+              <div class="mod-duracao">5h</div>
+              <div class="mod-acao"><span class="tag amarelo" style="font-size:9px">quiz</span></div>
+            </div>
+
+            <div class="modulo-item atual">
+              <div class="mod-num-pq atual">6</div>
+              <div class="mod-info">
+                <div class="mod-titulo">6. Famílias paramétricas no Revit <span class="tag laranja" style="font-size:9px">▶ em curso 45%</span></div>
+                <div class="mod-meta">
+                  <span>📹 11 vídeos · 3 de 5 assistidos</span>
+                  <span>⏱ <strong>7h</strong></span>
+                  <span>📅 Iniciado 23/05</span>
+                </div>
+              </div>
+              <div class="mod-duracao">7h</div>
+              <div class="mod-acao"><button class="btn btn-primario btn-xs">▶ Continuar</button></div>
+            </div>
+
+            <div class="modulo-item bloq">
+              <div class="mod-num-pq bloq">🔒</div>
+              <div class="mod-info">
+                <div class="mod-titulo">7. Documentação e pranchas</div>
+                <div class="mod-meta">
+                  <span>📹 8 vídeos</span>
+                  <span>⏱ <strong>5h</strong></span>
+                  <span>🔒 Desbloqueia ao concluir módulo 6</span>
+                </div>
+              </div>
+              <div class="mod-duracao">5h</div>
+              <div class="mod-acao"><span class="tag" style="font-size:9px">bloq.</span></div>
+            </div>
+
+            <div class="modulo-item bloq">
+              <div class="mod-num-pq bloq">🔒</div>
+              <div class="mod-info">
+                <div class="mod-titulo">8. Projeto final &amp; certificação</div>
+                <div class="mod-meta">
+                  <span>📹 4 vídeos + projeto</span>
+                  <span>⏱ <strong>7h</strong></span>
+                  <span>🏆 Certificado Alura ao concluir</span>
+                </div>
+              </div>
+              <div class="mod-duracao">7h</div>
+              <div class="mod-acao"><span class="tag" style="font-size:9px">bloq.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- INSTRUTOR -->
+          <div class="instrutor-card">
+            <div class="instrutor-av">RS</div>
+            <div>
+              <div class="instrutor-titulo">👨‍🏫 Instrutor</div>
+              <div class="instrutor-nome">Eng. Ricardo Souza</div>
+              <div class="instrutor-cargo">Arquiteto BIM Sr · 12 anos exp · Alura</div>
+              <button class="btn btn-fantasma btn-sm" style="margin-top:8px;width:100%;justify-content:center">💬 Mandar dúvida</button>
+            </div>
+          </div>
+
+          <!-- ATALHOS DO CURSO -->
+          <div class="painel">
+            <h3 style="font-size:16px">Recursos <em>do curso</em></h3>
+            <p class="sub-titulo">Material para você</p>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">📥 PDF de apoio (24 págs)</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">💾 Arquivos .rvt exemplo</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">🎬 Videoaulas (88 no total)</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">📝 Quizzes (8 módulos)</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">💭 Fórum de alunos (Alura)</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">📊 Suas anotações</button>
+            </div>
+          </div>
+
+          <!-- CERTIFICADO PREVIEW -->
+          <div class="cert-card">
+            <div class="cert-medalha">🏆</div>
+            <div class="cert-eyebrow">Ao concluir, você ganha</div>
+            <div class="cert-titulo">Certificado · <em style="color:var(--laranja);font-style:italic">BIM Specialist</em></div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;line-height:1.55">
+              Emitido pela Alura · reconhecido por <strong>Construtora Aurora</strong> · vale 48h na trilha de evolução · contagem automática nas suas <strong>horas-treinamento</strong> do ano.
+            </div>
+            <div class="cert-meta">
+              📅 Previsão de conclusão: <strong style="color:var(--marinho);font-family:var(--serif);font-style:italic">28/06/2026</strong>
+            </div>
+          </div>
+
+          <!-- PRÓXIMO PASSO -->
+          <div class="painel" style="background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none"></div>
+            <h3 style="font-size:16px;color:var(--papel);position:relative">📅 Próximo <em style="color:var(--laranja)">marco</em></h3>
+            <div style="font-family:var(--ui);font-size:11px;opacity:.5;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;position:relative">objetivo da semana</div>
+            <p style="font-family:var(--ui);font-size:12.5px;line-height:1.55;opacity:.85;margin-top:14px;position:relative">Concluir <strong style="color:var(--laranja)">Módulo 6 (Famílias paramétricas)</strong> até <strong style="color:var(--laranja)">sexta 30/05</strong>. Faltam 4h 32min.</p>
+            <button class="btn btn-primario btn-sm" style="width:100%;justify-content:center;margin-top:14px;position:relative">▶ Retomar agora</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Treinamentos · Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-treina-rh">📊 Dashboard RH</option>
+    <option value="t-catalogo">📚 Catálogo de Cursos</option>
+    <option value="t-trilha-fernando">🎯 Trilha Fernando (BIM)</option>
+    <option value="t-curso-bim">📐 Curso BIM · Módulos</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  const alvo = document.getElementById(idTela);
+  if(!alvo){
+    alert('Tela "' + idTela + '" ainda em construção. Aguarde as próximas partes.');
+    return;
+  }
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  alvo.classList.add('ativa');
+  window.scrollTo({top:0,behavior:'instant'});
+  const sel = document.getElementById('seletor-tela');
+  if(sel) sel.value = idTela;
+}
+</script>
+</body>
+</html>

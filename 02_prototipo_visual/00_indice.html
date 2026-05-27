@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Protótipo Visual Completo</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --juridico:#5B3FA0;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  /* HERO */
+  .hero{background:linear-gradient(135deg,var(--marinho) 0%,var(--marinho-esc) 100%);color:var(--papel);padding:64px 36px 80px;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none}
+  .hero::after{content:"";position:absolute;bottom:-30%;left:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(126,91,204,.12) 0%,transparent 65%);pointer-events:none}
+  .hero-content{max-width:1280px;margin:0 auto;position:relative}
+  .logo-hero{font-family:var(--serif);font-weight:400;line-height:1;font-size:56px;display:inline-flex;align-items:flex-end;margin-bottom:18px}
+  .logo-hero .oi{color:var(--laranja);font-style:italic}
+  .logo-hero .nora{color:var(--papel);margin-left:14px}
+  .hero h1{font-size:38px;font-weight:400;letter-spacing:-.5px;line-height:1.15;margin-bottom:10px;max-width:900px}
+  .hero h1 em{color:var(--laranja);font-style:italic}
+  .hero-sub{font-family:var(--ui);font-size:14px;opacity:.7;letter-spacing:.5px;line-height:1.6;max-width:760px}
+  .hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+  .hero-tag{padding:6px 14px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--papel);border-radius:14px;font-family:var(--ui);font-size:11.5px;letter-spacing:.5px;font-weight:500}
+  .hero-tag.laranja{border-color:var(--laranja);background:rgba(232,99,58,.15);color:#FBD3C5}
+  .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:40px;padding-top:32px;border-top:1px solid rgba(255,255,255,.1)}
+  .hero-stat{}
+  .hero-stat-num{font-family:var(--serif);font-style:italic;font-size:38px;color:var(--laranja);line-height:1;font-weight:400}
+  .hero-stat-label{font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.6);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-top:8px}
+
+  /* MAIN */
+  main{max-width:1280px;margin:0 auto;padding:64px 36px 80px}
+
+  /* SEÇÃO */
+  .secao{margin-bottom:64px}
+  .secao-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;border-bottom:1px solid var(--cinza-cl);padding-bottom:14px;gap:18px;flex-wrap:wrap}
+  .secao-titulo{font-size:24px;font-weight:400;letter-spacing:-.3px;line-height:1.2}
+  .secao-titulo em{color:var(--laranja);font-style:italic}
+  .secao-sub{font-family:var(--ui);font-size:12px;color:var(--cinza);letter-spacing:.5px;line-height:1.5;max-width:600px;margin-top:4px}
+  .secao-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;text-align:right;flex-shrink:0}
+
+  /* GRID DE CARDS */
+  .grid-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid-cards-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+
+  /* CARD */
+  .card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden;transition:all .2s;display:flex;flex-direction:column;cursor:pointer;position:relative}
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(31,42,68,.08);border-color:var(--marinho-med)}
+  .card:hover .card-cta{background:var(--laranja);color:white;border-color:var(--laranja)}
+
+  .card-numero{position:absolute;top:14px;right:14px;font-family:var(--serif);font-style:italic;font-size:48px;color:var(--cinza-cl);line-height:.8;font-weight:400;z-index:0;pointer-events:none}
+
+  .card-thumb{height:140px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:48px;color:rgba(255,255,255,.9)}
+  .card-thumb::before{content:"";position:absolute;top:-20%;right:-15%;width:280px;height:280px;background:radial-gradient(circle,rgba(255,255,255,.12) 0%,transparent 65%);pointer-events:none}
+  .card-thumb.publico{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .card-thumb.candidato{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .card-thumb.empresa{background:linear-gradient(135deg,#1F2A44,#131B2E)}
+  .card-thumb.empregado{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .card-thumb.oinora{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .card-thumb.config{background:linear-gradient(135deg,#5C6478,#3B4A6B)}
+  .card-thumb.modulos{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .card-thumb.gestao{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .card-thumb.juridico{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .card-thumb.diagrama{background:linear-gradient(135deg,#E8633A,#A33518)}
+
+  .card-corpo{padding:18px 20px;flex:1;display:flex;flex-direction:column;position:relative}
+  .card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+  .card-tag{font-family:var(--ui);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);background:var(--cinza-fundo);padding:2px 7px;border-radius:2px;border:1px solid var(--cinza-cl);font-weight:700}
+  .card-tag.laranja{color:var(--laranja);background:var(--laranja-cl);border-color:var(--laranja)}
+  .card-tag.verde{color:var(--verde);background:var(--verde-cl);border-color:var(--verde)}
+  .card-tag.roxo{color:var(--juridico);background:#EFE9FB;border-color:var(--juridico)}
+  .card-tag.marinho{color:var(--marinho);background:#EEF1F6;border-color:var(--marinho)}
+  .card-tag.amarelo{color:#876715;background:var(--amarelo-cl);border-color:var(--amarelo)}
+
+  .card-titulo{font-size:18px;font-weight:400;color:var(--marinho);line-height:1.2;margin-bottom:8px;letter-spacing:-.2px}
+  .card-titulo em{color:var(--laranja);font-style:italic}
+
+  .card-desc{font-family:var(--ui);font-size:12px;color:var(--cinza);line-height:1.55;flex:1;letter-spacing:.2px}
+  .card-desc strong{color:var(--marinho);font-weight:600}
+
+  .card-personagem{margin-top:10px;padding-top:10px;border-top:1px dashed var(--cinza-cl);font-family:var(--ui);font-size:10.5px;color:var(--cinza);letter-spacing:.3px;display:flex;align-items:center;gap:8px}
+  .card-personagem .av{width:24px;height:24px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:10px;font-weight:600;flex-shrink:0}
+  .av-laranja{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-marinho{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-verde{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-roxo{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-amarelo{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-vermelho{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .card-personagem strong{color:var(--marinho);font-weight:600;font-family:var(--serif);font-style:italic;font-size:12px}
+
+  .card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--cinza-cl)}
+  .card-info-pq{font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+  .card-cta{font-family:var(--ui);font-size:10.5px;color:var(--marinho);padding:5px 12px;border:1px solid var(--cinza-cl);border-radius:2px;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:all .15s}
+
+  /* FOOTER */
+  footer{background:var(--marinho);color:var(--papel);padding:48px 36px;text-align:center;margin-top:64px;position:relative;overflow:hidden}
+  footer::before{content:"";position:absolute;top:-30%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(232,99,58,.12) 0%,transparent 65%);pointer-events:none}
+  footer .logo{font-family:var(--serif);font-size:32px;display:inline-flex;align-items:flex-end;margin-bottom:14px;position:relative}
+  footer .logo .oi{color:var(--laranja);font-style:italic}
+  footer .logo .nora{color:var(--papel);margin-left:8px}
+  footer p{font-family:var(--ui);font-size:12.5px;opacity:.6;letter-spacing:.3px;line-height:1.6;max-width:620px;margin:0 auto;position:relative}
+  footer .nota{font-family:var(--ui);font-size:10.5px;opacity:.4;margin-top:18px;letter-spacing:.5px;position:relative}
+
+  /* CARD DESTAQUE · LOGIN */
+  .card-destaque{grid-column:span 3;background:linear-gradient(135deg,var(--marinho) 0%,var(--marinho-esc) 100%);color:var(--papel);border:none;padding:32px 36px;display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;position:relative;overflow:hidden}
+  .card-destaque::before{content:"";position:absolute;top:-30%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(232,99,58,.2) 0%,transparent 65%);pointer-events:none}
+  .card-destaque > *{position:relative}
+  .card-destaque-ic{width:80px;height:80px;border-radius:50%;background:var(--laranja);display:flex;align-items:center;justify-content:center;font-size:36px;color:white;flex-shrink:0;box-shadow:0 8px 24px rgba(232,99,58,.3)}
+  .card-destaque h2{font-size:26px;font-weight:400;color:var(--papel);line-height:1.2;letter-spacing:-.2px}
+  .card-destaque h2 em{color:var(--laranja);font-style:italic}
+  .card-destaque p{font-family:var(--ui);font-size:13px;color:rgba(250,247,242,.7);margin-top:6px;letter-spacing:.3px;line-height:1.55;max-width:600px}
+  .card-destaque .btn-ir{padding:14px 28px;background:var(--laranja);color:white;border-radius:2px;font-family:var(--ui);font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:none;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-block}
+  .card-destaque .btn-ir:hover{background:var(--laranja-esc);transform:translateY(-1px)}
+
+  /* GUIA NAVEGAÇÃO */
+  .guia-nav{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:32px;margin-bottom:48px;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
+  .guia-ic{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));color:white;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+  .guia-titulo{font-size:20px;font-weight:400;color:var(--marinho);margin-bottom:6px}
+  .guia-titulo em{color:var(--laranja);font-style:italic}
+  .guia-passos{font-family:var(--ui);font-size:13px;color:var(--cinza);line-height:1.7}
+  .guia-passos strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-weight:400}
+  .guia-passos ol{padding-left:18px;margin-top:8px}
+
+  @media (max-width:1050px){
+    .grid-cards{grid-template-columns:repeat(2,1fr)}
+    .card-destaque{grid-column:span 2;grid-template-columns:1fr;text-align:center}
+    .card-destaque-ic{margin:0 auto}
+    .hero-stats{grid-template-columns:repeat(2,1fr)}
+    .guia-nav{grid-template-columns:1fr;text-align:center}
+    .guia-ic{margin:0 auto}
+  }
+  @media (max-width:700px){
+    .grid-cards,.grid-cards-2{grid-template-columns:1fr}
+    .card-destaque{grid-column:span 1}
+    .hero{padding:48px 24px 60px}
+    .logo-hero{font-size:42px}
+    .hero h1{font-size:26px}
+    main{padding:48px 24px 60px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-content">
+    <div class="logo-hero"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+    <h1>Protótipo <em>visual completo</em></h1>
+    <p class="hero-sub">Plataforma SaaS B2B brasileira que unifica <strong style="color:var(--laranja)">Recrutamento & Seleção + Gestão de Pessoas + Folha + Ponto + Jurídico Trabalhista</strong> em um único produto, com IA nativa, voltada para construção civil. 20 telas funcionais, 95+ visualizações, 10 personagens narrativos.</p>
+
+    <div class="hero-tags">
+      <span class="hero-tag laranja">20 telas funcionais</span>
+      <span class="hero-tag">95+ visualizações</span>
+      <span class="hero-tag">10 personagens</span>
+      <span class="hero-tag">multi-tenant</span>
+      <span class="hero-tag">multi-papel · 10 roles</span>
+      <span class="hero-tag">CCT SINTRAICCMG</span>
+      <span class="hero-tag">eSocial integrado</span>
+      <span class="hero-tag">IA nativa</span>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">20</div>
+        <div class="hero-stat-label">Telas funcionais</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">18</div>
+        <div class="hero-stat-label">Módulos do produto</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">10</div>
+        <div class="hero-stat-label">Papéis (roles)</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">~1.9MB</div>
+        <div class="hero-stat-label">de HTML puro</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- GUIA RÁPIDO DE NAVEGAÇÃO -->
+  <div class="guia-nav">
+    <div class="guia-ic">📍</div>
+    <div>
+      <div class="guia-titulo">Como <em>navegar</em> este protótipo</div>
+      <div class="guia-passos">
+        <ol>
+          <li>Comece pela <strong>tela de Login</strong> para entender o multi-tenant</li>
+          <li>Siga o <strong>fluxo do candidato</strong> (Letícia) → <strong>recrutamento</strong> (Mariana) → <strong>gestão de pessoas</strong> (Roberto)</li>
+          <li>Cada tela tem uma <strong>barra de navegação no canto inferior direito</strong> para pular entre subtelas</li>
+          <li>Em todas, persona, dados e datas são <strong>coerentes entre si</strong> (Fernando do RH é o mesmo da folha, do ponto, da trilha BIM)</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTRADA · LOGIN -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">Comece <em>aqui</em></div>
+        <div class="secao-sub">A jornada começa pelo login multi-tenant que detecta o tipo de usuário</div>
+      </div>
+      <div class="secao-meta">1 tela · 9 estados</div>
+    </div>
+
+    <div class="grid-cards">
+      <a href="00_login.html" class="card card-destaque">
+        <div class="card-destaque-ic">🔐</div>
+        <div>
+          <h2>Login &amp; <em>Autenticação</em></h2>
+          <p>9 telas cobrindo: login padrão, recuperação de senha, magic link, signup, criação de tenant, escolha de workspace (multi-papel), 2FA, esqueci senha, bloqueio de conta. Detecta role automaticamente.</p>
+        </div>
+        <a href="00_login.html" class="btn-ir">Entrar →</a>
+      </a>
+    </div>
+  </section>
+
+  <!-- ★ NOVAS TELAS · destaque -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">★ Novidades · <em>3 telas adicionais</em></div>
+        <div class="secao-sub">Dashboard executivo unificado · App mobile para canteiros · Avaliação 9-Box com PDI e IA</div>
+      </div>
+      <div class="secao-meta">NOVO · 3 telas críticas</div>
+    </div>
+
+    <div class="grid-cards">
+      <a href="18_dashboard_executivo.html" class="card" style="border-color:var(--laranja);border-width:2px">
+        <div class="card-thumb empresa" style="background:linear-gradient(135deg,var(--marinho),var(--marinho-esc))">⌂</div>
+        <div class="card-corpo">
+          <div class="card-numero">18</div>
+          <div class="card-tags"><span class="card-tag laranja">★ NOVO</span><span class="card-tag marinho">Owner view</span><span class="card-tag roxo">IA</span></div>
+          <h3 class="card-titulo">Dashboard <em>Executivo</em></h3>
+          <p class="card-desc">Visão unificada do Roberto: 12 KPIs de todos os módulos, alerta de audiência hoje 14:30, 3 insights da Nora·IA, agenda 30d, status folha em fechamento. <strong>Resolve o problema dos 8 sistemas separados.</strong></p>
+          <div class="card-personagem">
+            <div class="av av-marinho">RA</div>
+            <span><strong>Roberto Aurora</strong> · primeira tela ao logar</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">1 tela · ~42K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="19_mobile_empregado.html" class="card" style="border-color:var(--laranja);border-width:2px">
+        <div class="card-thumb empregado" style="background:linear-gradient(135deg,#1F2A44,#131B2E)">📱</div>
+        <div class="card-corpo">
+          <div class="card-numero">19</div>
+          <div class="card-tags"><span class="card-tag laranja">★ NOVO</span><span class="card-tag verde">Mobile</span><span class="card-tag">PWA offline</span></div>
+          <h3 class="card-titulo">App <em>mobile</em> empregado</h3>
+          <p class="card-desc">3 mockups celular lado a lado: home do Fernando às 07:14 com relógio dinâmico, bater ponto com câmera+geofence, bloqueio dramático do Marcelo (NR-18 vencida há 14 dias). <strong>PWA com offline</strong> para canteiros.</p>
+          <div class="card-personagem">
+            <div class="av av-laranja">F</div>
+            <span><strong>Fernando + Marcelo</strong> · Sítio II hoje</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">3 mockups · ~34K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="20_avaliacao_9box.html" class="card" style="border-color:var(--laranja);border-width:2px">
+        <div class="card-thumb empregado" style="background:linear-gradient(135deg,#7E5BCC,#5B3FA0)">⭐</div>
+        <div class="card-corpo">
+          <div class="card-numero">20</div>
+          <div class="card-tags"><span class="card-tag laranja">★ NOVO</span><span class="card-tag roxo">9-Box + PDI</span><span class="card-tag">IA Nora</span></div>
+          <h3 class="card-titulo">Avaliação <em>9-Box &amp; PDI</em></h3>
+          <p class="card-desc">Matriz 3×3 com 128 empregados plotados, <strong>Fernando como ★ Estrela borda dourada</strong>, drag&amp;drop para recalibrar. PDI do Fernando com 5 ações + sugestão IA: antecipar promoção R$ 16.500 e atribuir Vila Aurora.</p>
+          <div class="card-personagem">
+            <div class="av av-marinho">RA</div>
+            <span><strong>Roberto</strong> · calibrando · Fernando ★</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">1 tela · ~36K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FASE 1 · ENTRADA NO PRODUTO (RECRUTAMENTO) -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">Fase 1 · <em>Recrutamento & Seleção</em></div>
+        <div class="secao-sub">Do candidato à contratação · personas Letícia (candidata), Mariana (recrutadora Oi Nora) e Roberto (cliente)</div>
+      </div>
+      <div class="secao-meta">3 telas · 22 visualizações</div>
+    </div>
+
+    <div class="grid-cards">
+      <a href="01_portal_candidato.html" class="card">
+        <div class="card-thumb candidato">👤</div>
+        <div class="card-corpo">
+          <div class="card-numero">01</div>
+          <div class="card-tags"><span class="card-tag laranja">Externo</span><span class="card-tag">Mobile-first</span></div>
+          <h3 class="card-titulo">Portal do <em>candidato</em></h3>
+          <p class="card-desc">Site público responsivo onde <strong>Letícia Ferraz</strong> busca vagas, faz upload do CV, acompanha candidaturas. 10 telas incluindo perfil, recomendações de IA e chat com recrutador.</p>
+          <div class="card-personagem">
+            <div class="av av-laranja">L</div>
+            <span><strong>Letícia Ferraz</strong> · candidata vaga afirmativa Eng. Pleno</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">10 telas · ~92K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="02_empresa_recrutamento.html" class="card">
+        <div class="card-thumb empresa">📋</div>
+        <div class="card-corpo">
+          <div class="card-numero">02</div>
+          <div class="card-tags"><span class="card-tag">Interno</span><span class="card-tag roxo">IA</span></div>
+          <h3 class="card-titulo">Recrutamento <em>(ATS)</em></h3>
+          <p class="card-desc">Visão da recrutadora Mariana: pipeline Kanban, banco de talentos, triagem com IA, calendário de entrevistas. 142% meta em maio. Atende Aurora, Pluma e Horizonte.</p>
+          <div class="card-personagem">
+            <div class="av av-roxo">M</div>
+            <span><strong>Mariana Costa</strong> · Recrutadora Sr · Oi Nora</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">7 telas · ~94K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="09_wizard_vaga.html" class="card">
+        <div class="card-thumb candidato">✨</div>
+        <div class="card-corpo">
+          <div class="card-numero">09</div>
+          <div class="card-tags"><span class="card-tag laranja">Wizard</span><span class="card-tag roxo">IA</span></div>
+          <h3 class="card-titulo">Wizard de <em>vaga</em></h3>
+          <p class="card-desc">5 passos para criar vaga afirmativa <strong>#2026-0042</strong> (Eng. Civil Pleno). IA sugere descrição, sistema valida orçamento e dispara workflow de aprovação CFO.</p>
+          <div class="card-personagem">
+            <div class="av av-roxo">M</div>
+            <span><strong>Mariana</strong> · criando para Aurora</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">5 passos · ~66K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FASE 2 · GESTÃO DE PESSOAS NÚCLEO -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">Fase 2 · <em>Gestão de Pessoas · Núcleo</em></div>
+        <div class="secao-sub">Cadastro de empregado, área pessoal, configurações da empresa</div>
+      </div>
+      <div class="secao-meta">4 telas · 28 visualizações</div>
+    </div>
+
+    <div class="grid-cards">
+      <a href="03_empresa_gestao_pessoas.html" class="card">
+        <div class="card-thumb gestao">👥</div>
+        <div class="card-corpo">
+          <div class="card-numero">03</div>
+          <div class="card-tags"><span class="card-tag">RH</span><span class="card-tag">Dashboard</span></div>
+          <h3 class="card-titulo">Gestão de <em>Pessoas</em></h3>
+          <p class="card-desc">Visão completa do Roberto: 128 empregados ativos, KPIs, organograma, alertas de aniversariantes, ASOs vencendo. Hub central da operação de RH.</p>
+          <div class="card-personagem">
+            <div class="av av-marinho">RA</div>
+            <span><strong>Roberto Aurora</strong> · Dir. RH · Owner Aurora</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">11 telas · ~145K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="10_ficha_empregado.html" class="card">
+        <div class="card-thumb empregado">📄</div>
+        <div class="card-corpo">
+          <div class="card-numero">10</div>
+          <div class="card-tags"><span class="card-tag verde">Empregado</span><span class="card-tag">7 abas</span></div>
+          <h3 class="card-titulo">Ficha do <em>empregado</em></h3>
+          <p class="card-desc">Ficha completa do <strong>Fernando Lacerda</strong> (Eng. Civil Sr, MAT 0112): 7 abas com dados pessoais, vínculo, dependentes, documentos, histórico. Promoção prevista para 02/08.</p>
+          <div class="card-personagem">
+            <div class="av av-laranja">F</div>
+            <span><strong>Fernando Lacerda</strong> · 4 anos casa · R$ 12.500</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">7 abas · ~90K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="04_area_empregado.html" class="card">
+        <div class="card-thumb empregado">🌟</div>
+        <div class="card-corpo">
+          <div class="card-numero">04</div>
+          <div class="card-tags"><span class="card-tag verde">Self-service</span><span class="card-tag">Mobile-first</span></div>
+          <h3 class="card-titulo">Área do <em>empregado</em></h3>
+          <p class="card-desc">Visão do Fernando como usuário: meus dados, holerites, férias, ponto, treinamentos, avaliação, comunicados. Tudo o que o empregado precisa em um portal.</p>
+          <div class="card-personagem">
+            <div class="av av-laranja">F</div>
+            <span><strong>Fernando</strong> · acessando do canteiro pelo app</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">8 telas · ~110K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="13_configuracoes_empresa.html" class="card">
+        <div class="card-thumb config">⚙</div>
+        <div class="card-corpo">
+          <div class="card-numero">13</div>
+          <div class="card-tags"><span class="card-tag">Owner only</span><span class="card-tag amarelo">6 seções</span></div>
+          <h3 class="card-titulo">Configurações <em>da empresa</em></h3>
+          <p class="card-desc">Dados cadastrais Aurora (CNPJ 12.345.678/0001-90), organograma, cargos com CBO, centros de custo, CCT SINTRAICCMG, FAP 1.2317, políticas, fluxos de aprovação.</p>
+          <div class="card-personagem">
+            <div class="av av-marinho">RA</div>
+            <span><strong>Roberto</strong> · Owner · acesso total</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">6 seções · ~100K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FASE 3 · OPERAÇÃO RH AVANÇADA -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">Fase 3 · <em>Operação RH avançada</em></div>
+        <div class="secao-sub">Folha, ponto, onboarding, treinamentos · o dia-a-dia da Bruna (HR Ops) e da Paula (em onboarding)</div>
+      </div>
+      <div class="secao-meta">4 telas · 14 visualizações</div>
+    </div>
+
+    <div class="grid-cards">
+      <a href="11_folha_pagamento.html" class="card">
+        <div class="card-thumb gestao">💰</div>
+        <div class="card-corpo">
+          <div class="card-numero">11</div>
+          <div class="card-tags"><span class="card-tag verde">eSocial</span><span class="card-tag">5 telas</span></div>
+          <h3 class="card-titulo">Folha de <em>pagamento</em></h3>
+          <p class="card-desc">Maio/2026 fechando com <strong>R$ 2.789K</strong>: dashboard, eventos, conferência (4-eyes), preview de holerite do Fernando R$ 8.658, relatórios contábeis exportáveis para Sienge.</p>
+          <div class="card-personagem">
+            <div class="av av-verde">BL</div>
+            <span><strong>Bruna Lima</strong> · HR Ops · calculando folha</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">5 telas · ~84K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="12_ponto_eletronico_rh.html" class="card">
+        <div class="card-thumb gestao">⏱</div>
+        <div class="card-corpo">
+          <div class="card-numero">12</div>
+          <div class="card-tags"><span class="card-tag">Geofence</span><span class="card-tag amarelo">PWA offline</span></div>
+          <h3 class="card-titulo">Ponto <em>eletrônico</em></h3>
+          <p class="card-desc">4 telas com relógio JS em tempo real: dashboard, espelho mensal do Fernando 213h, banco de horas +312h, solicitações de ajuste. Bloqueio de obra por NR vencida.</p>
+          <div class="card-personagem">
+            <div class="av av-verde">BL</div>
+            <span><strong>Bruna</strong> · gerenciando + Fernando batendo</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">4 telas · ~89K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="14_onboarding.html" class="card">
+        <div class="card-thumb empregado">🎓</div>
+        <div class="card-corpo">
+          <div class="card-numero">14</div>
+          <div class="card-tags"><span class="card-tag verde">DIA 1</span><span class="card-tag">3 visões</span></div>
+          <h3 class="card-titulo">Onboarding <em>automático</em></h3>
+          <p class="card-desc">Paula Marques admitida em 26/05/2026 (DIA 1 hoje). 3 visões: Dashboard RH, checklist da Paula (12 itens), tela da Carla como mentora. eSocial S-2200 já enviado.</p>
+          <div class="card-personagem">
+            <div class="av av-vermelho">PM</div>
+            <span><strong>Paula Marques</strong> · Coord. RH em onboarding</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">3 visões · ~78K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="15_treinamentos_trilhas.html" class="card">
+        <div class="card-thumb empregado">📚</div>
+        <div class="card-corpo">
+          <div class="card-numero">15</div>
+          <div class="card-tags"><span class="card-tag laranja">NRs</span><span class="card-tag verde">Trilhas</span></div>
+          <h3 class="card-titulo">Treinamentos &amp; <em>trilhas</em></h3>
+          <p class="card-desc">Dashboard NR (3 vencidos alerta vermelho), catálogo 24 cursos, trilha BIM do Fernando 65%, curso individual com player de vídeo + certificado Alura. Envio S-2210 SST.</p>
+          <div class="card-personagem">
+            <div class="av av-laranja">F</div>
+            <span><strong>Fernando</strong> · cursando BIM Alura</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">4 telas · ~78K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FASE 4 · ESTRATÉGICO -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">Fase 4 · <em>Estratégico & Headcount</em></div>
+        <div class="secao-sub">Visão do Roberto/CFO sobre quadro autorizado, projeções e movimentações</div>
+      </div>
+      <div class="secao-meta">2 telas · 10 visualizações</div>
+    </div>
+
+    <div class="grid-cards">
+      <a href="16_headcount_quadro.html" class="card">
+        <div class="card-thumb empresa">📊</div>
+        <div class="card-corpo">
+          <div class="card-numero">16</div>
+          <div class="card-tags"><span class="card-tag marinho">Estratégico</span><span class="card-tag">CFO view</span></div>
+          <h3 class="card-titulo">Headcount &amp; <em>quadro</em></h3>
+          <p class="card-desc">Gestão orçamentária de pessoas: 128/135 autorizados, 5% slack (R$ 151K/mês), projeção 12m com 3 cenários, movimentações com IA Nora analisando.</p>
+          <div class="card-personagem">
+            <div class="av av-marinho">RA</div>
+            <span><strong>Roberto</strong> · revisão CFO Eduardo 02/06</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">3 telas · ~79K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="06_avaliacao_pesquisas_analytics.html" class="card">
+        <div class="card-thumb empregado">📈</div>
+        <div class="card-corpo">
+          <div class="card-numero">06</div>
+          <div class="card-tags"><span class="card-tag">9-Box</span><span class="card-tag">eNPS</span><span class="card-tag roxo">Analytics</span></div>
+          <h3 class="card-titulo">Avaliação &amp; <em>analytics</em></h3>
+          <p class="card-desc">9-Box visual com calibração, PDI do Fernando (Estrela), ciclos de avaliação 360, pesquisa de clima eNPS, dashboards executivos com filtros e exportação.</p>
+          <div class="card-personagem">
+            <div class="av av-marinho">RA</div>
+            <span><strong>Roberto</strong> · calibrando 9-Box semestre</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">7 telas · ~136K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FASE 5 · JURÍDICO TRABALHISTA -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">Fase 5 · <em>Jurídico Trabalhista</em></div>
+        <div class="secao-sub">Módulo separado · sidebar roxa · 3 modelos de advogado · Dr. Henrique Vasconcellos atende 3 empresas-clientes</div>
+      </div>
+      <div class="secao-meta">1 tela · 4 visualizações · NOVO!</div>
+    </div>
+
+    <div class="grid-cards">
+      <a href="17_juridico_trabalhista.html" class="card card-destaque" style="background:linear-gradient(135deg,var(--juridico) 0%,#3F2C7A 100%)">
+        <div class="card-destaque-ic" style="background:#A33518">⚖</div>
+        <div>
+          <h2>Jurídico <em>Trabalhista</em></h2>
+          <p>Plataforma jurídica completa para Dr. Henrique Vasconcellos (OAB/MG 78.452). 4 telas: dashboard com 18 processos · R$ 1.86M em risco · audiência hoje 14:30 do José Roberto Pinheiro · lista completa com filtros · ficha rica com timeline + IA cálculo de risco (3 cenários) · wizard de cadastro com integração ficha ex-empregado e IA encontrando processos similares (83%).</p>
+        </div>
+        <a href="17_juridico_trabalhista.html" class="btn-ir">Explorar →</a>
+      </a>
+    </div>
+  </section>
+
+  <!-- FASE 6 · CONSOLE OI NORA -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">Fase 6 · <em>Console Oi Nora</em></div>
+        <div class="secao-sub">Visão interna da Cláudia (CEO) sobre o SaaS · multi-tenant · billing · health score por conta</div>
+      </div>
+      <div class="secao-meta">3 telas · 16 visualizações</div>
+    </div>
+
+    <div class="grid-cards">
+      <a href="05_console_oinora.html" class="card">
+        <div class="card-thumb oinora">🏛</div>
+        <div class="card-corpo">
+          <div class="card-numero">05</div>
+          <div class="card-tags"><span class="card-tag amarelo">Super Admin</span><span class="card-tag">Multi-tenant</span></div>
+          <h3 class="card-titulo">Console <em>Oi Nora</em></h3>
+          <p class="card-desc">Visão da CEO Cláudia: MRR, ARR, churn, NPS por conta, health score, tickets de suporte, customer success, gestão dos planos comerciais. Multi-tenant unificado.</p>
+          <div class="card-personagem">
+            <div class="av av-amarelo">CV</div>
+            <span><strong>Cláudia Vasconcelos</strong> · CEO Oi Nora</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">11 telas · ~152K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="07_gerenciar_usuarios.html" class="card">
+        <div class="card-thumb config">🔐</div>
+        <div class="card-corpo">
+          <div class="card-numero">07</div>
+          <div class="card-tags"><span class="card-tag">RBAC</span><span class="card-tag">10 papéis</span></div>
+          <h3 class="card-titulo">Usuários &amp; <em>permissões</em></h3>
+          <p class="card-desc">Gestão completa de usuários, convites por magic link, atribuição de papéis (10 roles), audit log filtrado, suspensão/reativação, multi-papel multi-tenant.</p>
+          <div class="card-personagem">
+            <div class="av av-marinho">RA</div>
+            <span><strong>Roberto</strong> · convidando admin/gestor/hr_ops</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">3 telas · ~54K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="08_modulos_planos.html" class="card">
+        <div class="card-thumb modulos">📦</div>
+        <div class="card-corpo">
+          <div class="card-numero">08</div>
+          <div class="card-tags"><span class="card-tag laranja">Pricing</span><span class="card-tag">3 planos</span></div>
+          <h3 class="card-titulo">Módulos &amp; <em>planos</em></h3>
+          <p class="card-desc">18 módulos disponíveis, 3 planos comerciais (Essencial R$ 990, Profissional R$ 2.490, Premium R$ 4.990), 9 add-ons configuráveis, comparativo lado a lado.</p>
+          <div class="card-personagem">
+            <div class="av av-amarelo">CV</div>
+            <span><strong>Cláudia</strong> · gerenciando catálogo</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-info-pq">3 telas · ~57K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- DIAGRAMA -->
+  <section class="secao">
+    <div class="secao-head">
+      <div>
+        <div class="secao-titulo">Complementares · <em>diagramas</em></div>
+        <div class="secao-sub">Material adicional para entender o sistema</div>
+      </div>
+      <div class="secao-meta">Referência visual</div>
+    </div>
+
+    <div class="grid-cards-2">
+      <a href="diagrama_papeis.html" class="card">
+        <div class="card-thumb diagrama">🎭</div>
+        <div class="card-corpo">
+          <div class="card-numero">★</div>
+          <div class="card-tags"><span class="card-tag">RBAC</span><span class="card-tag">Visualização</span></div>
+          <h3 class="card-titulo">Diagrama de <em>papéis</em></h3>
+          <p class="card-desc">Mapa visual interativo dos 10 papéis (roles), suas permissões e relações entre tenants. Inclui relação especial dos escritórios jurídicos com múltiplos clientes.</p>
+          <div class="card-footer">
+            <span class="card-info-pq">Diagrama · ~30K</span>
+            <span class="card-cta">Abrir →</span>
+          </div>
+        </div>
+      </a>
+
+      <div class="card" style="cursor:default;background:var(--cinza-fundo);border-style:dashed">
+        <div class="card-thumb" style="background:linear-gradient(135deg,#5C6478,#3B4A6B);opacity:.7">📚</div>
+        <div class="card-corpo">
+          <div class="card-numero">📂</div>
+          <div class="card-tags"><span class="card-tag">Codex</span><span class="card-tag verde">8 docs</span></div>
+          <h3 class="card-titulo">Documentação <em>técnica</em></h3>
+          <p class="card-desc">A pasta <strong>../01_documentacao/</strong> contém os 8 documentos para o agente Codex / Claude Code construir o produto real: PROMPTS_CODEX, MODELO_DE_DADOS, ROADMAP, MATRIZ_PERMISSOES, MODULOS_E_PLANOS, BRIEFING_TECNICO, ROTEIRO e README.</p>
+          <div class="card-footer">
+            <span class="card-info-pq">8 arquivos .md · ~250K</span>
+            <span class="card-cta" style="background:var(--verde-cl);color:var(--verde);border-color:var(--verde)">Pasta /01_documentacao</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+  <p>Protótipo visual completo · 17 telas funcionais · 90+ visualizações · 10 personagens narrativos coerentes · ~1.7 MB de HTML puro com identidade Book Antiqua preservada.</p>
+  <p class="nota">v1.0 · 2026 · construído para apresentação aos sócios e handoff para o Codex / Claude Code</p>
+</footer>
+
+</body>
+</html>

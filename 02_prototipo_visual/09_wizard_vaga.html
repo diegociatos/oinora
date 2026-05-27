@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Nova Vaga (Wizard)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh;max-width:1100px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:18px;flex-wrap:wrap}
+  .topbar h1{font-size:30px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .topbar h1 em{color:var(--laranja);font-style:italic}
+  .topbar .topbar-meta{font-family:var(--ui);font-size:12.5px;color:var(--cinza);margin-top:5px}
+
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  /* STEPPER */
+  .stepper{display:flex;align-items:center;gap:0;padding:24px 0;margin-bottom:24px;border-top:1px solid var(--cinza-cl);border-bottom:1px solid var(--cinza-cl)}
+  .step{flex:1;display:flex;align-items:center;gap:10px;font-family:var(--ui);font-size:11px;letter-spacing:.5px;color:var(--cinza);text-transform:uppercase;font-weight:600;position:relative}
+  .step-bola{width:32px;height:32px;border-radius:50%;background:var(--cinza-fundo);color:var(--cinza);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;border:2px solid var(--cinza-cl);font-family:var(--ui)}
+  .step.concluida .step-bola{background:var(--verde);color:white;border-color:var(--verde)}
+  .step.atual .step-bola{background:var(--laranja);color:white;border-color:var(--laranja);box-shadow:0 0 0 4px rgba(232,99,58,.15)}
+  .step.atual{color:var(--laranja)}
+  .step.concluida{color:var(--verde)}
+  .step-titulo{font-size:11px;line-height:1.3;letter-spacing:1px;font-weight:700}
+  .step-sub{font-size:9px;text-transform:none;letter-spacing:.3px;color:var(--cinza);font-weight:500;display:block;margin-top:2px}
+  .step-linha{flex:1;height:2px;background:var(--cinza-cl);margin:0 14px;min-width:20px}
+  .step-linha.concluida{background:var(--verde)}
+
+  /* PAINEL FORM */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:18px}
+  .painel h3{font-size:22px;font-weight:400;margin-bottom:4px;letter-spacing:-.2px}
+  .painel h3 em{color:var(--laranja);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;font-weight:600}
+
+  .campo{margin-bottom:18px}
+  .campo label{display:block;font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--marinho-med);margin-bottom:6px;font-weight:600}
+  .campo label .obrig{color:var(--laranja);margin-left:3px}
+  .campo input,.campo select,.campo textarea{width:100%;padding:11px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;color:var(--marinho);border-radius:2px;transition:all .15s}
+  .campo input:focus,.campo select:focus,.campo textarea:focus{outline:none;border-color:var(--laranja);box-shadow:0 0 0 3px rgba(232,99,58,.08)}
+  .campo .hint{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;line-height:1.5;letter-spacing:.3px}
+  .campo-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .campo-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+  /* RADIO/CHECKBOX CARDS */
+  .opcao-grade{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .opcao-grade-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .opcao-card{padding:14px 16px;border:1px solid var(--cinza-cl);border-radius:2px;background:var(--branco);cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:all .15s}
+  .opcao-card:hover{border-color:var(--marinho)}
+  .opcao-card.selecionado{border-color:var(--laranja);background:var(--laranja-cl);box-shadow:0 0 0 3px rgba(232,99,58,.08)}
+  .opcao-card input{margin-top:2px;width:16px;height:16px;accent-color:var(--laranja);flex-shrink:0}
+  .opcao-card-info{flex:1;min-width:0}
+  .opcao-card-titulo{font-size:14px;font-weight:500;margin-bottom:2px}
+  .opcao-card-desc{font-family:var(--ui);font-size:11.5px;color:var(--cinza);line-height:1.5}
+
+  /* CHIPS DE SKILL */
+  .chips-skill{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip-skill{padding:5px 12px;background:var(--laranja-cl);border:1px solid var(--laranja);color:var(--laranja);font-family:var(--ui);font-size:12px;letter-spacing:.3px;border-radius:14px;display:inline-flex;align-items:center;gap:6px;font-weight:600}
+  .chip-skill .x{cursor:pointer;font-size:14px;opacity:.7}
+  .chip-skill .x:hover{opacity:1}
+  .chip-sugerido{background:var(--cinza-fundo);border:1px solid var(--cinza-cl);color:var(--cinza)}
+  .chip-sugerido:hover{background:var(--laranja-cl);border-color:var(--laranja);color:var(--laranja);cursor:pointer}
+
+  /* SLIDER SALÁRIO */
+  .salario-bar{position:relative;height:50px;background:var(--cinza-fundo);border-radius:4px;margin-top:12px;overflow:hidden}
+  .salario-faixa{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,var(--laranja),var(--laranja-esc));opacity:.8}
+  .salario-marca{position:absolute;top:-4px;bottom:-4px;width:4px;background:var(--marinho);border-radius:2px}
+  .salario-labels{display:flex;justify-content:space-between;font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px}
+  .salario-info{font-family:var(--ui);font-size:11px;color:var(--marinho);background:var(--cinza-fundo);padding:8px 12px;border-radius:2px;margin-top:10px;display:flex;justify-content:space-between}
+  .salario-info strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:14px;font-weight:400}
+
+  /* ALERT/BANNER */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden}
+  .alert-marinho::before{content:"";position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .alert-marinho > *{position:relative}
+  .alert-laranja{background:var(--laranja-cl);border-left:3px solid var(--laranja);color:var(--marinho)}
+  .alert-verde{background:var(--verde-cl);border-left:3px solid var(--verde);color:var(--marinho)}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* TAG */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+
+  /* SUGESTÃO IA */
+  .sugestao-ia{background:linear-gradient(135deg,var(--marinho),var(--marinho-esc));color:var(--papel);padding:18px;border-radius:2px;margin-bottom:18px;position:relative;overflow:hidden}
+  .sugestao-ia::before{content:"";position:absolute;top:-50%;right:-15%;width:280px;height:280px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .sugestao-ia-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative}
+  .sugestao-ia-tag{background:var(--laranja);color:white;font-family:var(--ui);font-size:9px;padding:3px 8px;letter-spacing:1.5px;font-weight:700;border-radius:2px;display:inline-flex;align-items:center;gap:4px}
+  .sugestao-ia-tag::before{content:"●";font-size:8px}
+  .sugestao-ia h4{font-size:15px;font-weight:500;line-height:1.3;color:var(--papel);position:relative}
+  .sugestao-ia h4 em{color:var(--laranja);font-style:italic}
+  .sugestao-ia p{font-family:var(--ui);font-size:12px;line-height:1.6;opacity:.8;margin-top:8px;position:relative}
+  .sugestao-ia-acoes{display:flex;gap:8px;margin-top:14px;position:relative}
+  .sugestao-ia-acoes button{background:rgba(255,255,255,.1);color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 12px;font-family:var(--ui);font-size:11px;letter-spacing:.3px;border-radius:2px;cursor:pointer}
+  .sugestao-ia-acoes button:hover{background:rgba(255,255,255,.2)}
+  .sugestao-ia-acoes button.principal{background:var(--laranja);border-color:var(--laranja)}
+
+  /* APROVADORES (passo 4) */
+  .aprovador-fluxo{display:flex;flex-direction:column;gap:10px}
+  .aprovador-item{padding:14px;border:1px solid var(--cinza-cl);border-radius:2px;background:var(--branco);display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+  .aprovador-num{width:28px;height:28px;border-radius:50%;background:var(--laranja);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;font-weight:600;flex-shrink:0}
+  .aprovador-info-pessoa{display:flex;align-items:center;gap:10px}
+  .av-mini{width:34px;height:34px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;font-weight:600;flex-shrink:0}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+
+  /* PUBLICAÇÃO (passo 5) */
+  .canal-pub{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .canal-card{padding:16px;border:1px solid var(--cinza-cl);border-radius:2px;background:var(--branco);cursor:pointer;transition:all .15s}
+  .canal-card:hover{border-color:var(--marinho)}
+  .canal-card.ativo{border-color:var(--verde);background:var(--verde-cl)}
+  .canal-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .canal-card h5{font-size:14px;font-weight:500}
+  .canal-card .toggle{position:relative;width:38px;height:20px;background:var(--cinza-cl);border-radius:10px;cursor:pointer;transition:background .2s;flex-shrink:0}
+  .canal-card .toggle::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+  .canal-card.ativo .toggle{background:var(--verde)}
+  .canal-card.ativo .toggle::after{transform:translateX(18px)}
+  .canal-card-desc{font-family:var(--ui);font-size:11.5px;color:var(--cinza);line-height:1.5}
+  .canal-card-stats{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:6px;letter-spacing:.3px;text-transform:uppercase;font-weight:600}
+
+  /* PREVIEW DA VAGA */
+  .preview-vaga{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-top:14px}
+  .preview-vaga-titulo{font-size:22px;font-weight:400;margin-bottom:6px}
+  .preview-vaga-meta{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:14px;display:flex;gap:14px;flex-wrap:wrap}
+  .preview-vaga-meta strong{color:var(--marinho)}
+  .preview-secao{margin-top:18px;padding-top:18px;border-top:1px solid var(--cinza-cl)}
+  .preview-secao h5{font-family:var(--ui);font-size:10px;letter-spacing:2px;color:var(--cinza);text-transform:uppercase;font-weight:700;margin-bottom:10px}
+  .preview-secao p{font-family:var(--ui);font-size:13px;color:var(--marinho);line-height:1.65}
+  .preview-secao ul{font-family:var(--ui);font-size:13px;color:var(--marinho);line-height:1.7;padding-left:20px}
+
+  /* RODAPÉ AÇÕES */
+  .acoes-rodape{position:sticky;bottom:0;background:var(--branco);border-top:1px solid var(--cinza-cl);padding:18px 36px;display:flex;justify-content:space-between;align-items:center;margin:24px -36px -60px;gap:14px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,.05)}
+  .acoes-info{font-family:var(--ui);font-size:12px;color:var(--cinza)}
+  .acoes-info strong{color:var(--marinho)}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:90px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:900px){
+    .campo-grid-2,.campo-grid-3{grid-template-columns:1fr}
+    .opcao-grade,.opcao-grade-3,.canal-pub{grid-template-columns:1fr}
+    .step-titulo,.step-sub{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: PASSO 1 - O QUE PROCURAMOS -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-passo1">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item ativo"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-item outro"><span class="ic">💬</span> Chat com Oi Nora</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Vagas</a> &gt; <span style="color:var(--laranja)">Nova vaga</span></div>
+
+      <div class="topbar">
+        <div>
+          <h1>Nova <em>vaga</em></h1>
+          <p class="topbar-meta">Vamos criar juntos · 5 passos · você pode salvar como rascunho a qualquer momento</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm">⤓ Importar de outra vaga</button>
+          <button class="btn btn-fantasma btn-sm">💾 Salvar rascunho</button>
+        </div>
+      </div>
+
+      <!-- STEPPER -->
+      <div class="stepper">
+        <div class="step atual">
+          <div class="step-bola">1</div>
+          <div><div class="step-titulo">O que procuramos</div><div class="step-sub">Cargo, área, formato</div></div>
+        </div>
+        <div class="step-linha"></div>
+        <div class="step">
+          <div class="step-bola">2</div>
+          <div><div class="step-titulo">Requisitos</div><div class="step-sub">Skills, experiência</div></div>
+        </div>
+        <div class="step-linha"></div>
+        <div class="step">
+          <div class="step-bola">3</div>
+          <div><div class="step-titulo">Remuneração</div><div class="step-sub">Salário, benefícios</div></div>
+        </div>
+        <div class="step-linha"></div>
+        <div class="step">
+          <div class="step-bola">4</div>
+          <div><div class="step-titulo">Fluxo de aprovação</div><div class="step-sub">Quem aprova proposta</div></div>
+        </div>
+        <div class="step-linha"></div>
+        <div class="step">
+          <div class="step-bola">5</div>
+          <div><div class="step-titulo">Publicação</div><div class="step-sub">Canais e revisão</div></div>
+        </div>
+      </div>
+
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🤖</span>
+        <div>
+          <strong>Mariana Costa (sua recrutadora Oi Nora) será notificada automaticamente</strong>
+          Assim que a vaga for publicada, ela já entra na fila dela. Você também pode chamar a Mariana no chat para tirar dúvidas antes de publicar.
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>1. O que <em>procuramos?</em></h3>
+        <p class="sub-titulo">Defina o cargo e o formato da contratação</p>
+
+        <div class="campo">
+          <label>Título da vaga <span class="obrig">*</span></label>
+          <input value="Engenheiro Civil Pleno" placeholder="Ex: Analista Financeiro Sênior"/>
+          <div class="hint">💡 Use títulos claros e padronizados — evita "rockstar" e "ninja", pioram o ranking nos buscadores.</div>
+        </div>
+
+        <div class="campo-grid-2">
+          <div class="campo">
+            <label>Área / Departamento <span class="obrig">*</span></label>
+            <select>
+              <option>Engenharia</option>
+              <option>Operações &amp; Obra</option>
+              <option>Financeiro &amp; Adm</option>
+              <option>Comercial</option>
+              <option>Suprimentos</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Gestor direto desta vaga <span class="obrig">*</span></label>
+            <select>
+              <option>Luísa Mendonça · Dir. Engenharia</option>
+              <option>Carlos Aurora · Dir. Operações</option>
+              <option>Eduardo Santos · Dir. Financeiro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo-grid-3">
+          <div class="campo">
+            <label>Nº de posições <span class="obrig">*</span></label>
+            <input type="number" value="1" min="1" max="50"/>
+          </div>
+          <div class="campo">
+            <label>Tipo de contratação <span class="obrig">*</span></label>
+            <select>
+              <option>CLT</option>
+              <option>PJ</option>
+              <option>Estágio</option>
+              <option>Jovem Aprendiz</option>
+              <option>Temporário</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Urgência <span class="obrig">*</span></label>
+            <select>
+              <option>Normal · 30-45 dias</option>
+              <option>Urgente · &lt; 15 dias</option>
+              <option>Sem prazo · talent pipeline</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Local de trabalho <span class="obrig">*</span></label>
+          <div class="opcao-grade-3">
+            <label class="opcao-card selecionado">
+              <input type="radio" name="local" checked/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">🏢 Presencial</div>
+                <div class="opcao-card-desc">5 dias na sede</div>
+              </div>
+            </label>
+            <label class="opcao-card">
+              <input type="radio" name="local"/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">🏠 Híbrido</div>
+                <div class="opcao-card-desc">3 presencial · 2 home</div>
+              </div>
+            </label>
+            <label class="opcao-card">
+              <input type="radio" name="local"/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">🌍 Remoto</div>
+                <div class="opcao-card-desc">100% home office</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="campo-grid-2">
+          <div class="campo">
+            <label>Cidade-base</label>
+            <input value="Belo Horizonte/MG"/>
+          </div>
+          <div class="campo">
+            <label>Endereço (será exibido na vaga?)</label>
+            <select>
+              <option>Não exibir endereço (recomendado)</option>
+              <option>Exibir bairro/região</option>
+              <option>Exibir endereço completo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Resumo da vaga (1-2 frases que aparecem no topo) <span class="obrig">*</span></label>
+          <textarea rows="3" placeholder="Ex: Procuramos um(a) engenheiro(a) pleno(a) com experiência em planejamento de obras residenciais, para integrar nossa equipe de gestão de projetos no Sítio II.">Procuramos um(a) Engenheiro(a) Civil Pleno(a) com experiência em planejamento e controle de obras residenciais de médio porte, para integrar a equipe de Luísa Mendonça no projeto Sítio II.</textarea>
+          <div class="hint">📝 Esse texto é o "anzol" — aparece no resultado de busca e na prévia da rede social.</div>
+        </div>
+      </div>
+
+      <div class="alert alert-laranja">
+        <span class="ic-grande">💡</span>
+        <div>
+          <strong>Dica da Mariana</strong>
+          Já trabalhamos 5 vagas de Eng. Civil Pleno com vocês. <strong>Time-to-hire médio: 24 dias</strong>. Tem 87 candidatos qualificados no banco para esse perfil. Sugiro Híbrido — atrai 2,3× mais candidatos qualificados.
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>Passo 1 de 5</strong> · Os campos com * são obrigatórios
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm">← Cancelar</button>
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-passo2')">Continuar para Requisitos →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: PASSO 2 - REQUISITOS -->
+<!-- ============================================== -->
+<div class="tela" id="t-passo2">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item ativo"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-item outro"><span class="ic">💬</span> Chat com Oi Nora</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Vagas</a> &gt; <a onclick="irPara('t-passo1')">Nova vaga</a> &gt; <span style="color:var(--laranja)">Requisitos</span></div>
+
+      <div class="topbar">
+        <div>
+          <h1>Nova <em>vaga</em> · Eng. Civil Pleno</h1>
+          <p class="topbar-meta">Quais habilidades e experiência são essenciais?</p>
+        </div>
+      </div>
+
+      <div class="stepper">
+        <div class="step concluida">
+          <div class="step-bola">✓</div>
+          <div><div class="step-titulo">O que procuramos</div><div class="step-sub">Eng. Civil Pleno</div></div>
+        </div>
+        <div class="step-linha concluida"></div>
+        <div class="step atual">
+          <div class="step-bola">2</div>
+          <div><div class="step-titulo">Requisitos</div><div class="step-sub">Skills, experiência</div></div>
+        </div>
+        <div class="step-linha"></div>
+        <div class="step">
+          <div class="step-bola">3</div>
+          <div><div class="step-titulo">Remuneração</div><div class="step-sub">Salário, benefícios</div></div>
+        </div>
+        <div class="step-linha"></div>
+        <div class="step">
+          <div class="step-bola">4</div>
+          <div><div class="step-titulo">Fluxo de aprovação</div><div class="step-sub">Quem aprova proposta</div></div>
+        </div>
+        <div class="step-linha"></div>
+        <div class="step">
+          <div class="step-bola">5</div>
+          <div><div class="step-titulo">Publicação</div><div class="step-sub">Canais e revisão</div></div>
+        </div>
+      </div>
+
+      <div class="sugestao-ia">
+        <div class="sugestao-ia-head">
+          <span class="sugestao-ia-tag">🤖 NORA · IA</span>
+          <span style="font-family:var(--ui);font-size:10px;opacity:.6">Sugestão baseada em 5 vagas similares fechadas</span>
+        </div>
+        <h4>Sugiro estes <em>requisitos</em> baseado no histórico da Aurora</h4>
+        <p>Suas últimas vagas de Eng. Civil Pleno fecharam em 18-24 dias com este perfil. Você pode aceitar tudo, ou personalizar.</p>
+        <div class="sugestao-ia-acoes">
+          <button class="principal">✓ Usar sugestão completa</button>
+          <button>Customizar</button>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>2. <em>Requisitos</em> e qualificações</h3>
+        <p class="sub-titulo">Habilidades, experiência e formação</p>
+
+        <div class="campo-grid-2">
+          <div class="campo">
+            <label>Nível de senioridade <span class="obrig">*</span></label>
+            <select>
+              <option>Júnior · 0-2 anos</option>
+              <option selected>Pleno · 3-6 anos</option>
+              <option>Sênior · 6-10 anos</option>
+              <option>Especialista · 10+ anos</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Formação mínima <span class="obrig">*</span></label>
+            <select>
+              <option>Ensino Médio completo</option>
+              <option>Técnico</option>
+              <option selected>Superior completo</option>
+              <option>Pós-graduação</option>
+              <option>Mestrado/Doutorado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Curso / formação específica</label>
+          <input value="Engenharia Civil · CREA ativo obrigatório" placeholder="Ex: Engenharia Civil"/>
+        </div>
+
+        <div class="campo">
+          <label>Habilidades obrigatórias (must-have) <span class="obrig">*</span></label>
+          <div class="chips-skill">
+            <span class="chip-skill">Sienge <span class="x">✕</span></span>
+            <span class="chip-skill">AutoCAD <span class="x">✕</span></span>
+            <span class="chip-skill">MS Project <span class="x">✕</span></span>
+            <span class="chip-skill">Planejamento de obras <span class="x">✕</span></span>
+            <span class="chip-skill">Controle de cronograma <span class="x">✕</span></span>
+          </div>
+          <input style="margin-top:10px" placeholder="Digite e pressione Enter para adicionar..."/>
+        </div>
+
+        <div class="campo">
+          <label>Habilidades desejáveis (nice-to-have)</label>
+          <div class="chips-skill">
+            <span class="chip-skill">Revit/BIM <span class="x">✕</span></span>
+            <span class="chip-skill">Excel avançado <span class="x">✕</span></span>
+            <span class="chip-skill">Inglês intermediário <span class="x">✕</span></span>
+          </div>
+          <div style="margin-top:10px">
+            <span style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1px;font-weight:600">SUGESTÕES IA:</span>
+            <div class="chips-skill" style="margin-top:4px">
+              <span class="chip-skill chip-sugerido">+ Power BI</span>
+              <span class="chip-skill chip-sugerido">+ Gestão de equipes</span>
+              <span class="chip-skill chip-sugerido">+ NBR 12721</span>
+              <span class="chip-skill chip-sugerido">+ Lean Construction</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Descrição das atividades / responsabilidades</label>
+          <textarea rows="6">• Planejamento e controle do cronograma físico-financeiro de obras
+• Coordenação técnica com mestres de obras e empreiteiros
+• Acompanhamento de medições, aditivos e diários de obra
+• Garantia de conformidade com normas técnicas (NBR) e CREA
+• Reuniões periódicas com cliente e direção
+• Apoio à diretoria de Engenharia em decisões estratégicas</textarea>
+        </div>
+
+        <div class="campo-grid-2">
+          <div class="campo">
+            <label>Anos mínimos de experiência</label>
+            <select>
+              <option>Sem experiência</option>
+              <option>1+ ano</option>
+              <option>2+ anos</option>
+              <option selected>3+ anos</option>
+              <option>5+ anos</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label>Disponibilidade para viagens</label>
+            <select>
+              <option selected>Eventual (até 20% do tempo)</option>
+              <option>Não necessária</option>
+              <option>Frequente (20-50%)</option>
+              <option>Constante (50%+)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Requisitos opcionais ou diferencial</label>
+          <textarea rows="3">Experiência em obras residenciais de médio porte. Conhecimento em sustentabilidade (LEED, AQUA-HQE) é um diferencial.</textarea>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>2.1 Diversidade &amp; <em>Inclusão</em></h3>
+        <p class="sub-titulo">A Aurora valoriza times diversos · campos opcionais</p>
+
+        <div class="campo">
+          <label>Esta vaga é prioritária para grupos sub-representados?</label>
+          <div class="opcao-grade-3">
+            <label class="opcao-card selecionado">
+              <input type="checkbox" checked/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">🚺 Vaga afirmativa para mulheres</div>
+                <div class="opcao-card-desc">Eng. Civil tem 18% mulheres no setor</div>
+              </div>
+            </label>
+            <label class="opcao-card">
+              <input type="checkbox"/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">🌎 Pessoas pretas e pardas</div>
+                <div class="opcao-card-desc">PCD ou PCN</div>
+              </div>
+            </label>
+            <label class="opcao-card">
+              <input type="checkbox"/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">♿ Vaga PCD</div>
+                <div class="opcao-card-desc">Quota legal (Lei 8.213/91)</div>
+              </div>
+            </label>
+          </div>
+          <div class="hint">⚖️ Vagas afirmativas são <strong>legais e recomendadas</strong>. Aurora reporta diversidade trimestralmente.</div>
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>Passo 2 de 5</strong> · 5 skills must-have · 3 desejáveis · vaga afirmativa para mulheres
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-passo1')">← Voltar</button>
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-passo3')">Continuar para Remuneração →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: PASSO 3 - REMUNERAÇÃO -->
+<!-- ============================================== -->
+<div class="tela" id="t-passo3">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item ativo"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-item outro"><span class="ic">💬</span> Chat com Oi Nora</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Vagas</a> &gt; <a onclick="irPara('t-passo1')">Nova vaga</a> &gt; <span style="color:var(--laranja)">Remuneração</span></div>
+
+      <div class="topbar">
+        <div>
+          <h1>Nova <em>vaga</em> · Eng. Civil Pleno</h1>
+          <p class="topbar-meta">Salário, benefícios e PLR · será que exibimos para o candidato?</p>
+        </div>
+      </div>
+
+      <div class="stepper">
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">O que procuramos</div><div class="step-sub">Eng. Civil Pleno</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">Requisitos</div><div class="step-sub">5 skills · vaga afirmativa</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step atual"><div class="step-bola">3</div><div><div class="step-titulo">Remuneração</div><div class="step-sub">Salário, benefícios</div></div></div>
+        <div class="step-linha"></div>
+        <div class="step"><div class="step-bola">4</div><div><div class="step-titulo">Fluxo de aprovação</div><div class="step-sub">Quem aprova proposta</div></div></div>
+        <div class="step-linha"></div>
+        <div class="step"><div class="step-bola">5</div><div><div class="step-titulo">Publicação</div><div class="step-sub">Canais e revisão</div></div></div>
+      </div>
+
+      <div class="painel">
+        <h3>3. <em>Remuneração</em> e benefícios</h3>
+        <p class="sub-titulo">Faixa salarial · transparência · pacote total</p>
+
+        <div class="alert alert-marinho" style="margin-bottom:24px">
+          <span class="ic-grande">📊</span>
+          <div>
+            <strong>Benchmark do mercado (IA · 28 clientes Oi Nora)</strong>
+            Eng. Civil Pleno em BH/MG: P25 <strong style="color:var(--laranja)">R$ 7.500</strong> · Mediana <strong style="color:var(--laranja)">R$ 9.500</strong> · P75 <strong style="color:var(--laranja)">R$ 11.500</strong>. Para vagas afirmativas, sugiro pagar acima da mediana — aumenta diversidade do funil em 40%.
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Faixa salarial <span class="obrig">*</span></label>
+          <div class="campo-grid-2">
+            <div>
+              <input value="R$ 8.500" placeholder="Mínimo"/>
+              <div class="hint">Mínimo (proposta inicial)</div>
+            </div>
+            <div>
+              <input value="R$ 11.000" placeholder="Máximo"/>
+              <div class="hint">Máximo (top performer)</div>
+            </div>
+          </div>
+
+          <!-- Slider visual -->
+          <div class="salario-bar">
+            <div class="salario-faixa" style="left:18%;width:32%"></div>
+            <div class="salario-marca" style="left:42%"></div>
+          </div>
+          <div class="salario-labels">
+            <span>R$ 6k</span><span>R$ 8k</span><span>R$ 10k</span><span>R$ 12k</span><span>R$ 14k</span>
+          </div>
+          <div class="salario-info">
+            <span>Posição no mercado: <strong>P50–P70</strong> (competitivo)</span>
+            <span>Aurora aprovou até: <strong>R$ 12.500</strong> · plano de cargos</span>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Exibir salário na vaga para o candidato?</label>
+          <div class="opcao-grade-3">
+            <label class="opcao-card selecionado">
+              <input type="radio" name="exibir-sal" checked/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">👁 Exibir faixa</div>
+                <div class="opcao-card-desc">"R$ 8.500–11.000" · transparente, atrai melhor</div>
+              </div>
+            </label>
+            <label class="opcao-card">
+              <input type="radio" name="exibir-sal"/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">💬 "A combinar"</div>
+                <div class="opcao-card-desc">Não exibe · candidato pode estimar</div>
+              </div>
+            </label>
+            <label class="opcao-card">
+              <input type="radio" name="exibir-sal"/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">🤐 Confidencial</div>
+                <div class="opcao-card-desc">Só após primeira entrevista</div>
+              </div>
+            </label>
+          </div>
+          <div class="hint">📈 Vagas com faixa exibida recebem <strong>71% mais candidatos qualificados</strong> e reduzem perda no fim do processo.</div>
+        </div>
+
+        <div class="campo">
+          <label>Benefícios da empresa</label>
+          <div class="opcao-grade">
+            <label class="opcao-card selecionado">
+              <input type="checkbox" checked/>
+              <div class="opcao-card-info"><div class="opcao-card-titulo">🍽 Vale-refeição</div><div class="opcao-card-desc">R$ 35/dia · Flash</div></div>
+            </label>
+            <label class="opcao-card selecionado">
+              <input type="checkbox" checked/>
+              <div class="opcao-card-info"><div class="opcao-card-titulo">🚌 Vale-transporte</div><div class="opcao-card-desc">Conforme legislação</div></div>
+            </label>
+            <label class="opcao-card selecionado">
+              <input type="checkbox" checked/>
+              <div class="opcao-card-info"><div class="opcao-card-titulo">🏥 Plano de saúde</div><div class="opcao-card-desc">Unimed · titular + dependentes</div></div>
+            </label>
+            <label class="opcao-card selecionado">
+              <input type="checkbox" checked/>
+              <div class="opcao-card-info"><div class="opcao-card-titulo">🦷 Plano odontológico</div><div class="opcao-card-desc">Uniodonto</div></div>
+            </label>
+            <label class="opcao-card selecionado">
+              <input type="checkbox" checked/>
+              <div class="opcao-card-info"><div class="opcao-card-titulo">📚 Auxílio educação</div><div class="opcao-card-desc">Até R$ 500/mês</div></div>
+            </label>
+            <label class="opcao-card">
+              <input type="checkbox"/>
+              <div class="opcao-card-info"><div class="opcao-card-titulo">💳 Vale-cultura</div><div class="opcao-card-desc">Sem aderência ainda</div></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>PLR / Bônus variável</label>
+          <textarea rows="2">Participação nos Lucros (PLR) anual · até 2,5 salários · vinculada a metas individuais e da empresa.</textarea>
+        </div>
+
+        <div class="campo">
+          <label>Pacote total estimado (proposta competitiva)</label>
+          <div class="alert alert-verde" style="margin-bottom:0">
+            <span class="ic-grande">💰</span>
+            <div>
+              <strong>Salário + benefícios + PLR ≈ R$ 13.200/mês equivalente</strong>
+              Acima da mediana do mercado em ~12%. Use esse cálculo nas conversas finais com o candidato.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>Passo 3 de 5</strong> · Faixa R$ 8.5k–11k · 5 benefícios · pacote ≈ R$ 13.2k
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-passo2')">← Voltar</button>
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-passo4')">Continuar para Aprovação →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: PASSO 4 - FLUXO DE APROVAÇÃO -->
+<!-- ============================================== -->
+<div class="tela" id="t-passo4">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item ativo"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-item outro"><span class="ic">💬</span> Chat com Oi Nora</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Vagas</a> &gt; <a onclick="irPara('t-passo1')">Nova vaga</a> &gt; <span style="color:var(--laranja)">Fluxo de Aprovação</span></div>
+
+      <div class="topbar">
+        <div>
+          <h1>Nova <em>vaga</em> · Eng. Civil Pleno</h1>
+          <p class="topbar-meta">Quem aprova a proposta final do candidato escolhido?</p>
+        </div>
+      </div>
+
+      <div class="stepper">
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">O que procuramos</div><div class="step-sub">Eng. Civil Pleno</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">Requisitos</div><div class="step-sub">5 skills · vaga afirmativa</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">Remuneração</div><div class="step-sub">R$ 8.5k–11k</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step atual"><div class="step-bola">4</div><div><div class="step-titulo">Fluxo de aprovação</div><div class="step-sub">Quem aprova</div></div></div>
+        <div class="step-linha"></div>
+        <div class="step"><div class="step-bola">5</div><div><div class="step-titulo">Publicação</div><div class="step-sub">Canais e revisão</div></div></div>
+      </div>
+
+      <div class="painel">
+        <h3>4. Fluxo de <em>aprovação</em></h3>
+        <p class="sub-titulo">Defina os aprovadores da proposta final</p>
+
+        <div class="alert alert-laranja">
+          <span class="ic-grande">ℹ</span>
+          <div>
+            <strong>Por que isso importa?</strong>
+            O fluxo abaixo é acionado <strong>quando você decide enviar oferta para um candidato</strong> — não na publicação. Cada aprovador recebe notificação no app + e-mail e tem 48h para responder, senão escala automaticamente.
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Modelo de fluxo</label>
+          <div class="opcao-grade-3">
+            <label class="opcao-card selecionado">
+              <input type="radio" name="fluxo" checked/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">📋 Padrão da empresa</div>
+                <div class="opcao-card-desc">Gestor → RH → Diretoria Financeira (se &gt; R$ 10k)</div>
+              </div>
+            </label>
+            <label class="opcao-card">
+              <input type="radio" name="fluxo"/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">⚡ Simplificado</div>
+                <div class="opcao-card-desc">Apenas gestor direto</div>
+              </div>
+            </label>
+            <label class="opcao-card">
+              <input type="radio" name="fluxo"/>
+              <div class="opcao-card-info">
+                <div class="opcao-card-titulo">🛠 Personalizado</div>
+                <div class="opcao-card-desc">Construa seu fluxo abaixo</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="campo" style="margin-top:24px">
+          <label>Fluxo aplicado a esta vaga</label>
+
+          <div class="aprovador-fluxo">
+            <div class="aprovador-item">
+              <div class="aprovador-num">1</div>
+              <div class="aprovador-info-pessoa">
+                <div class="av-mini av-b">L</div>
+                <div>
+                  <div style="font-size:14px;font-weight:500">Luísa Mendonça</div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Diretora de Engenharia · gestora direta</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="tag laranja">Sempre</span>
+                <button class="btn btn-fantasma btn-xs">⋮</button>
+              </div>
+            </div>
+
+            <div class="aprovador-item">
+              <div class="aprovador-num">2</div>
+              <div class="aprovador-info-pessoa">
+                <div class="av-mini av-b">RA</div>
+                <div>
+                  <div style="font-size:14px;font-weight:500">Roberto Aurora <span class="tag" style="font-size:9px;margin-left:6px">VOCÊ</span></div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Diretor de RH · valida fit cultural e enquadramento</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="tag laranja">Sempre</span>
+                <button class="btn btn-fantasma btn-xs">⋮</button>
+              </div>
+            </div>
+
+            <div class="aprovador-item" style="background:var(--amarelo-cl);border-color:var(--amarelo)">
+              <div class="aprovador-num" style="background:var(--amarelo)">3</div>
+              <div class="aprovador-info-pessoa">
+                <div class="av-mini av-c">ES</div>
+                <div>
+                  <div style="font-size:14px;font-weight:500">Eduardo Santos <span class="tag amarelo" style="font-size:9px;margin-left:6px">CONDICIONAL</span></div>
+                  <div style="font-family:var(--ui);font-size:11px;color:var(--cinza)">Dir. Financeiro · só se proposta &gt; R$ 10.000</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="tag" style="background:#fff;border-color:var(--amarelo);color:#876715">limite R$ 50k</span>
+                <button class="btn btn-fantasma btn-xs">⋮</button>
+              </div>
+            </div>
+
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;padding:14px;border-style:dashed">+ Adicionar aprovador</button>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>Regras adicionais</label>
+          <div style="display:flex;flex-direction:column;gap:10px;font-family:var(--ui);font-size:13px">
+            <label style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--cinza-fundo);border-radius:2px;cursor:pointer">
+              <input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--laranja)"/>
+              <span>⏱ Auto-escala para o nível acima se o aprovador não responder em <strong>48h</strong></span>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--cinza-fundo);border-radius:2px;cursor:pointer">
+              <input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--laranja)"/>
+              <span>📧 Notificar candidato apenas <strong>após</strong> todas as aprovações</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--cinza-fundo);border-radius:2px;cursor:pointer">
+              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--laranja)"/>
+              <span>🚨 Permitir override pelo CEO em caso de urgência (Alfredo Aurora)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>Passo 4 de 5</strong> · 3 aprovadores · auto-escala em 48h
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-passo3')">← Voltar</button>
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-passo5')">Continuar para Publicação →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: PASSO 5 - PUBLICAÇÃO E REVISÃO -->
+<!-- ============================================== -->
+<div class="tela" id="t-passo5">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item ativo"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-item outro"><span class="ic">💬</span> Chat com Oi Nora</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">RA</div><div><div class="nome">Roberto Aurora</div><div class="cargo">Dir. RH</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Vagas</a> &gt; <a onclick="irPara('t-passo1')">Nova vaga</a> &gt; <span style="color:var(--laranja)">Publicação</span></div>
+
+      <div class="topbar">
+        <div>
+          <h1>Nova <em>vaga</em> · Eng. Civil Pleno</h1>
+          <p class="topbar-meta">Quase lá! Escolha os canais de divulgação e revise tudo antes de publicar</p>
+        </div>
+      </div>
+
+      <div class="stepper">
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">O que procuramos</div><div class="step-sub">Eng. Civil Pleno</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">Requisitos</div><div class="step-sub">5 skills · vaga afirmativa</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">Remuneração</div><div class="step-sub">R$ 8.5k–11k</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step concluida"><div class="step-bola">✓</div><div><div class="step-titulo">Fluxo de aprovação</div><div class="step-sub">3 aprovadores</div></div></div>
+        <div class="step-linha concluida"></div>
+        <div class="step atual"><div class="step-bola">5</div><div><div class="step-titulo">Publicação</div><div class="step-sub">Canais e revisão</div></div></div>
+      </div>
+
+      <div class="painel">
+        <h3>5. Canais de <em>publicação</em></h3>
+        <p class="sub-titulo">Onde a vaga vai aparecer · todas as opções são incluídas no plano Premium</p>
+
+        <div class="canal-pub">
+          <div class="canal-card ativo">
+            <div class="canal-card-head">
+              <h5>🌐 Portal Oi Nora</h5>
+              <div class="toggle"></div>
+            </div>
+            <p class="canal-card-desc">Vaga pública em <strong>oinora.com.br/vagas</strong> · 2.847 candidatos no banco</p>
+            <div class="canal-card-stats">~120 candidaturas em 21 dias</div>
+          </div>
+
+          <div class="canal-card ativo">
+            <div class="canal-card-head">
+              <h5>🔍 Banco de Talentos · IA</h5>
+              <div class="toggle"></div>
+            </div>
+            <p class="canal-card-desc">Mariana convoca proativamente <strong>5-10 candidatos</strong> que dão match acima de 80%</p>
+            <div class="canal-card-stats">Inclui no plano</div>
+          </div>
+
+          <div class="canal-card ativo">
+            <div class="canal-card-head">
+              <h5>💼 LinkedIn</h5>
+              <div class="toggle"></div>
+            </div>
+            <p class="canal-card-desc">Anúncio pago segmentado · alcance de ~3.500 profissionais</p>
+            <div class="canal-card-stats">Custo: R$ 380 · pago à parte</div>
+          </div>
+
+          <div class="canal-card">
+            <div class="canal-card-head">
+              <h5>📰 Catho · InfoJobs · Vagas.com</h5>
+              <div class="toggle"></div>
+            </div>
+            <p class="canal-card-desc">Distribui em redes parceiras · maior volume, qualidade variável</p>
+            <div class="canal-card-stats">Inclui no plano · ativar?</div>
+          </div>
+
+          <div class="canal-card">
+            <div class="canal-card-head">
+              <h5>👥 Indicação interna</h5>
+              <div class="toggle"></div>
+            </div>
+            <p class="canal-card-desc">Envia para os 128 empregados da Aurora · <strong>bônus R$ 800</strong> por contratação</p>
+            <div class="canal-card-stats">Conversão 4× maior</div>
+          </div>
+
+          <div class="canal-card">
+            <div class="canal-card-head">
+              <h5>🌐 Página de carreiras Aurora</h5>
+              <div class="toggle"></div>
+            </div>
+            <p class="canal-card-desc">Vagas em <strong>vagas.construtoraaurora.com.br</strong> (white-label)</p>
+            <div class="canal-card-stats">Inclui no Premium</div>
+          </div>
+        </div>
+
+        <div class="campo" style="margin-top:24px">
+          <label>Cronograma da vaga</label>
+          <div class="campo-grid-2">
+            <div>
+              <input type="date" value="2026-05-27"/>
+              <div class="hint">Publicação imediata</div>
+            </div>
+            <div>
+              <input type="date" value="2026-07-15"/>
+              <div class="hint">Encerramento automático (SLA 45 dias)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>📋 Revisão <em>final</em></h3>
+        <p class="sub-titulo">Como a vaga vai aparecer para o candidato</p>
+
+        <div class="preview-vaga">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="tag laranja">⭐ Vaga afirmativa para mulheres</span>
+            <span class="tag verde">Aceita candidaturas</span>
+            <span class="tag marinho">Híbrido</span>
+          </div>
+          <h2 class="preview-vaga-titulo">Engenheira/o Civil Pleno (Vaga Afirmativa Mulheres)</h2>
+          <div class="preview-vaga-meta">
+            <span>🏢 <strong>Construtora Aurora</strong></span>
+            <span>📍 Belo Horizonte/MG · Híbrido</span>
+            <span>💼 CLT · efetivo</span>
+            <span>💰 R$ 8.500 – R$ 11.000</span>
+          </div>
+
+          <div class="preview-secao">
+            <h5>Sobre a vaga</h5>
+            <p>Procuramos um(a) Engenheiro(a) Civil Pleno(a) com experiência em planejamento e controle de obras residenciais de médio porte, para integrar a equipe de Luísa Mendonça no projeto Sítio II.</p>
+          </div>
+
+          <div class="preview-secao">
+            <h5>Responsabilidades</h5>
+            <ul>
+              <li>Planejamento e controle do cronograma físico-financeiro de obras</li>
+              <li>Coordenação técnica com mestres de obras e empreiteiros</li>
+              <li>Acompanhamento de medições, aditivos e diários de obra</li>
+              <li>Garantia de conformidade com normas técnicas (NBR) e CREA</li>
+            </ul>
+          </div>
+
+          <div class="preview-secao">
+            <h5>Requisitos obrigatórios</h5>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+              <span class="tag">Eng. Civil completa · CREA</span>
+              <span class="tag">3+ anos exp.</span>
+              <span class="tag">Sienge</span>
+              <span class="tag">AutoCAD</span>
+              <span class="tag">MS Project</span>
+              <span class="tag">Planejamento de obras</span>
+            </div>
+          </div>
+
+          <div class="preview-secao">
+            <h5>Benefícios</h5>
+            <p style="font-family:var(--ui);font-size:13px;line-height:1.7">🍽 VR R$ 35/dia · 🚌 VT · 🏥 Plano de saúde Unimed · 🦷 Plano odontológico · 📚 Auxílio educação R$ 500/mês · 💰 PLR até 2,5 salários</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-verde">
+        <span class="ic-grande">✓</span>
+        <div>
+          <strong>Tudo pronto!</strong>
+          Vaga será publicada em 4 canais imediatamente após sua confirmação. Mariana Costa será notificada e começa a curadoria amanhã. SLA combinado: <strong>até 30/06</strong> (24 dias).
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>Passo 5 de 5</strong> · 4 canais ativos · revisão completa
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-passo4')">← Voltar</button>
+          <button class="btn btn-fantasma btn-sm">💾 Salvar como rascunho</button>
+          <button class="btn btn-primario btn-sm">🚀 Publicar vaga</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Wizard Vaga — Passo:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-passo1">1. O que procuramos</option>
+    <option value="t-passo2">2. Requisitos</option>
+    <option value="t-passo3">3. Remuneração</option>
+    <option value="t-passo4">4. Fluxo de Aprovação</option>
+    <option value="t-passo5">5. Publicação</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+
+// Opção cards
+document.querySelectorAll('.opcao-card').forEach(c=>{
+  c.addEventListener('click',function(e){
+    const inp = this.querySelector('input');
+    if(!inp) return;
+    if(inp.type==='radio'){
+      document.querySelectorAll('input[name="'+inp.name+'"]').forEach(r=>{
+        r.closest('.opcao-card').classList.remove('selecionado');
+      });
+      inp.checked = true;
+      this.classList.add('selecionado');
+    } else {
+      if(e.target.tagName!=='INPUT') inp.checked = !inp.checked;
+      setTimeout(()=>{
+        if(inp.checked) this.classList.add('selecionado');
+        else this.classList.remove('selecionado');
+      },0);
+    }
+  });
+});
+
+// Toggle canais
+document.querySelectorAll('.canal-card .toggle').forEach(t=>{
+  t.addEventListener('click',function(e){
+    e.stopPropagation();
+    this.closest('.canal-card').classList.toggle('ativo');
+  });
+});
+document.querySelectorAll('.canal-card').forEach(c=>{
+  c.addEventListener('click',function(){
+    this.classList.toggle('ativo');
+  });
+});
+</script>
+</body>
+</html>

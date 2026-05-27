@@ -1,0 +1,59 @@
+# =================================================
+# Oi Nora · root .gitignore
+# =================================================
+
+# --- Node.js / Next.js (no subdiretório oinora/) ---
+oinora/node_modules/
+oinora/.next/
+oinora/out/
+oinora/build/
+oinora/.turbo/
+
+# --- Env files (não commitar segredos) ---
+**/.env
+**/.env.local
+**/.env.*.local
+**/.env.development
+**/.env.production
+# permitir templates de exemplo
+!**/.env.example
+!**/.env.local.example
+
+# --- Dependências e logs ---
+**/.pnp
+**/.pnp.*
+**/.yarn/cache
+**/coverage/
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# --- TypeScript ---
+**/*.tsbuildinfo
+**/next-env.d.ts
+
+# --- Deploy ---
+**/.vercel
+**/.netlify
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Supabase ---
+**/.branches/
+**/.temp/
+
+# --- Claude Code (local per-project config — não commitar) ---
+.claude/
+memory/

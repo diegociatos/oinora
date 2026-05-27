@@ -1,0 +1,23 @@
+# =================================================
+# Oi Nora · configuração de deploy Netlify
+# =================================================
+# O Next.js fica no subdiretório oinora/ — informamos isso ao Netlify via "base".
+# Plugin @netlify/plugin-nextjs é detectado automaticamente.
+
+[build]
+  base    = "oinora"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Headers de segurança aplicados a todas as respostas
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options          = "DENY"
+    X-Content-Type-Options   = "nosniff"
+    Referrer-Policy          = "strict-origin-when-cross-origin"
+    Permissions-Policy       = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"

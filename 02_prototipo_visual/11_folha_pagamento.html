@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Folha de Pagamento (Maio/2026)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-marinho:hover{background:var(--marinho-esc)}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-verde{background:var(--verde);color:white}
+  .btn-verde:hover{background:#1F5740}
+  .btn-perigo{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  /* SHELL */
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--marinho);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.12);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#D4A02C,#A37614);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  /* HEADER FOLHA */
+  .folha-header{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border:1px solid var(--cinza-cl);border-radius:2px;padding:24px 28px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+  .folha-header h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .folha-header h1 em{color:var(--laranja);font-style:italic}
+  .folha-header .competencia{font-family:var(--ui);font-size:12px;color:var(--cinza);letter-spacing:.5px;margin-top:6px}
+  .folha-header .competencia strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:16px;font-weight:400}
+  .folha-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .folha-header-acoes{display:flex;flex-direction:column;gap:8px}
+
+  /* ABAS */
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;overflow-x:auto;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:0 6px}
+  .aba{padding:14px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .aba:hover{color:var(--marinho)}
+  .aba.ativa{color:var(--laranja);border-bottom-color:var(--laranja)}
+  .aba .ic{font-size:14px}
+  .aba .cnt{background:var(--cinza-fundo);font-size:10px;padding:1px 7px;border-radius:10px;letter-spacing:.3px;font-weight:700;color:var(--cinza)}
+  .aba.ativa .cnt{background:var(--laranja);color:white}
+  .aba .alerta{background:var(--vermelho);color:white;font-size:10px;padding:1px 7px;border-radius:10px;letter-spacing:.3px;font-weight:700}
+
+  /* WIZARD DE FECHAMENTO */
+  .wizard-fechamento{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:22px;margin-bottom:18px}
+  .wizard-fechamento-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+  .wizard-fechamento-titulo{font-size:17px;font-weight:500}
+  .wizard-fechamento-titulo em{color:var(--laranja);font-style:italic}
+  .wizard-sub{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px}
+  .progresso-bar{position:relative;height:8px;background:var(--cinza-fundo);border-radius:4px;overflow:hidden;margin-bottom:6px}
+  .progresso-bar-preenchimento{height:100%;background:linear-gradient(90deg,var(--verde),#1F5740);border-radius:4px;transition:width .3s}
+  .progresso-percent{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;text-align:right}
+  .progresso-percent strong{color:var(--verde);font-family:var(--serif);font-style:italic;font-size:13px}
+
+  .checklist-fechamento{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+  .check-item{padding:10px 14px;border:1px solid var(--cinza-cl);border-radius:2px;background:var(--branco);display:flex;align-items:center;gap:10px;font-family:var(--ui);font-size:12.5px}
+  .check-item.feito{background:var(--verde-cl);border-color:var(--verde)}
+  .check-item.pendente{background:var(--amarelo-cl);border-color:var(--amarelo)}
+  .check-item .ic-status{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0}
+  .check-item.feito .ic-status{background:var(--verde)}
+  .check-item.pendente .ic-status{background:var(--amarelo)}
+  .check-item .info{flex:1;min-width:0}
+  .check-item .titulo-c{font-weight:500;color:var(--marinho)}
+  .check-item .sub-c{font-size:10.5px;color:var(--cinza);margin-top:2px}
+
+  /* KPIS GRID */
+  .kpis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .kpi.destaque{background:linear-gradient(135deg,var(--branco) 50%,var(--laranja-cl));border-color:var(--laranja)}
+  .kpi-titulo{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .kpi-valor{font-size:24px;font-weight:400;color:var(--marinho);line-height:1;letter-spacing:-.3px;font-family:var(--serif);font-style:italic}
+  .kpi-valor em{color:var(--laranja)}
+  .kpi-valor span{font-size:13px;color:var(--cinza);font-style:normal}
+  .kpi-delta{font-family:var(--ui);font-size:11px;margin-top:6px;letter-spacing:.3px;display:flex;align-items:center;gap:4px}
+  .kpi-delta.up{color:var(--verde)}
+  .kpi-delta.down{color:var(--vermelho)}
+  .kpi-delta.neutro{color:var(--cinza)}
+
+  /* PAINEL */
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px;letter-spacing:-.2px}
+  .painel h3 em{color:var(--laranja);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  .painel-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:14px;flex-wrap:wrap}
+
+  /* TAGS */
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+
+  /* ALERT */
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-marinho{background:var(--marinho);color:var(--papel);border:none;position:relative;overflow:hidden}
+  .alert-marinho::before{content:"";position:absolute;top:-30%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.15) 0%,transparent 65%);pointer-events:none}
+  .alert-marinho > *{position:relative}
+  .alert-amarelo{background:var(--amarelo-cl);border-left:3px solid var(--amarelo);color:#876715}
+  .alert-verde{background:var(--verde-cl);border-left:3px solid var(--verde);color:var(--marinho)}
+  .alert-laranja{background:var(--laranja-cl);border-left:3px solid var(--laranja);color:var(--marinho)}
+  .alert-vermelho{background:var(--vermelho-cl);border-left:3px solid var(--vermelho);color:var(--marinho)}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* COMPOSIÇÃO DA FOLHA */
+  .composicao-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .comp-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:20px}
+  .comp-card h4{font-size:14px;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .comp-linha{display:flex;justify-content:space-between;padding:8px 0;font-family:var(--ui);font-size:12.5px;border-bottom:1px solid var(--cinza-cl)}
+  .comp-linha:last-child{border:none}
+  .comp-linha.total{margin-top:8px;padding-top:14px;border-top:2px solid var(--marinho);border-bottom:none;font-weight:600;font-family:var(--serif);font-size:14px}
+  .comp-linha .valor-r{color:var(--marinho);font-weight:500}
+  .comp-linha.total .valor-r{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--laranja)}
+
+  /* BAR HORIZONTAL DE COMPOSIÇÃO */
+  .barra-comp{display:flex;height:36px;border-radius:2px;overflow:hidden;margin:8px 0 14px;border:1px solid var(--cinza-cl)}
+  .barra-seg{display:flex;align-items:center;justify-content:center;color:white;font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.3px;padding:0 8px;min-width:40px}
+  .seg-sal{background:var(--marinho)}
+  .seg-enc{background:var(--laranja)}
+  .seg-ben{background:var(--verde)}
+  .seg-out{background:var(--cinza)}
+  .barra-legend{display:flex;gap:14px;font-family:var(--ui);font-size:11px;color:var(--cinza);flex-wrap:wrap}
+  .barra-legend-item{display:flex;align-items:center;gap:6px}
+  .barra-legend-item .quad{width:10px;height:10px;border-radius:2px}
+
+  /* TABELA EMPREGADOS */
+  .tabela{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden}
+  .tab-linha{padding:13px 22px;border-bottom:1px solid var(--cinza-cl);display:grid;grid-template-columns:2.2fr 1.2fr 1fr 1fr 1fr 100px;gap:14px;align-items:center;transition:background .15s;font-family:var(--ui);font-size:12.5px}
+  .tab-linha:hover{background:var(--cinza-fundo)}
+  .tab-linha:last-child{border-bottom:none}
+  .tab-linha.head{background:var(--cinza-fundo);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700}
+  .tab-linha.head:hover{background:var(--cinza-fundo)}
+  .tab-linha.alerta{background:var(--amarelo-cl)}
+  .tab-linha.erro{background:var(--vermelho-cl)}
+  .tab-pessoa{display:flex;align-items:center;gap:10px;min-width:0}
+  .tab-av{width:34px;height:34px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:13px;flex-shrink:0;font-weight:600}
+  .av-a{background:linear-gradient(135deg,#E8633A,#C94E28)}
+  .av-b{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .av-c{background:linear-gradient(135deg,#7E5BCC,#5B3FA0)}
+  .av-d{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .av-e{background:linear-gradient(135deg,#D4A02C,#A37614)}
+  .av-f{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .tab-nome{font-size:13px;font-weight:500;line-height:1.2;color:var(--marinho);font-family:var(--serif)}
+  .tab-meta{font-size:10.5px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+  .valor-mon{font-family:var(--serif);font-style:italic;color:var(--marinho)}
+  .valor-pos{color:var(--verde);font-weight:600}
+  .valor-neg{color:var(--vermelho);font-weight:600}
+
+  /* FILTROS */
+  .filtros-bar{background:var(--branco);border:1px solid var(--cinza-cl);padding:14px 18px;border-radius:2px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .filtros-bar input,.filtros-bar select{padding:8px 12px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:13px;color:var(--marinho);border-radius:2px}
+  .filtros-bar .busca{flex:1;min-width:240px;position:relative}
+  .filtros-bar .busca input{width:100%;padding-left:34px}
+  .filtros-bar .busca span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--cinza)}
+
+  /* SUMÁRIO LATERAL */
+  .grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+
+  /* DEPARTAMENTOS */
+  .dept-grid{display:flex;flex-direction:column;gap:10px}
+  .dept-item{padding:12px 14px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;font-family:var(--ui);font-size:12px}
+  .dept-info{display:flex;flex-direction:column}
+  .dept-nome{font-weight:500;color:var(--marinho);font-size:12.5px}
+  .dept-meta{font-size:10px;color:var(--cinza);margin-top:2px}
+  .dept-barra{width:60px;height:6px;background:var(--cinza-fundo);border-radius:3px;overflow:hidden}
+  .dept-barra-fill{height:100%;background:var(--laranja)}
+  .dept-valor{font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:13px;min-width:75px;text-align:right}
+
+  /* HOLERITE PRÉVIA */
+  .holerite-prev{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;font-family:var(--ui);font-size:12px}
+  .holerite-head{padding-bottom:14px;border-bottom:2px solid var(--marinho);margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-end}
+  .holerite-head h4{font-family:var(--serif);font-size:18px;font-weight:400}
+  .holerite-meta-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--cinza-cl)}
+  .holerite-meta-item .rotulo-h{font-size:9px;letter-spacing:1.5px;color:var(--cinza);text-transform:uppercase;font-weight:700}
+  .holerite-meta-item .valor-h{font-size:13px;color:var(--marinho);margin-top:3px;font-weight:500}
+  .holerite-tabela{width:100%;border-collapse:collapse}
+  .holerite-tabela th{text-align:left;font-size:9px;letter-spacing:1.5px;color:var(--cinza);text-transform:uppercase;font-weight:700;padding:8px 0;border-bottom:1px solid var(--cinza-cl)}
+  .holerite-tabela th:nth-child(2),.holerite-tabela th:nth-child(3),.holerite-tabela th:nth-child(4){text-align:right}
+  .holerite-tabela td{padding:8px 0;border-bottom:1px solid var(--cinza-cl);font-size:11.5px}
+  .holerite-tabela td:nth-child(2),.holerite-tabela td:nth-child(3),.holerite-tabela td:nth-child(4){text-align:right;font-family:var(--serif);font-style:italic;color:var(--marinho)}
+  .holerite-tabela td.cod{font-family:'SF Mono',monospace;color:var(--cinza);font-size:10px;width:50px}
+  .holerite-tabela tr.total-row td{font-weight:700;font-family:var(--serif);font-style:italic;font-size:15px;color:var(--laranja);border-bottom:none;padding-top:14px;border-top:2px solid var(--marinho)}
+
+  /* RELATORIOS / FISCAL */
+  .relat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .relat-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+  .relat-card.feito{border-left:3px solid var(--verde)}
+  .relat-card.pendente{border-left:3px solid var(--amarelo)}
+  .relat-card.erro{border-left:3px solid var(--vermelho)}
+  .relat-ic{width:46px;height:46px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--cinza-fundo)}
+  .relat-titulo{font-size:14px;font-weight:500;line-height:1.2}
+  .relat-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px;letter-spacing:.3px}
+
+  /* AÇÕES RODAPÉ */
+  .acoes-rodape{position:sticky;bottom:0;background:var(--branco);border-top:1px solid var(--cinza-cl);padding:16px 36px;display:flex;justify-content:space-between;align-items:center;margin:24px -36px -60px;gap:14px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,.05);z-index:10}
+  .acoes-info{font-family:var(--ui);font-size:12px;color:var(--cinza)}
+  .acoes-info strong{color:var(--marinho)}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:88px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;cursor:pointer;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  @media (max-width:1050px){
+    .kpis-grid{grid-template-columns:repeat(2,1fr)}
+    .composicao-grid,.grid-2-1,.relat-grid,.checklist-fechamento{grid-template-columns:1fr}
+    .tab-linha{grid-template-columns:1fr;gap:8px;padding:12px 16px}
+    .holerite-meta-row{grid-template-columns:1fr 1fr}
+    .folha-header{grid-template-columns:1fr;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TELA 1: DASHBOARD DA FOLHA -->
+<!-- ============================================== -->
+<div class="tela ativa" id="t-dashboard-folha">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item ativo"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Folha</a> &gt; <span style="color:var(--laranja)">Fechamento Maio/2026</span></div>
+
+      <!-- HEADER -->
+      <div class="folha-header">
+        <div>
+          <h1>Folha · <em>Maio/2026</em></h1>
+          <div class="competencia">Competência <strong>05/2026</strong> · 128 empregados · pagamento previsto <strong>05/06/2026</strong></div>
+          <div class="folha-tags">
+            <span class="tag amarelo">⚠ Em conferência · 4 alertas</span>
+            <span class="tag">Cálculo automático ✓</span>
+            <span class="tag">eSocial pronto</span>
+            <span class="tag">FGTS DCTFWeb pendente</span>
+          </div>
+        </div>
+        <div class="folha-header-acoes">
+          <select style="padding:8px 12px;border:1px solid var(--cinza-cl);font-family:var(--serif);font-size:13px;border-radius:2px;background:var(--branco)">
+            <option>Maio/2026 (atual)</option>
+            <option>Abril/2026</option>
+            <option>Março/2026</option>
+            <option>13º salário 2025</option>
+          </select>
+          <button class="btn btn-fantasma btn-sm">📋 Histórico de folhas</button>
+        </div>
+      </div>
+
+      <!-- WIZARD DE FECHAMENTO -->
+      <div class="wizard-fechamento">
+        <div class="wizard-fechamento-head">
+          <div>
+            <div class="wizard-fechamento-titulo">Checklist de <em>fechamento</em></div>
+            <div class="wizard-sub">5 etapas · você precisa concluir todas para fechar a folha</div>
+          </div>
+          <div style="flex:1;min-width:200px;max-width:300px">
+            <div class="progresso-bar">
+              <div class="progresso-bar-preenchimento" style="width:60%"></div>
+            </div>
+            <div class="progresso-percent"><strong>3 de 5</strong> etapas concluídas · 60%</div>
+          </div>
+        </div>
+
+        <div class="checklist-fechamento">
+          <div class="check-item feito">
+            <div class="ic-status">✓</div>
+            <div class="info">
+              <div class="titulo-c">1. Importar ponto eletrônico</div>
+              <div class="sub-c">128 empregados · concluído ontem por Bruna</div>
+            </div>
+          </div>
+          <div class="check-item feito">
+            <div class="ic-status">✓</div>
+            <div class="info">
+              <div class="titulo-c">2. Aplicar eventos do mês</div>
+              <div class="sub-c">23 eventos · férias, faltas, h.extras, ajustes</div>
+            </div>
+          </div>
+          <div class="check-item feito">
+            <div class="ic-status">✓</div>
+            <div class="info">
+              <div class="titulo-c">3. Calcular folha (motor IA)</div>
+              <div class="sub-c">processado em 47s · 4 alertas detectados</div>
+            </div>
+          </div>
+          <div class="check-item pendente">
+            <div class="ic-status">⚠</div>
+            <div class="info">
+              <div class="titulo-c">4. Conferir &amp; tratar alertas</div>
+              <div class="sub-c">4 pendências · Fernanda Toledo (R$ 0), Pedro Aurélio (h.extras 60h+), 2 outros</div>
+            </div>
+          </div>
+          <div class="check-item pendente">
+            <div class="ic-status">⏳</div>
+            <div class="info">
+              <div class="titulo-c">5. Fechar &amp; gerar arquivos</div>
+              <div class="sub-c">holerites · eSocial S-1200 · DCTFWeb · FGTS · CAGED</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERTAS -->
+      <div class="alert alert-amarelo">
+        <span class="ic-grande">⚠</span>
+        <div>
+          <strong>4 alertas precisam da sua atenção</strong>
+          Antes de fechar, revise os pontos sinalizados pela IA. <a onclick="irPara('t-conferencia')" style="color:#876715;font-weight:700;text-decoration:underline">Ir para conferência →</a>
+        </div>
+      </div>
+
+      <!-- KPIS -->
+      <div class="kpis-grid">
+        <div class="kpi destaque">
+          <div class="kpi-titulo">Folha bruta total</div>
+          <div class="kpi-valor"><em>R$ 1.948.7K</em></div>
+          <div class="kpi-delta up">▲ +2,1% vs abril (+R$ 40,2k)</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Encargos &amp; impostos</div>
+          <div class="kpi-valor">R$ 642.1K</div>
+          <div class="kpi-delta up">▲ +1,8% · INSS+FGTS+IRRF</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Benefícios</div>
+          <div class="kpi-valor">R$ 198.4K</div>
+          <div class="kpi-delta neutro">≈ estável · VR+saúde+odonto</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Custo total empresa</div>
+          <div class="kpi-valor"><em>R$ 2.789.2K</em></div>
+          <div class="kpi-delta up">▲ +2,2% · 128 empregados ativos</div>
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div>
+          <!-- COMPOSIÇÃO -->
+          <div class="painel">
+            <h3>Composição da <em>folha</em></h3>
+            <p class="sub-titulo">Como o custo se distribui</p>
+
+            <div class="barra-comp">
+              <div class="barra-seg seg-sal" style="flex:1.948">SALÁRIOS 69,9%</div>
+              <div class="barra-seg seg-enc" style="flex:.642">ENCARGOS 23,0%</div>
+              <div class="barra-seg seg-ben" style="flex:.198">BEN. 7,1%</div>
+            </div>
+            <div class="barra-legend">
+              <div class="barra-legend-item"><div class="quad" style="background:var(--marinho)"></div>Salários + variáveis</div>
+              <div class="barra-legend-item"><div class="quad" style="background:var(--laranja)"></div>Encargos (INSS, FGTS, IRRF, RAT, SAT)</div>
+              <div class="barra-legend-item"><div class="quad" style="background:var(--verde)"></div>Benefícios (VR, saúde, odonto, educação)</div>
+            </div>
+
+            <div class="composicao-grid" style="margin-top:18px">
+              <div class="comp-card">
+                <h4>💼 Salários &amp; variáveis</h4>
+                <div class="comp-linha"><span>Salário base · 128 empregados</span><span class="valor-r">R$ 1.687.500</span></div>
+                <div class="comp-linha"><span>Horas extras (50% + 100%)</span><span class="valor-r">R$ 142.800</span></div>
+                <div class="comp-linha"><span>Adicional noturno</span><span class="valor-r">R$ 18.450</span></div>
+                <div class="comp-linha"><span>Insalubridade · NR-15</span><span class="valor-r">R$ 38.640</span></div>
+                <div class="comp-linha"><span>Comissões / prêmios</span><span class="valor-r">R$ 61.320</span></div>
+                <div class="comp-linha total"><span>Total bruto</span><span class="valor-r">R$ 1.948.710</span></div>
+              </div>
+              <div class="comp-card">
+                <h4>📊 Encargos sociais</h4>
+                <div class="comp-linha"><span>INSS patronal (20%)</span><span class="valor-r">R$ 389.742</span></div>
+                <div class="comp-linha"><span>FGTS (8%)</span><span class="valor-r">R$ 155.896</span></div>
+                <div class="comp-linha"><span>SAT/RAT · construção (3%)</span><span class="valor-r">R$ 58.461</span></div>
+                <div class="comp-linha"><span>Sistema S · SESI/SENAI/INCRA (5,8%)</span><span class="valor-r">R$ 112.985</span></div>
+                <div class="comp-linha"><span>IRRF retido</span><span class="valor-r">R$ 87.450</span></div>
+                <div class="comp-linha total"><span>Total encargos</span><span class="valor-r">R$ 642.084</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROVISÕES -->
+          <div class="painel">
+            <h3>Provisões <em>do mês</em></h3>
+            <p class="sub-titulo">13º salário e férias acumuladas</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div style="padding:18px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1px;font-weight:700;text-transform:uppercase">13º Salário (provisão)</div>
+                <div style="font-family:var(--serif);font-style:italic;font-size:24px;color:var(--marinho);margin-top:6px">R$ 162.392</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px">5/12 do total · pagamento dez/2026</div>
+              </div>
+              <div style="padding:18px;background:var(--cinza-fundo);border-radius:2px">
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1px;font-weight:700;text-transform:uppercase">Férias (provisão)</div>
+                <div style="font-family:var(--serif);font-style:italic;font-size:24px;color:var(--marinho);margin-top:6px">R$ 216.523</div>
+                <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px">acumulado · 18 empregados com período vencido</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- DEPARTAMENTOS -->
+          <div class="painel">
+            <h3 style="font-size:16px">Folha por <em>departamento</em></h3>
+            <div class="sub-titulo">Distribuição do custo</div>
+            <div class="dept-grid">
+              <div class="dept-item">
+                <div class="dept-info">
+                  <div class="dept-nome">Operações &amp; Obra</div>
+                  <div class="dept-meta">78 empregados · 61%</div>
+                </div>
+                <div class="dept-barra"><div class="dept-barra-fill" style="width:100%"></div></div>
+                <div class="dept-valor">R$ 1.184k</div>
+              </div>
+              <div class="dept-item">
+                <div class="dept-info">
+                  <div class="dept-nome">Engenharia</div>
+                  <div class="dept-meta">22 empregados · 17%</div>
+                </div>
+                <div class="dept-barra"><div class="dept-barra-fill" style="width:42%"></div></div>
+                <div class="dept-valor">R$ 498k</div>
+              </div>
+              <div class="dept-item">
+                <div class="dept-info">
+                  <div class="dept-nome">Financeiro &amp; Adm</div>
+                  <div class="dept-meta">12 empregados · 9%</div>
+                </div>
+                <div class="dept-barra"><div class="dept-barra-fill" style="width:21%"></div></div>
+                <div class="dept-valor">R$ 248k</div>
+              </div>
+              <div class="dept-item">
+                <div class="dept-info">
+                  <div class="dept-nome">Comercial</div>
+                  <div class="dept-meta">8 empregados · 7%</div>
+                </div>
+                <div class="dept-barra"><div class="dept-barra-fill" style="width:14%"></div></div>
+                <div class="dept-valor">R$ 167k</div>
+              </div>
+              <div class="dept-item">
+                <div class="dept-info">
+                  <div class="dept-nome">Suprimentos &amp; RH</div>
+                  <div class="dept-meta">8 empregados · 6%</div>
+                </div>
+                <div class="dept-barra"><div class="dept-barra-fill" style="width:12%"></div></div>
+                <div class="dept-valor">R$ 142k</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TIMELINE FECHAMENTO -->
+          <div class="painel">
+            <h3 style="font-size:16px">Calendário <em>mensal</em></h3>
+            <div class="sub-titulo">Próximos prazos legais</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12px">
+              <div style="padding:10px;background:var(--vermelho-cl);border-left:3px solid var(--vermelho);border-radius:2px">
+                <div style="font-size:10px;color:var(--vermelho);letter-spacing:1px;font-weight:700">HOJE · URGENTE</div>
+                <div style="font-weight:500;color:var(--marinho);margin-top:2px">📤 Enviar eventos S-1200 (eSocial)</div>
+                <div style="font-size:11px;color:var(--cinza);margin-top:2px">prazo até 26/05 23:59</div>
+              </div>
+              <div style="padding:10px;background:var(--amarelo-cl);border-left:3px solid var(--amarelo);border-radius:2px">
+                <div style="font-size:10px;color:#876715;letter-spacing:1px;font-weight:700">27/05 · QUARTA</div>
+                <div style="font-weight:500;color:var(--marinho);margin-top:2px">📊 DCTFWeb · maio</div>
+                <div style="font-size:11px;color:var(--cinza);margin-top:2px">declaração + pagamento</div>
+              </div>
+              <div style="padding:10px;background:var(--cinza-fundo);border-left:3px solid var(--marinho);border-radius:2px">
+                <div style="font-size:10px;color:var(--marinho);letter-spacing:1px;font-weight:700">05/06 · SEXTA</div>
+                <div style="font-weight:500;color:var(--marinho);margin-top:2px">💸 Pagamento aos empregados</div>
+                <div style="font-size:11px;color:var(--cinza);margin-top:2px">128 holerites disponíveis</div>
+              </div>
+              <div style="padding:10px;background:var(--cinza-fundo);border-left:3px solid var(--marinho);border-radius:2px">
+                <div style="font-size:10px;color:var(--marinho);letter-spacing:1px;font-weight:700">07/06 · DOMINGO</div>
+                <div style="font-weight:500;color:var(--marinho);margin-top:2px">💼 Pagamento FGTS</div>
+                <div style="font-size:11px;color:var(--cinza);margin-top:2px">via Conectividade Social</div>
+              </div>
+              <div style="padding:10px;background:var(--cinza-fundo);border-left:3px solid var(--marinho);border-radius:2px">
+                <div style="font-size:10px;color:var(--marinho);letter-spacing:1px;font-weight:700">07/06 · DOMINGO</div>
+                <div style="font-weight:500;color:var(--marinho);margin-top:2px">📑 CAGED · admissões/desligamentos</div>
+                <div style="font-size:11px;color:var(--cinza);margin-top:2px">via eSocial</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>4 alertas pendentes</strong> · Você pode prosseguir para a conferência detalhada
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm">💾 Salvar prévia</button>
+          <button class="btn btn-marinho btn-sm" onclick="irPara('t-conferencia')">→ Conferir empregados (128)</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 2: CONFERÊNCIA POR EMPREGADO -->
+<!-- ============================================== -->
+<div class="tela" id="t-conferencia">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item ativo"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dashboard-folha')">Folha</a> &gt; <span style="color:var(--laranja)">Conferência por empregado</span></div>
+
+      <div class="folha-header">
+        <div>
+          <h1>Conferência <em>por empregado</em></h1>
+          <div class="competencia">Folha <strong>05/2026</strong> · 128 empregados processados · 4 com alertas</div>
+          <div class="folha-tags">
+            <span class="tag vermelho">2 erros</span>
+            <span class="tag amarelo">2 alertas</span>
+            <span class="tag verde">124 OK</span>
+          </div>
+        </div>
+        <div class="folha-header-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar Excel</button>
+          <button class="btn btn-fantasma btn-sm">🤖 Re-rodar IA</button>
+        </div>
+      </div>
+
+      <!-- ABAS -->
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-dashboard-folha')"><span class="ic">📊</span> Dashboard</div>
+        <div class="aba ativa"><span class="ic">👥</span> Conferência <span class="alerta">4</span></div>
+        <div class="aba" onclick="irPara('t-eventos')"><span class="ic">⚡</span> Eventos &amp; Exceções <span class="cnt">23</span></div>
+        <div class="aba" onclick="irPara('t-relatorios')"><span class="ic">📋</span> Relatórios &amp; Fiscal</div>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="filtros-bar">
+        <div class="busca"><span>⌕</span><input placeholder="Buscar empregado por nome, MAT ou CPF..."/></div>
+        <select><option>Todos os status</option><option>Apenas alertas</option><option>Apenas erros</option><option>OK</option></select>
+        <select><option>Todos os departamentos</option><option>Engenharia</option><option>Operações</option><option>Financeiro</option></select>
+        <select><option>Ordenar por: salário ↓</option><option>Nome A-Z</option><option>Variação ↑</option><option>Departamento</option></select>
+        <button class="btn btn-fantasma btn-sm">⤓ Exportar</button>
+      </div>
+
+      <!-- ALERTAS FOCO -->
+      <div class="alert alert-marinho">
+        <span class="ic-grande">🤖</span>
+        <div>
+          <strong>Nora · IA detectou 4 anomalias</strong>
+          A IA compara cada empregado com sua média dos últimos 6 meses e com seus pares de mesmo cargo. Anomalias são possíveis erros de lançamento, não erros do sistema.
+        </div>
+      </div>
+
+      <div class="tabela" style="margin-bottom:18px">
+        <div class="tab-linha head">
+          <div>Empregado</div>
+          <div>Departamento</div>
+          <div>Bruto</div>
+          <div>Descontos</div>
+          <div>Líquido</div>
+          <div></div>
+        </div>
+
+        <!-- ERRO 1: Fernanda Toledo R$ 0 -->
+        <div class="tab-linha erro" onclick="irPara('t-holerite-prev')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-c">FT</div>
+            <div>
+              <div class="tab-nome">Fernanda Toledo <span class="tag vermelho" style="font-size:9px;margin-left:6px">❌ ERRO</span></div>
+              <div class="tab-meta">MAT 0148 · Recrutadora · admissão 03/2026</div>
+            </div>
+          </div>
+          <div>Comercial</div>
+          <div class="valor-mon">R$ 0,00</div>
+          <div class="valor-mon">R$ 0,00</div>
+          <div class="valor-mon valor-neg">R$ 0,00</div>
+          <button class="btn btn-perigo btn-xs">⚠ Tratar</button>
+        </div>
+
+        <!-- ERRO 2: Ricardo Borges -->
+        <div class="tab-linha erro" onclick="irPara('t-holerite-prev')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-f">RB</div>
+            <div>
+              <div class="tab-nome">Ricardo Borges <span class="tag vermelho" style="font-size:9px;margin-left:6px">❌ ERRO</span></div>
+              <div class="tab-meta">MAT 0089 · Mestre de obras · falta dados bancários</div>
+            </div>
+          </div>
+          <div>Operações</div>
+          <div class="valor-mon">R$ 6.840</div>
+          <div class="valor-mon">R$ 1.230</div>
+          <div class="valor-mon">R$ 5.610</div>
+          <button class="btn btn-perigo btn-xs">⚠ Tratar</button>
+        </div>
+
+        <!-- ALERTA 1: Pedro Aurélio horas extras -->
+        <div class="tab-linha alerta" onclick="irPara('t-holerite-prev')">
+          <div class="tab-pessoa">
+            <div class="tab-av av-d">PA</div>
+            <div>
+              <div class="tab-nome">Pedro Aurélio Castro <span class="tag amarelo" style="font-size:9px;margin-left:6px">⚠ ALERTA</span></div>
+              <div class="tab-meta">MAT 0067 · Eng. Civil Pl · h.extras +62h (média: 12h)</div>
+            </div>
+          </div>
+          <div>Engenharia</div>
+          <div class="valor-mon">R$ 12.840 <span style="color:var(--amarelo);font-size:10px">▲43%</span></div>
+          <div class="valor-mon">R$ 2.180</div>
+          <div class="valor-mon">R$ 10.660</div>
+          <button class="btn btn-fantasma btn-xs" style="border-color:var(--amarelo);color:#876715">Revisar</button>
+        </div>
+
+        <!-- ALERTA 2: Marcelo Andrade insalubridade -->
+        <div class="tab-linha alerta">
+          <div class="tab-pessoa">
+            <div class="tab-av av-b">MA</div>
+            <div>
+              <div class="tab-nome">Marcelo Andrade Lima <span class="tag amarelo" style="font-size:9px;margin-left:6px">⚠ ALERTA</span></div>
+              <div class="tab-meta">MAT 0094 · Eng. Civil Sr · insalubridade NR-15 ausente</div>
+            </div>
+          </div>
+          <div>Engenharia</div>
+          <div class="valor-mon">R$ 12.500</div>
+          <div class="valor-mon">R$ 2.080</div>
+          <div class="valor-mon">R$ 10.420</div>
+          <button class="btn btn-fantasma btn-xs" style="border-color:var(--amarelo);color:#876715">Revisar</button>
+        </div>
+
+        <!-- FERNANDO LACERDA · OK -->
+        <div class="tab-linha" onclick="irPara('t-holerite-prev')" style="background:var(--verde-cl)">
+          <div class="tab-pessoa">
+            <div class="tab-av av-a">F</div>
+            <div>
+              <div class="tab-nome">Fernando Lacerda Costa <span class="tag verde" style="font-size:9px;margin-left:6px">✓</span></div>
+              <div class="tab-meta">MAT 0112 · Eng. Civil Sr · ver holerite</div>
+            </div>
+          </div>
+          <div>Engenharia</div>
+          <div class="valor-mon">R$ 12.500</div>
+          <div class="valor-mon">R$ 2.842</div>
+          <div class="valor-mon valor-pos">R$ 9.658</div>
+          <button class="btn btn-fantasma btn-xs">👁</button>
+        </div>
+
+        <div class="tab-linha">
+          <div class="tab-pessoa">
+            <div class="tab-av av-b">LM</div>
+            <div>
+              <div class="tab-nome">Luísa Mendonça <span class="tag verde" style="font-size:9px;margin-left:6px">✓</span></div>
+              <div class="tab-meta">MAT 0042 · Dir. Engenharia</div>
+            </div>
+          </div>
+          <div>Engenharia</div>
+          <div class="valor-mon">R$ 28.500</div>
+          <div class="valor-mon">R$ 7.842</div>
+          <div class="valor-mon valor-pos">R$ 20.658</div>
+          <button class="btn btn-fantasma btn-xs">👁</button>
+        </div>
+
+        <div class="tab-linha">
+          <div class="tab-pessoa">
+            <div class="tab-av av-c">ES</div>
+            <div>
+              <div class="tab-nome">Eduardo Santos <span class="tag verde" style="font-size:9px;margin-left:6px">✓</span></div>
+              <div class="tab-meta">MAT 0033 · Dir. Financeiro</div>
+            </div>
+          </div>
+          <div>Financeiro</div>
+          <div class="valor-mon">R$ 32.000</div>
+          <div class="valor-mon">R$ 9.120</div>
+          <div class="valor-mon valor-pos">R$ 22.880</div>
+          <button class="btn btn-fantasma btn-xs">👁</button>
+        </div>
+
+        <div class="tab-linha">
+          <div class="tab-pessoa">
+            <div class="tab-av av-e">DP</div>
+            <div>
+              <div class="tab-nome">Daniel Pinheiro <span class="tag verde" style="font-size:9px;margin-left:6px">✓</span></div>
+              <div class="tab-meta">MAT 0118 · Eng. Civil Pl</div>
+            </div>
+          </div>
+          <div>Engenharia</div>
+          <div class="valor-mon">R$ 9.200</div>
+          <div class="valor-mon">R$ 1.804</div>
+          <div class="valor-mon valor-pos">R$ 7.396</div>
+          <button class="btn btn-fantasma btn-xs">👁</button>
+        </div>
+
+        <div class="tab-linha">
+          <div class="tab-pessoa">
+            <div class="tab-av av-f">AS</div>
+            <div>
+              <div class="tab-nome">Ana Carolina Souza <span class="tag verde" style="font-size:9px;margin-left:6px">✓</span></div>
+              <div class="tab-meta">MAT 0124 · Eng. Civil Jr</div>
+            </div>
+          </div>
+          <div>Engenharia</div>
+          <div class="valor-mon">R$ 6.800</div>
+          <div class="valor-mon">R$ 1.156</div>
+          <div class="valor-mon valor-pos">R$ 5.644</div>
+          <button class="btn btn-fantasma btn-xs">👁</button>
+        </div>
+
+        <div class="tab-linha">
+          <div class="tab-pessoa">
+            <div class="tab-av av-d">GT</div>
+            <div>
+              <div class="tab-nome">Gabriela Tavares <span class="tag verde" style="font-size:9px;margin-left:6px">✓</span></div>
+              <div class="tab-meta">MAT 0078 · Coord. de Suprimentos</div>
+            </div>
+          </div>
+          <div>Suprimentos</div>
+          <div class="valor-mon">R$ 11.500</div>
+          <div class="valor-mon">R$ 2.380</div>
+          <div class="valor-mon valor-pos">R$ 9.120</div>
+          <button class="btn btn-fantasma btn-xs">👁</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:14px;font-family:var(--ui);font-size:12px;color:var(--cinza)">Mostrando 10 de 128 empregados · <a style="color:var(--laranja);font-weight:600">Carregar próximos →</a></div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>4 pendências bloqueiam o fechamento</strong> · 2 erros + 2 alertas para revisar
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-dashboard-folha')">← Voltar ao dashboard</button>
+          <button class="btn btn-marinho btn-sm" onclick="irPara('t-eventos')">Ver eventos do mês →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 3: EVENTOS & EXCEÇÕES -->
+<!-- ============================================== -->
+<div class="tela" id="t-eventos">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item ativo"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dashboard-folha')">Folha</a> &gt; <span style="color:var(--laranja)">Eventos &amp; Exceções</span></div>
+
+      <div class="folha-header">
+        <div>
+          <h1>Eventos &amp; <em>Exceções</em></h1>
+          <div class="competencia">Maio/2026 · 23 eventos lançados · 18 automáticos + 5 manuais</div>
+          <div class="folha-tags">
+            <span class="tag verde">23 aplicados</span>
+            <span class="tag">5 ajustes manuais</span>
+            <span class="tag laranja">2 retroativos</span>
+          </div>
+        </div>
+        <div class="folha-header-acoes">
+          <button class="btn btn-primario btn-sm">+ Adicionar evento</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-dashboard-folha')"><span class="ic">📊</span> Dashboard</div>
+        <div class="aba" onclick="irPara('t-conferencia')"><span class="ic">👥</span> Conferência <span class="alerta">4</span></div>
+        <div class="aba ativa"><span class="ic">⚡</span> Eventos &amp; Exceções <span class="cnt">23</span></div>
+        <div class="aba" onclick="irPara('t-relatorios')"><span class="ic">📋</span> Relatórios &amp; Fiscal</div>
+      </div>
+
+      <!-- FÉRIAS -->
+      <div class="painel">
+        <h3>🌴 <em>Férias</em> no mês</h3>
+        <p class="sub-titulo">3 empregados em férias · gozos e abonos</p>
+
+        <div class="tabela">
+          <div class="tab-linha head" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px">
+            <div>Empregado</div>
+            <div>Período</div>
+            <div>Dias</div>
+            <div>1/3 + abono</div>
+            <div>Total a pagar</div>
+            <div></div>
+          </div>
+          <div class="tab-linha" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px">
+            <div class="tab-pessoa">
+              <div class="tab-av av-b">JC</div>
+              <div><div class="tab-nome">João Carlos Pinheiro</div><div class="tab-meta">MAT 0028 · Operações</div></div>
+            </div>
+            <div>05/05 a 19/05</div>
+            <div>15 dias</div>
+            <div>R$ 1.430</div>
+            <div class="valor-mon valor-pos">R$ 5.720</div>
+            <button class="btn btn-fantasma btn-xs">✎</button>
+          </div>
+          <div class="tab-linha" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px">
+            <div class="tab-pessoa">
+              <div class="tab-av av-c">CS</div>
+              <div><div class="tab-nome">Camila Silva</div><div class="tab-meta">MAT 0091 · Comercial</div></div>
+            </div>
+            <div>12/05 a 22/05</div>
+            <div>10 dias + 5 abono</div>
+            <div>R$ 1.860</div>
+            <div class="valor-mon valor-pos">R$ 7.440</div>
+            <button class="btn btn-fantasma btn-xs">✎</button>
+          </div>
+          <div class="tab-linha" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px">
+            <div class="tab-pessoa">
+              <div class="tab-av av-e">RM</div>
+              <div><div class="tab-nome">Rafael Monteiro</div><div class="tab-meta">MAT 0103 · Operações</div></div>
+            </div>
+            <div>20/05 a 31/05</div>
+            <div>12 dias</div>
+            <div>R$ 980</div>
+            <div class="valor-mon valor-pos">R$ 3.920</div>
+            <button class="btn btn-fantasma btn-xs">✎</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HORAS EXTRAS -->
+      <div class="painel">
+        <h3>⏱ Horas <em>extras</em></h3>
+        <p class="sub-titulo">42 empregados com h.extras · total R$ 142.800</p>
+
+        <div class="composicao-grid">
+          <div class="comp-card">
+            <h4>Distribuição por tipo</h4>
+            <div class="comp-linha"><span>50% (segunda a sábado)</span><span class="valor-r">R$ 89.420 · 1.842h</span></div>
+            <div class="comp-linha"><span>100% (domingos e feriados)</span><span class="valor-r">R$ 47.380 · 612h</span></div>
+            <div class="comp-linha"><span>Adicional noturno (20%)</span><span class="valor-r">R$ 6.000 · 78h</span></div>
+            <div class="comp-linha total"><span>Total</span><span class="valor-r">R$ 142.800</span></div>
+          </div>
+          <div class="comp-card">
+            <h4>Top 5 maiores volumes</h4>
+            <div class="comp-linha"><span><strong>Pedro Aurélio Castro</strong> <span class="tag amarelo" style="font-size:9px">⚠</span></span><span class="valor-r">62h · R$ 4.840</span></div>
+            <div class="comp-linha"><span>Roberto Almeida</span><span class="valor-r">48h · R$ 2.760</span></div>
+            <div class="comp-linha"><span>Marcos Tavares</span><span class="valor-r">42h · R$ 2.420</span></div>
+            <div class="comp-linha"><span>Henrique Lopes</span><span class="valor-r">38h · R$ 2.190</span></div>
+            <div class="comp-linha"><span>Luiz Otavio</span><span class="valor-r">35h · R$ 2.040</span></div>
+          </div>
+        </div>
+
+        <div class="alert alert-amarelo" style="margin-top:14px;margin-bottom:0">
+          <span class="ic-grande">⚠</span>
+          <div>
+            <strong>Pedro Aurélio Castro · 62h de hora extra</strong>
+            Acima do limite legal de 2h/dia · 10 dias úteis. Pode caracterizar excesso. Recomendo: contato com a Luísa para validar lançamentos.
+          </div>
+        </div>
+      </div>
+
+      <!-- AJUSTES MANUAIS -->
+      <div class="painel">
+        <h3>✎ Ajustes <em>manuais</em></h3>
+        <p class="sub-titulo">5 lançamentos manuais · sempre geram auditoria</p>
+
+        <div class="tabela">
+          <div class="tab-linha head" style="grid-template-columns:2fr 1.5fr 1fr 1fr 80px">
+            <div>Empregado · evento</div>
+            <div>Motivo</div>
+            <div>Valor</div>
+            <div>Aprovado por</div>
+            <div></div>
+          </div>
+          <div class="tab-linha" style="grid-template-columns:2fr 1.5fr 1fr 1fr 80px">
+            <div class="tab-pessoa">
+              <div class="tab-av av-d">RP</div>
+              <div><div class="tab-nome">Roberta Pinheiro</div><div class="tab-meta">Prêmio · projeto Sítio II finalizado</div></div>
+            </div>
+            <div>Prêmio único por entrega</div>
+            <div class="valor-mon valor-pos">+ R$ 3.500</div>
+            <div>Luísa Mendonça</div>
+            <button class="btn btn-fantasma btn-xs">👁</button>
+          </div>
+          <div class="tab-linha" style="grid-template-columns:2fr 1.5fr 1fr 1fr 80px">
+            <div class="tab-pessoa">
+              <div class="tab-av av-f">CB</div>
+              <div><div class="tab-nome">Carlos Aurora <span class="tag laranja" style="font-size:9px">retroativo</span></div><div class="tab-meta">Diferença salarial · ajuste abril</div></div>
+            </div>
+            <div>Erro de cálculo na folha anterior</div>
+            <div class="valor-mon valor-pos">+ R$ 420</div>
+            <div>Bruna Lima</div>
+            <button class="btn btn-fantasma btn-xs">👁</button>
+          </div>
+          <div class="tab-linha" style="grid-template-columns:2fr 1.5fr 1fr 1fr 80px">
+            <div class="tab-pessoa">
+              <div class="tab-av av-b">JM</div>
+              <div><div class="tab-nome">João Mendes</div><div class="tab-meta">Desconto · adiantamento</div></div>
+            </div>
+            <div>Vale recebido em 15/05</div>
+            <div class="valor-mon valor-neg">- R$ 1.500</div>
+            <div>Bruna Lima</div>
+            <button class="btn btn-fantasma btn-xs">👁</button>
+          </div>
+          <div class="tab-linha" style="grid-template-columns:2fr 1.5fr 1fr 1fr 80px">
+            <div class="tab-pessoa">
+              <div class="tab-av av-e">VT</div>
+              <div><div class="tab-nome">Vinícius Torres</div><div class="tab-meta">Desconto · pensão alimentícia</div></div>
+            </div>
+            <div>Determinação judicial · processo nº 0123/22</div>
+            <div class="valor-mon valor-neg">- R$ 1.840</div>
+            <div>Roberto Aurora</div>
+            <button class="btn btn-fantasma btn-xs">👁</button>
+          </div>
+          <div class="tab-linha" style="grid-template-columns:2fr 1.5fr 1fr 1fr 80px">
+            <div class="tab-pessoa">
+              <div class="tab-av av-c">SP</div>
+              <div><div class="tab-nome">Sofia Pacheco</div><div class="tab-meta">Reembolso · viagem cliente Pluma</div></div>
+            </div>
+            <div>Reembolso despesas (NF anexa)</div>
+            <div class="valor-mon valor-pos">+ R$ 680</div>
+            <div>Eduardo Santos</div>
+            <button class="btn btn-fantasma btn-xs">👁</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FALTAS -->
+      <div class="painel">
+        <h3>📅 <em>Faltas</em> e atestados</h3>
+        <p class="sub-titulo">7 ocorrências no mês · todas com justificativa</p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+          <div style="padding:14px;background:var(--verde-cl);border-radius:2px;border:1px solid var(--verde)">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--verde);letter-spacing:1.5px;font-weight:700;text-transform:uppercase">Atestados médicos</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:26px;color:var(--verde);margin-top:6px">5</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">12 dias acumulados</div>
+          </div>
+          <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700;text-transform:uppercase">Faltas justificadas</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:26px;color:var(--marinho);margin-top:6px">2</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">casamento + óbito familiar</div>
+          </div>
+          <div style="padding:14px;background:var(--cinza-fundo);border-radius:2px">
+            <div style="font-family:var(--ui);font-size:10px;color:var(--cinza);letter-spacing:1.5px;font-weight:700;text-transform:uppercase">Faltas não justificadas</div>
+            <div style="font-family:var(--serif);font-style:italic;font-size:26px;color:var(--marinho);margin-top:6px">0</div>
+            <div style="font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:4px">excelente · 100% justificadas</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>23 eventos no mês · todos aplicados</strong> · auditoria registrada para os 5 manuais
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-conferencia')">← Voltar para conferência</button>
+          <button class="btn btn-marinho btn-sm" onclick="irPara('t-relatorios')">Ver relatórios fiscais →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 4: HOLERITE PRÉVIA -->
+<!-- ============================================== -->
+<div class="tela" id="t-holerite-prev">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item ativo"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dashboard-folha')">Folha</a> &gt; <a onclick="irPara('t-conferencia')">Conferência</a> &gt; <span style="color:var(--laranja)">Holerite · Fernando Lacerda</span></div>
+
+      <div class="folha-header">
+        <div>
+          <h1>Holerite · <em>Fernando Lacerda</em></h1>
+          <div class="competencia">Maio/2026 · MAT 0112 · prévia antes do fechamento</div>
+          <div class="folha-tags">
+            <span class="tag verde">✓ Validado pela IA</span>
+            <span class="tag">Sem alertas</span>
+          </div>
+        </div>
+        <div class="folha-header-acoes">
+          <button class="btn btn-fantasma btn-sm">⤓ Download PDF</button>
+          <button class="btn btn-fantasma btn-sm">✉ Enviar prévia</button>
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div class="holerite-prev">
+          <div class="holerite-head">
+            <div>
+              <h4>Recibo de Pagamento de Salário</h4>
+              <div style="font-size:10px;color:var(--cinza);margin-top:4px;letter-spacing:.5px">RECIBO Nº 05/2026 · maio/2026</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:var(--serif);font-style:italic;font-size:16px;color:var(--marinho)">Construtora Aurora Ltda</div>
+              <div style="font-size:10px;color:var(--cinza);margin-top:2px">CNPJ 12.345.678/0001-90</div>
+            </div>
+          </div>
+
+          <div class="holerite-meta-row">
+            <div class="holerite-meta-item">
+              <div class="rotulo-h">Empregado</div>
+              <div class="valor-h">Fernando Lacerda Costa</div>
+            </div>
+            <div class="holerite-meta-item">
+              <div class="rotulo-h">Matrícula</div>
+              <div class="valor-h">0112</div>
+            </div>
+            <div class="holerite-meta-item">
+              <div class="rotulo-h">Cargo · CBO</div>
+              <div class="valor-h">Eng. Civil Sr · 2142-05</div>
+            </div>
+            <div class="holerite-meta-item">
+              <div class="rotulo-h">Departamento</div>
+              <div class="valor-h">Engenharia</div>
+            </div>
+            <div class="holerite-meta-item">
+              <div class="rotulo-h">Admissão</div>
+              <div class="valor-h">22/04/2022</div>
+            </div>
+            <div class="holerite-meta-item">
+              <div class="rotulo-h">Categoria</div>
+              <div class="valor-h">CLT · efetivo</div>
+            </div>
+          </div>
+
+          <table class="holerite-tabela">
+            <thead>
+              <tr><th>Descrição</th><th>Ref</th><th style="color:var(--verde)">Provento</th><th style="color:var(--vermelho)">Desconto</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="cod">001</td><td>Salário base · 30 dias</td><td>220h</td><td style="color:var(--verde)">12.500,00</td><td>—</td></tr>
+              <tr><td class="cod">004</td><td>Horas extras 50%</td><td>4h</td><td style="color:var(--verde)">340,80</td><td>—</td></tr>
+              <tr><td class="cod">020</td><td>Insalubridade NR-15</td><td>30%</td><td style="color:var(--verde)">420,00</td><td>—</td></tr>
+              <tr><td class="cod">025</td><td>VR a creditar (compensação)</td><td>22 dias</td><td style="color:var(--verde)">770,00</td><td>—</td></tr>
+              <tr><td class="cod">101</td><td>INSS (11% até teto)</td><td>—</td><td>—</td><td style="color:var(--vermelho)">876,98</td></tr>
+              <tr><td class="cod">102</td><td>IRRF</td><td>22,5%</td><td>—</td><td style="color:var(--vermelho)">1.184,32</td></tr>
+              <tr><td class="cod">110</td><td>Vale-refeição · contrib. 6%</td><td>—</td><td>—</td><td style="color:var(--vermelho)">46,20</td></tr>
+              <tr><td class="cod">120</td><td>Plano de saúde · titular</td><td>—</td><td>—</td><td style="color:var(--vermelho)">220,00</td></tr>
+              <tr><td class="cod">130</td><td>Adiantamento (15/05)</td><td>—</td><td>—</td><td style="color:var(--vermelho)">3.045,30</td></tr>
+              <tr class="total-row"><td colspan="2">Total bruto · descontos · líquido</td><td>14.030,80</td><td>5.372,80</td></tr>
+              <tr class="total-row"><td colspan="3" style="color:var(--marinho);border-top:none">Líquido a pagar</td><td style="color:var(--laranja);font-size:22px">R$ 8.658,00</td></tr>
+            </tbody>
+          </table>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:18px;padding-top:14px;border-top:1px solid var(--cinza-cl);font-size:11px">
+            <div>
+              <div style="font-size:9px;letter-spacing:1.5px;color:var(--cinza);text-transform:uppercase;font-weight:700">Base INSS</div>
+              <div style="font-family:var(--serif);font-style:italic;font-size:14px;margin-top:3px">R$ 7.972,57</div>
+            </div>
+            <div>
+              <div style="font-size:9px;letter-spacing:1.5px;color:var(--cinza);text-transform:uppercase;font-weight:700">Base IRRF</div>
+              <div style="font-family:var(--serif);font-style:italic;font-size:14px;margin-top:3px">R$ 11.659,02</div>
+            </div>
+            <div>
+              <div style="font-size:9px;letter-spacing:1.5px;color:var(--cinza);text-transform:uppercase;font-weight:700">FGTS depositado</div>
+              <div style="font-family:var(--serif);font-style:italic;font-size:14px;margin-top:3px">R$ 1.122,46</div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--cinza-cl);font-family:var(--ui);font-size:10px;color:var(--cinza);line-height:1.5">
+            🔒 Holerite gerado automaticamente pela Oi Nora · disponível na área do empregado em 05/06/2026 ·
+            assinatura digital ICP-Brasil será aplicada no fechamento.
+          </div>
+        </div>
+
+        <div>
+          <div class="painel">
+            <h3 style="font-size:16px">Histórico do <em>Fernando</em></h3>
+            <div class="sub-titulo">Últimos 6 meses</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--ui);font-size:12px">
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--laranja-cl);border-radius:2px;border:1px solid var(--laranja)"><span style="color:var(--laranja);font-weight:600">Maio/2026 (atual)</span><strong>R$ 8.658</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>Abril/2026</span><strong>R$ 8.420</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>Março/2026</span><strong>R$ 8.180</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>Fevereiro/2026 +PLR</span><strong>R$ 33.108</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>Janeiro/2026</span><strong>R$ 7.892</strong></div>
+              <div style="display:flex;justify-content:space-between;padding:8px;background:var(--cinza-fundo);border-radius:2px"><span>Dezembro/2025 + 13º</span><strong>R$ 19.450</strong></div>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:16px">Análise da <em>IA</em></h3>
+            <div class="sub-titulo">Comparação com pares</div>
+            <div style="font-family:var(--ui);font-size:12px;line-height:1.6;color:var(--marinho-med)">
+              <p style="margin-bottom:10px"><strong style="color:var(--verde)">✓ Tudo dentro da normalidade.</strong></p>
+              <p>Fernando recebe R$ 12.500 base · <strong>P65</strong> do mercado para Eng. Civil Sr em BH.</p>
+              <p style="margin-top:10px">Comparado com seus 5 pares na Aurora (Coord. Engenharia), está em <strong>linha com a média da equipe</strong> (R$ 12.300).</p>
+              <p style="margin-top:10px">Líquido atual <strong>69%</strong> do bruto · padrão para faixa salarial.</p>
+            </div>
+          </div>
+
+          <div class="painel">
+            <h3 style="font-size:16px">Ações</h3>
+            <div class="sub-titulo">Sobre este holerite</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">✎ Editar evento</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">📜 Histórico completo</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">⤓ Download PDF</button>
+              <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:flex-start">✉ Enviar prévia</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>Holerite OK</strong> · sem alertas · pronto para fechamento
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-conferencia')">← Voltar para a lista</button>
+          <button class="btn btn-marinho btn-sm" onclick="irPara('t-conferencia')">Próximo empregado →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- TELA 5: RELATÓRIOS & FISCAL -->
+<!-- ============================================== -->
+<div class="tela" id="t-relatorios">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">EMPRESA<strong>Construtora Aurora</strong></div>
+      <div class="sidebar-secao">Recrutamento</div>
+      <div class="sidebar-item outro"><span class="ic">▤</span> Vagas</div>
+      <div class="sidebar-item outro"><span class="ic">◆</span> Banco de Talentos</div>
+      <div class="sidebar-secao">Gestão de Pessoas</div>
+      <div class="sidebar-item outro"><span class="ic">⌂</span> Visão Geral</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Empregados</div>
+      <div class="sidebar-item outro"><span class="ic">⏱</span> Ponto</div>
+      <div class="sidebar-item outro"><span class="ic">🌴</span> Férias</div>
+      <div class="sidebar-item ativo"><span class="ic">💰</span> Folha</div>
+      <div class="sidebar-item outro"><span class="ic">🎁</span> Benefícios</div>
+      <div class="sidebar-secao">Desenvolvimento</div>
+      <div class="sidebar-item outro"><span class="ic">⭐</span> Avaliação</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Pesquisas</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🔐</span> Usuários</div>
+      <div class="sidebar-perfil"><div class="av">BL</div><div><div class="nome">Bruna Lima</div><div class="cargo">📋 HR Ops · DP</div></div></div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-dashboard-folha')">Folha</a> &gt; <span style="color:var(--laranja)">Relatórios &amp; Fiscal</span></div>
+
+      <div class="folha-header">
+        <div>
+          <h1>Relatórios &amp; <em>Fiscal</em></h1>
+          <div class="competencia">Arquivos para envio aos órgãos · Maio/2026</div>
+          <div class="folha-tags">
+            <span class="tag verde">5 prontos</span>
+            <span class="tag amarelo">2 pendentes</span>
+            <span class="tag">eSocial · CAGED · DCTFWeb</span>
+          </div>
+        </div>
+        <div class="folha-header-acoes">
+          <button class="btn btn-fantasma btn-sm">📋 Histórico completo</button>
+          <button class="btn btn-fantasma btn-sm">⚙ Configurar envios</button>
+        </div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-dashboard-folha')"><span class="ic">📊</span> Dashboard</div>
+        <div class="aba" onclick="irPara('t-conferencia')"><span class="ic">👥</span> Conferência <span class="alerta">4</span></div>
+        <div class="aba" onclick="irPara('t-eventos')"><span class="ic">⚡</span> Eventos &amp; Exceções <span class="cnt">23</span></div>
+        <div class="aba ativa"><span class="ic">📋</span> Relatórios &amp; Fiscal</div>
+      </div>
+
+      <!-- eSOCIAL -->
+      <div class="painel">
+        <h3>📤 <em>eSocial</em> · maio/2026</h3>
+        <p class="sub-titulo">Eventos a transmitir · prazo 26/05 23:59</p>
+
+        <div class="relat-grid">
+          <div class="relat-card feito">
+            <div class="relat-ic" style="background:var(--verde-cl);color:var(--verde)">✓</div>
+            <div>
+              <div class="relat-titulo">S-1200 · Remuneração</div>
+              <div class="relat-meta">128 trabalhadores · validado · 47KB · pronto para envio</div>
+            </div>
+            <button class="btn btn-verde btn-sm">📤 Enviar</button>
+          </div>
+
+          <div class="relat-card feito">
+            <div class="relat-ic" style="background:var(--verde-cl);color:var(--verde)">✓</div>
+            <div>
+              <div class="relat-titulo">S-1210 · Pagamentos</div>
+              <div class="relat-meta">128 lançamentos · validado · pronto · gerado em 24/05</div>
+            </div>
+            <button class="btn btn-verde btn-sm">📤 Enviar</button>
+          </div>
+
+          <div class="relat-card feito">
+            <div class="relat-ic" style="background:var(--verde-cl);color:var(--verde)">✓</div>
+            <div>
+              <div class="relat-titulo">S-2299 · Desligamentos (2)</div>
+              <div class="relat-meta">João Sampaio · Marcos Reis · validados</div>
+            </div>
+            <button class="btn btn-verde btn-sm">📤 Enviar</button>
+          </div>
+
+          <div class="relat-card feito">
+            <div class="relat-ic" style="background:var(--verde-cl);color:var(--verde)">✓</div>
+            <div>
+              <div class="relat-titulo">S-2200 · Admissão (1)</div>
+              <div class="relat-meta">Fernanda Toledo · enviado · aceito em 04/05</div>
+            </div>
+            <span class="tag verde" style="font-size:10px">Enviado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMPOSTOS -->
+      <div class="painel">
+        <h3>📊 Guias de <em>recolhimento</em></h3>
+        <p class="sub-titulo">DCTFWeb · FGTS · vencimentos próximos</p>
+
+        <div class="relat-grid">
+          <div class="relat-card pendente">
+            <div class="relat-ic" style="background:var(--amarelo-cl);color:#876715">⏳</div>
+            <div>
+              <div class="relat-titulo">DCTFWeb · maio/2026</div>
+              <div class="relat-meta">Aguardando envio dos eventos S-1200 · venc. <strong>27/05</strong></div>
+            </div>
+            <button class="btn btn-fantasma btn-sm">⏱ Aguardar</button>
+          </div>
+
+          <div class="relat-card pendente">
+            <div class="relat-ic" style="background:var(--amarelo-cl);color:#876715">⏳</div>
+            <div>
+              <div class="relat-titulo">DARF · INSS patronal</div>
+              <div class="relat-meta">R$ 389.742 · venc. <strong>27/05</strong> · após DCTFWeb</div>
+            </div>
+            <button class="btn btn-fantasma btn-sm">⏱ Aguardar</button>
+          </div>
+
+          <div class="relat-card feito">
+            <div class="relat-ic" style="background:var(--verde-cl);color:var(--verde)">✓</div>
+            <div>
+              <div class="relat-titulo">FGTS · maio/2026</div>
+              <div class="relat-meta">R$ 155.896 · gerado · venc. <strong>07/06</strong></div>
+            </div>
+            <button class="btn btn-fantasma btn-sm">⤓ Guia</button>
+          </div>
+
+          <div class="relat-card feito">
+            <div class="relat-ic" style="background:var(--verde-cl);color:var(--verde)">✓</div>
+            <div>
+              <div class="relat-titulo">DARF · IRRF retido</div>
+              <div class="relat-meta">R$ 87.450 · gerado · venc. <strong>20/06</strong></div>
+            </div>
+            <button class="btn btn-fantasma btn-sm">⤓ Guia</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOLERITES -->
+      <div class="painel">
+        <h3>💸 <em>Holerites</em> dos empregados</h3>
+        <p class="sub-titulo">Distribuição na área do empregado</p>
+
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:18px;background:var(--cinza-fundo);border-radius:2px">
+          <div class="relat-ic" style="background:var(--laranja-cl);color:var(--laranja);width:54px;height:54px;font-size:22px">💸</div>
+          <div>
+            <div style="font-size:15px;font-weight:500">128 holerites prontos para distribuição</div>
+            <div style="font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:4px">Liberação automática em 05/06/2026 às 08:00 · empregados recebem notificação push + e-mail</div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <span class="tag" style="font-size:10px">PDF assinado ICP-Brasil</span>
+              <span class="tag" style="font-size:10px">QR Code de validação</span>
+              <span class="tag" style="font-size:10px">App + e-mail</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn btn-fantasma btn-sm">👁 Prévia em lote</button>
+            <button class="btn btn-fantasma btn-sm">⤓ ZIP todos</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OUTROS RELATÓRIOS -->
+      <div class="painel">
+        <h3>📑 Outros <em>relatórios</em></h3>
+        <p class="sub-titulo">Documentos auxiliares</p>
+
+        <div class="relat-grid">
+          <div class="relat-card">
+            <div class="relat-ic">📊</div>
+            <div>
+              <div class="relat-titulo">Resumo gerencial (Excel)</div>
+              <div class="relat-meta">Folha completa por departamento</div>
+            </div>
+            <button class="btn btn-fantasma btn-sm">⤓</button>
+          </div>
+
+          <div class="relat-card">
+            <div class="relat-ic">🏦</div>
+            <div>
+              <div class="relat-titulo">CNAB 240 · Bradesco</div>
+              <div class="relat-meta">Arquivo de pagamento · 128 lançamentos</div>
+            </div>
+            <button class="btn btn-fantasma btn-sm">⤓</button>
+          </div>
+
+          <div class="relat-card">
+            <div class="relat-ic">📋</div>
+            <div>
+              <div class="relat-titulo">Resumo contábil</div>
+              <div class="relat-meta">Para integração com Sienge / ERP</div>
+            </div>
+            <button class="btn btn-fantasma btn-sm">⤓</button>
+          </div>
+
+          <div class="relat-card">
+            <div class="relat-ic">⚖</div>
+            <div>
+              <div class="relat-titulo">RAIS prévia · maio</div>
+              <div class="relat-meta">Acumulado anual · entrega anual em março/2027</div>
+            </div>
+            <button class="btn btn-fantasma btn-sm">⤓</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-verde" style="margin-top:14px">
+        <span class="ic-grande">✅</span>
+        <div>
+          <strong>Pronto para fechar!</strong>
+          Todos os alertas foram tratados, eventos validados, e os arquivos fiscais gerados. Ao clicar em "Fechar folha", o sistema bloqueia edições e envia os arquivos.
+        </div>
+      </div>
+
+      <div class="acoes-rodape">
+        <div class="acoes-info">
+          <strong>Folha de maio/2026 pronta</strong> · 128 empregados · R$ 2.789.2K custo total · pagamento 05/06
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-eventos')">← Voltar</button>
+          <button class="btn btn-fantasma btn-sm">💾 Salvar prévia</button>
+          <button class="btn btn-verde btn-sm">🔒 Fechar folha de maio</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Folha · Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-dashboard-folha">📊 Dashboard mensal</option>
+    <option value="t-conferencia">👥 Conferência (128 emp)</option>
+    <option value="t-eventos">⚡ Eventos &amp; Exceções</option>
+    <option value="t-holerite-prev">💸 Holerite (Fernando)</option>
+    <option value="t-relatorios">📋 Relatórios &amp; Fiscal</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  const alvo = document.getElementById(idTela);
+  if(alvo){
+    alvo.classList.add('ativa');
+    window.scrollTo({top:0,behavior:'instant'});
+    const sel = document.getElementById('seletor-tela');
+    if(sel) sel.value = idTela;
+  }
+}
+</script>
+</body>
+</html>

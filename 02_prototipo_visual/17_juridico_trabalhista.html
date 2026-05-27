@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oi Nora · Jurídico Trabalhista</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --laranja:#E8633A; --laranja-esc:#C94E28; --laranja-cl:#FDF1EC;
+    --marinho:#1F2A44; --marinho-esc:#131B2E; --marinho-med:#3B4A6B;
+    --papel:#FAF7F2; --branco:#FFFFFF;
+    --cinza:#5C6478; --cinza-cl:#E8E4DC; --cinza-fundo:#F2EEE6;
+    --verde:#2D7D5A; --verde-cl:#EAF5EE;
+    --vermelho:#C44545; --vermelho-cl:#FBEAEA;
+    --amarelo:#D4A02C; --amarelo-cl:#FAF1DA;
+    --roxo:#7E5BCC; --roxo-cl:#EFE9FB;
+    --juridico:#5B3FA0;
+    --serif:"Book Antiqua","Palatino Linotype",Palatino,"URW Palladio L",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  html,body{font-family:var(--serif);background:var(--papel);color:var(--marinho);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  .tela{display:none;min-height:100vh}
+  .tela.ativa{display:block}
+
+  .logo{display:inline-flex;align-items:flex-end;font-family:var(--serif);font-weight:400;line-height:1}
+  .logo .oi{color:var(--laranja);font-style:italic}
+  .logo .nora{color:var(--marinho);margin-left:6px}
+
+  .btn{font-family:var(--serif);font-size:15px;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;letter-spacing:.3px;cursor:pointer;border:none}
+  .btn-primario{background:var(--laranja);color:white}
+  .btn-primario:hover{background:var(--laranja-esc)}
+  .btn-marinho{background:var(--marinho);color:white}
+  .btn-fantasma{background:transparent;color:var(--marinho);border:1px solid var(--cinza-cl)}
+  .btn-fantasma:hover{border-color:var(--marinho);background:var(--branco)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+  .btn-xs{padding:4px 10px;font-size:11px;font-family:var(--ui);letter-spacing:.5px}
+
+  .app-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  .sidebar{background:var(--juridico);color:var(--papel);padding:24px 0 0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+  .sidebar .logo{font-size:22px;padding:0 24px 22px}
+  .sidebar .logo .nora{color:var(--papel)}
+  .sidebar-empresa{padding:0 24px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;font-family:var(--ui);font-size:11px;color:rgba(250,247,242,.55);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-empresa strong{display:block;color:var(--papel);font-family:var(--serif);font-size:14px;margin-top:3px;text-transform:none;letter-spacing:0;font-weight:500}
+  .sidebar-secao{font-family:var(--ui);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(250,247,242,.4);padding:16px 24px 6px;font-weight:600}
+  .sidebar-item{padding:9px 24px;font-size:13.5px;display:flex;align-items:center;gap:11px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(250,247,242,.85)}
+  .sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--papel)}
+  .sidebar-item.ativo{background:rgba(232,99,58,.15);border-left-color:var(--laranja);color:var(--papel)}
+  .sidebar-item.outro{opacity:.55}
+  .sidebar-item .ic{font-size:14px;width:16px;text-align:center;opacity:.85}
+  .sidebar-perfil{margin-top:auto;padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.2)}
+  .sidebar-perfil .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#C44545,#8E2B2B);display:flex;align-items:center;justify-content:center;color:white;font-family:var(--serif);font-style:italic;font-size:14px}
+  .sidebar-perfil .nome{font-size:12px}
+  .sidebar-perfil .cargo{font-family:var(--ui);font-size:9px;opacity:.6;margin-top:2px;letter-spacing:.3px}
+  .sidebar-perfil .escritorio{font-family:var(--ui);font-size:8.5px;opacity:.5;margin-top:1px;letter-spacing:.3px}
+
+  .app-main{padding:28px 36px 60px;background:var(--papel);min-height:100vh}
+  .breadcrumb{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:.5px;margin-bottom:8px}
+  .breadcrumb a{color:var(--laranja);font-weight:600}
+
+  .header-bar{background:linear-gradient(135deg,var(--branco) 50%,#EFE9FB);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px 28px;margin-bottom:18px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+  .header-bar h1{font-size:32px;font-weight:400;letter-spacing:-.3px;line-height:1.1}
+  .header-bar h1 em{color:var(--juridico);font-style:italic}
+  .header-bar .meta{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:6px}
+  .header-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+  .tag{font-family:var(--ui);font-size:11px;padding:3px 9px;border:1px solid var(--cinza-cl);color:var(--cinza);border-radius:2px;letter-spacing:.5px;background:var(--cinza-fundo);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .tag.laranja{border-color:var(--laranja);color:var(--laranja);background:var(--laranja-cl)}
+  .tag.verde{border-color:var(--verde);color:var(--verde);background:var(--verde-cl)}
+  .tag.marinho{border-color:var(--marinho);color:var(--marinho);background:#EEF1F6}
+  .tag.amarelo{border-color:var(--amarelo);color:#876715;background:var(--amarelo-cl)}
+  .tag.vermelho{border-color:var(--vermelho);color:var(--vermelho);background:var(--vermelho-cl)}
+  .tag.roxo{border-color:var(--roxo);color:var(--roxo);background:var(--roxo-cl)}
+  .tag.juridico{border-color:var(--juridico);color:var(--juridico);background:#EFE9FB}
+
+  .abas{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:24px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:0 6px}
+  .aba{padding:14px 22px;font-family:var(--ui);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .aba.ativa{color:var(--juridico);border-bottom-color:var(--juridico)}
+  .aba .cnt{background:var(--cinza-fundo);font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700;color:var(--cinza)}
+  .aba.ativa .cnt{background:var(--juridico);color:white}
+  .aba .alerta{background:var(--vermelho);color:white;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700}
+
+  .painel{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .painel h3{font-size:19px;font-weight:400;margin-bottom:4px}
+  .painel h3 em{color:var(--juridico);font-style:italic}
+  .painel .sub-titulo{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+
+  .kpis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--branco);border:1px solid var(--cinza-cl);padding:18px;border-radius:2px}
+  .kpi.destaque{background:linear-gradient(135deg,var(--branco) 50%,#EFE9FB);border-color:var(--juridico)}
+  .kpi.vermelho{background:linear-gradient(135deg,var(--branco) 50%,var(--vermelho-cl));border-color:var(--vermelho)}
+  .kpi.verde{background:linear-gradient(135deg,var(--branco) 50%,var(--verde-cl));border-color:var(--verde)}
+  .kpi-titulo{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .kpi-valor{font-size:28px;color:var(--marinho);line-height:1;font-family:var(--serif);font-style:italic}
+  .kpi-valor em{color:var(--juridico)}
+  .kpi-valor span{font-size:13px;color:var(--cinza);font-style:normal}
+  .kpi-meta{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px}
+  .kpi-delta{font-family:var(--ui);font-size:11px;margin-top:6px}
+  .kpi-delta.up{color:var(--verde)}
+  .kpi-delta.down{color:var(--vermelho)}
+
+  .alert{padding:14px 18px;border-radius:2px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;font-family:var(--ui);font-size:13px;line-height:1.55}
+  .alert-roxo{background:#EFE9FB;border-left:3px solid var(--juridico);color:var(--marinho)}
+  .alert-vermelho{background:var(--vermelho-cl);border-left:3px solid var(--vermelho);color:var(--marinho)}
+  .alert .ic-grande{font-size:20px;flex-shrink:0}
+  .alert strong{display:block;margin-bottom:2px}
+
+  /* PROCESSO CARDS */
+  .proc-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto auto;gap:18px;align-items:center;border-left:3px solid var(--cinza);transition:all .15s;cursor:pointer}
+  .proc-card:hover{transform:translateX(2px);box-shadow:0 4px 12px rgba(31,42,68,.06)}
+  .proc-card.provavel{border-left-color:var(--vermelho)}
+  .proc-card.possivel{border-left-color:var(--amarelo)}
+  .proc-card.remoto{border-left-color:var(--verde)}
+  .proc-card.urgente{background:linear-gradient(90deg,var(--vermelho-cl) 0%,var(--branco) 30%)}
+
+  .proc-ic{width:48px;height:48px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--cinza-fundo);border:1px solid var(--cinza-cl);font-family:var(--serif);font-style:italic;font-weight:600;color:var(--juridico)}
+  .proc-card.provavel .proc-ic{background:var(--vermelho-cl);border-color:var(--vermelho);color:var(--vermelho)}
+  .proc-card.possivel .proc-ic{background:var(--amarelo-cl);border-color:var(--amarelo);color:#876715}
+  .proc-card.remoto .proc-ic{background:var(--verde-cl);border-color:var(--verde);color:var(--verde)}
+
+  .proc-info{min-width:0}
+  .proc-cnj{font-family:'SF Mono','Monaco',monospace;font-size:10px;color:var(--cinza);letter-spacing:.5px;margin-bottom:3px}
+  .proc-titulo{font-size:15px;font-weight:500;color:var(--marinho);line-height:1.2;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--serif)}
+  .proc-meta{font-family:var(--ui);font-size:11.5px;color:var(--cinza);margin-top:6px;line-height:1.55;letter-spacing:.3px}
+  .proc-meta strong{color:var(--marinho)}
+  .proc-tags-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+
+  .proc-valor{text-align:right;font-family:var(--ui);font-size:11px;color:var(--cinza);min-width:130px}
+  .proc-valor strong{display:block;font-family:var(--serif);font-style:italic;font-size:16px;font-weight:400;color:var(--marinho);line-height:1.1;margin-bottom:2px}
+  .proc-valor.provavel strong{color:var(--vermelho)}
+  .proc-valor.possivel strong{color:#876715}
+  .proc-valor.remoto strong{color:var(--verde)}
+
+  .proc-acoes{display:flex;flex-direction:column;gap:4px}
+
+  /* CALENDÁRIO PRÓXIMAS AUDIÊNCIAS */
+  .audiencia-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px;margin-bottom:8px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;border-left:3px solid var(--juridico);transition:all .15s}
+  .audiencia-card.hoje{background:linear-gradient(90deg,var(--vermelho-cl) 0%,var(--branco) 100%);border-left-color:var(--vermelho)}
+  .audiencia-card.semana{background:linear-gradient(90deg,var(--amarelo-cl) 0%,var(--branco) 100%);border-left-color:var(--amarelo)}
+
+  .audiencia-data{width:60px;text-align:center;flex-shrink:0;padding:8px;background:var(--cinza-fundo);border-radius:2px}
+  .audiencia-data .dia{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--marinho);line-height:1;font-weight:500}
+  .audiencia-data .mes{font-family:var(--ui);font-size:9px;color:var(--cinza);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-top:2px}
+  .audiencia-data .hora{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:3px;font-weight:600}
+  .audiencia-card.hoje .audiencia-data{background:var(--vermelho);color:white}
+  .audiencia-card.hoje .audiencia-data .dia,.audiencia-card.hoje .audiencia-data .mes,.audiencia-card.hoje .audiencia-data .hora{color:white}
+  .audiencia-info-card{min-width:0}
+  .audiencia-tipo{font-family:var(--ui);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--juridico);font-weight:700;margin-bottom:3px}
+  .audiencia-card.hoje .audiencia-tipo{color:var(--vermelho)}
+  .audiencia-card.semana .audiencia-tipo{color:#876715}
+  .audiencia-titulo{font-size:13.5px;font-weight:500;color:var(--marinho);line-height:1.2;font-family:var(--serif)}
+  .audiencia-meta-pq{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+
+  /* CONTEXTO MULTI-EMPRESA · seletor */
+  .multi-empresa-bar{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .multi-empresa-label{font-family:var(--ui);font-size:11px;color:var(--cinza);letter-spacing:1.5px;text-transform:uppercase;font-weight:700}
+  .empresa-chip{padding:6px 12px;border:1px solid var(--cinza-cl);border-radius:14px;font-family:var(--ui);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:500;color:var(--cinza);transition:all .15s}
+  .empresa-chip.ativo{background:var(--juridico);border-color:var(--juridico);color:white}
+  .empresa-chip:not(.ativo):hover{border-color:var(--marinho);color:var(--marinho)}
+  .empresa-chip .num-proc{background:rgba(255,255,255,.25);padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700}
+  .empresa-chip:not(.ativo) .num-proc{background:var(--cinza-fundo);color:var(--cinza)}
+
+  /* GRID 2-1 */
+  .grid-2-1{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+
+  /* MINIATURA DE GRÁFICO PIZZA · SVG */
+  .mini-pie{position:relative;width:140px;height:140px;margin:0 auto}
+
+  /* PROTO BAR */
+  .proto-bar{position:fixed;bottom:20px;right:20px;background:var(--marinho-esc);color:var(--papel);padding:12px 16px;border-radius:2px;display:flex;gap:10px;align-items:center;font-family:var(--ui);font-size:12px;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .proto-bar select{background:transparent;color:var(--papel);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-family:var(--ui);font-size:11px;border-radius:2px;max-width:240px}
+  .proto-bar option{background:var(--marinho)}
+  .proto-label{opacity:.6;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+
+  /* FILTROS · LISTA DE PROCESSOS */
+  .filtros-juri{background:var(--branco);border:1px solid var(--cinza-cl);padding:14px 18px;border-radius:2px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .filtros-juri input,.filtros-juri select{padding:8px 12px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:13px;color:var(--marinho);border-radius:2px}
+  .filtros-juri .busca-juri{flex:1;min-width:240px;position:relative}
+  .filtros-juri .busca-juri input{width:100%;padding-left:34px}
+  .filtros-juri .busca-juri span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--cinza)}
+
+  .chips-juri{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .chip-juri{font-family:var(--ui);font-size:11px;padding:6px 12px;border:1px solid var(--cinza-cl);background:var(--branco);color:var(--cinza);border-radius:14px;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+  .chip-juri:hover{border-color:var(--marinho);color:var(--marinho)}
+  .chip-juri.ativo{background:var(--juridico);border-color:var(--juridico);color:white}
+  .chip-juri .num-c{background:rgba(255,255,255,.25);padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700}
+  .chip-juri:not(.ativo) .num-c{background:var(--cinza-fundo);color:var(--cinza)}
+
+  /* TABELA DE PROCESSOS · LISTA COMPACTA */
+  .tab-proc{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden}
+  .tab-proc-linha{padding:14px 22px;border-bottom:1px solid var(--cinza-cl);display:grid;grid-template-columns:1.2fr 2fr 1.2fr 1fr 1fr 1fr 80px;gap:12px;align-items:center;transition:background .15s;font-family:var(--ui);font-size:12px;cursor:pointer}
+  .tab-proc-linha:hover{background:var(--cinza-fundo)}
+  .tab-proc-linha:last-child{border-bottom:none}
+  .tab-proc-linha.head{background:var(--cinza-fundo);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;cursor:default}
+  .tab-proc-linha.head:hover{background:var(--cinza-fundo)}
+  .tab-proc-linha.urgente{border-left:3px solid var(--vermelho);background:linear-gradient(90deg,var(--vermelho-cl) 0%,var(--branco) 25%)}
+  .tab-proc-linha.atencao{border-left:3px solid var(--amarelo)}
+  .tab-proc-cnj{font-family:'SF Mono','Monaco',monospace;font-size:10.5px;color:var(--cinza);line-height:1.4}
+  .tab-proc-cnj strong{display:block;font-family:var(--serif);font-style:italic;font-size:13px;color:var(--marinho);font-weight:400;margin-bottom:2px}
+  .tab-proc-parte{font-size:12.5px;font-weight:500;color:var(--marinho);font-family:var(--serif);line-height:1.3}
+  .tab-proc-empresa{font-family:var(--ui);font-size:10.5px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .tab-proc-empresa strong{color:var(--marinho)}
+  .tab-proc-fase{font-family:var(--ui);font-size:11px;color:var(--cinza)}
+  .tab-proc-fase strong{display:block;color:var(--marinho);font-size:12px;margin-bottom:2px}
+  .tab-proc-valor{font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:14px;text-align:right}
+  .tab-proc-valor.alto{color:var(--vermelho)}
+  .tab-proc-valor span{display:block;font-family:var(--ui);font-size:10px;color:var(--cinza);font-style:normal;margin-top:2px}
+  .tab-proc-risco{text-align:center}
+  .pill-risco{font-family:var(--ui);font-size:10px;padding:4px 10px;border-radius:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;display:inline-block}
+  .pill-risco.provavel{background:var(--vermelho-cl);color:var(--vermelho);border:1px solid var(--vermelho)}
+  .pill-risco.possivel{background:var(--amarelo-cl);color:#876715;border:1px solid var(--amarelo)}
+  .pill-risco.remoto{background:var(--verde-cl);color:var(--verde);border:1px solid var(--verde)}
+  .pill-risco.analise{background:var(--cinza-fundo);color:var(--cinza);border:1px solid var(--cinza-cl)}
+  .tab-proc-proxima{font-family:var(--ui);font-size:11px;color:var(--cinza)}
+  .tab-proc-proxima strong{display:block;font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:12px;margin-bottom:2px}
+  .tab-proc-proxima.urgente strong{color:var(--vermelho)}
+  .tab-proc-proxima.urgente{color:var(--vermelho)}
+
+  /* RESUMO COMPACTO POR RISCO */
+  .resumo-lista{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .resumo-bar{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px;border-left:3px solid var(--cinza)}
+  .resumo-bar.provavel{border-left-color:var(--vermelho)}
+  .resumo-bar.possivel{border-left-color:var(--amarelo)}
+  .resumo-bar.remoto{border-left-color:var(--verde)}
+  .resumo-bar.analise{border-left-color:var(--cinza)}
+  .resumo-bar-label{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:6px}
+  .resumo-bar-num{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--marinho);line-height:1}
+  .resumo-bar.provavel .resumo-bar-num{color:var(--vermelho)}
+  .resumo-bar.possivel .resumo-bar-num{color:#876715}
+  .resumo-bar.remoto .resumo-bar-num{color:var(--verde)}
+  .resumo-bar-valor{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px}
+  .resumo-bar-valor strong{font-family:var(--serif);font-style:italic;color:var(--marinho);font-weight:400;font-size:12.5px}
+
+  /* FICHA DE PROCESSO · HEADER */
+  .proc-header{background:linear-gradient(135deg,var(--branco) 60%,#EFE9FB);border:1px solid var(--cinza-cl);border-radius:2px;padding:28px;margin-bottom:18px;border-left:4px solid var(--juridico)}
+  .proc-header.provavel{border-left-color:var(--vermelho)}
+  .proc-header-top{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:flex-start;margin-bottom:14px}
+  .proc-cnj-grande{font-family:'SF Mono','Monaco',monospace;font-size:14px;color:var(--juridico);letter-spacing:1px;font-weight:700;margin-bottom:6px}
+  .proc-titulo-grande{font-size:28px;font-weight:400;line-height:1.15;letter-spacing:-.2px}
+  .proc-titulo-grande em{color:var(--juridico);font-style:italic}
+  .proc-subtitulo{font-family:var(--ui);font-size:13px;color:var(--cinza);margin-top:8px;letter-spacing:.3px;line-height:1.55}
+  .proc-subtitulo strong{color:var(--marinho)}
+  .proc-tags-grandes{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .proc-acoes-grandes{display:flex;flex-direction:column;gap:8px;min-width:200px}
+
+  /* ABAS INTERNAS DA FICHA */
+  .abas-ficha{display:flex;gap:0;border-bottom:1px solid var(--cinza-cl);margin-bottom:18px;background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:0 6px;overflow-x:auto}
+  .aba-ficha{padding:13px 18px;font-family:var(--ui);font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);cursor:pointer;border-bottom:2px solid transparent;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .aba-ficha:hover{color:var(--marinho)}
+  .aba-ficha.ativa{color:var(--juridico);border-bottom-color:var(--juridico)}
+
+  /* PARTES · cards lado a lado */
+  .partes-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+  .parte-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:18px;border-top:3px solid var(--cinza)}
+  .parte-card.reclamante{border-top-color:var(--vermelho)}
+  .parte-card.reclamada{border-top-color:var(--juridico)}
+  .parte-papel-label{font-family:var(--ui);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+  .parte-card.reclamante .parte-papel-label{color:var(--vermelho)}
+  .parte-card.reclamada .parte-papel-label{color:var(--juridico)}
+  .parte-pessoa-row{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin-bottom:14px}
+  .parte-foto{width:54px;height:54px;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:20px;font-weight:600}
+  .parte-nome-grande{font-size:17px;font-weight:500;color:var(--marinho);font-family:var(--serif);line-height:1.2}
+  .parte-cargo-info{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .parte-dados{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font-family:var(--ui);font-size:12px;color:var(--marinho);padding-top:12px;border-top:1px dashed var(--cinza-cl)}
+  .parte-dados .rotulo{color:var(--cinza);font-size:10.5px;letter-spacing:.3px;font-weight:600;text-transform:uppercase;font-size:9.5px;letter-spacing:1px}
+  .parte-dados .valor-c{color:var(--marinho);font-family:var(--serif);font-style:italic;font-size:12.5px}
+
+  .botao-ficha-empregado{margin-top:14px;display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--juridico);color:white;border-radius:2px;font-family:var(--ui);font-size:12px;cursor:pointer;border:none;font-weight:600;letter-spacing:.3px;width:100%;justify-content:center}
+  .botao-ficha-empregado:hover{background:#3F2C7A}
+
+  /* TIMELINE DE ANDAMENTOS */
+  .timeline-proc{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px}
+  .tl-linha{display:grid;grid-template-columns:100px 1fr;gap:18px;padding:14px 0;border-bottom:1px dashed var(--cinza-cl);align-items:flex-start;position:relative}
+  .tl-linha:last-child{border-bottom:none}
+  .tl-data-col{font-family:var(--serif);font-style:italic;color:var(--marinho);font-size:14px;text-align:right;font-weight:500;line-height:1.2}
+  .tl-data-col span{display:block;font-family:var(--ui);font-size:9px;color:var(--cinza);font-style:normal;letter-spacing:.5px;font-weight:600;margin-top:2px;text-transform:uppercase}
+  .tl-conteudo{padding-left:20px;border-left:3px solid var(--cinza-cl);position:relative}
+  .tl-conteudo::before{content:"";position:absolute;left:-9px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--branco);border:3px solid var(--cinza-cl)}
+  .tl-conteudo.evento::before{border-color:var(--juridico);background:var(--juridico)}
+  .tl-conteudo.audiencia::before{border-color:var(--laranja);background:var(--laranja)}
+  .tl-conteudo.peticao::before{border-color:var(--marinho);background:var(--marinho)}
+  .tl-conteudo.urgente::before{border-color:var(--vermelho);background:var(--vermelho)}
+  .tl-conteudo.evento{border-left-color:var(--juridico)}
+  .tl-conteudo.audiencia{border-left-color:var(--laranja)}
+  .tl-conteudo.peticao{border-left-color:var(--marinho)}
+  .tl-conteudo.urgente{border-left-color:var(--vermelho)}
+  .tl-tipo-label{font-family:var(--ui);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:4px;color:var(--cinza)}
+  .tl-conteudo.evento .tl-tipo-label{color:var(--juridico)}
+  .tl-conteudo.audiencia .tl-tipo-label{color:var(--laranja)}
+  .tl-conteudo.peticao .tl-tipo-label{color:var(--marinho)}
+  .tl-conteudo.urgente .tl-tipo-label{color:var(--vermelho)}
+  .tl-titulo-evento{font-size:14px;font-weight:500;color:var(--marinho);margin-bottom:4px;font-family:var(--serif)}
+  .tl-desc{font-family:var(--ui);font-size:12px;color:var(--cinza-fundo);line-height:1.55;letter-spacing:.3px;color:var(--cinza)}
+  .tl-desc strong{color:var(--marinho);font-weight:600}
+  .tl-doc-anexo{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:4px 10px;background:#EFE9FB;color:var(--juridico);font-family:var(--ui);font-size:10.5px;border-radius:12px;font-weight:600;letter-spacing:.3px;cursor:pointer;border:1px solid var(--juridico)}
+
+  /* CÁLCULO DE RISCO · análise financeira */
+  .calc-risco{background:linear-gradient(135deg,var(--branco) 60%,var(--vermelho-cl));border:1px solid var(--vermelho);border-radius:2px;padding:24px}
+  .calc-head-row{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:flex-start;margin-bottom:18px}
+  .calc-titulo{font-size:17px;font-weight:500;color:var(--marinho)}
+  .calc-titulo em{color:var(--vermelho);font-style:italic}
+  .calc-sub-c{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+  .calc-cenarios{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px}
+  .calc-cen{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:16px;text-align:center;border-top:3px solid var(--cinza)}
+  .calc-cen.melhor{border-top-color:var(--verde)}
+  .calc-cen.realista{border-top-color:var(--laranja);background:linear-gradient(180deg,var(--laranja-cl) 0%,var(--branco) 100%);transform:scale(1.05)}
+  .calc-cen.pior{border-top-color:var(--vermelho)}
+  .calc-cen-label{font-family:var(--ui);font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700;margin-bottom:8px}
+  .calc-cen-valor{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--marinho);line-height:1;margin-bottom:6px}
+  .calc-cen.melhor .calc-cen-valor{color:var(--verde)}
+  .calc-cen.realista .calc-cen-valor{color:var(--laranja);font-size:28px}
+  .calc-cen.pior .calc-cen-valor{color:var(--vermelho)}
+  .calc-cen-desc{font-family:var(--ui);font-size:10.5px;color:var(--cinza);line-height:1.4}
+
+  /* TABELA DE PARCELAS DO CÁLCULO */
+  .tab-calc{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;overflow:hidden;margin-top:14px}
+  .tab-calc-linha{padding:10px 16px;border-bottom:1px solid var(--cinza-cl);display:grid;grid-template-columns:1.5fr 1fr 1fr 80px;gap:14px;align-items:center;font-family:var(--ui);font-size:12px}
+  .tab-calc-linha:last-child{border-bottom:none}
+  .tab-calc-linha.head{background:var(--cinza-fundo);font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);font-weight:700}
+  .tab-calc-linha.total{background:linear-gradient(90deg,var(--laranja-cl) 0%,var(--branco) 100%);font-weight:700;border-top:2px solid var(--laranja)}
+  .tab-calc-parcela{font-weight:500;color:var(--marinho)}
+  .tab-calc-parcela .ref{font-family:var(--ui);font-size:10px;color:var(--cinza);font-weight:400;margin-top:2px;display:block}
+  .tab-calc-valor{font-family:var(--serif);font-style:italic;color:var(--marinho);text-align:right;font-size:13px}
+
+  /* DOCUMENTOS · grid de cards pequenos */
+  .docs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .doc-card{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;cursor:pointer;transition:all .15s}
+  .doc-card:hover{transform:translateY(-2px);border-color:var(--juridico);box-shadow:0 4px 10px rgba(91,63,160,.08)}
+  .doc-ic{width:40px;height:48px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:linear-gradient(135deg,var(--juridico),#3F2C7A);color:white;font-family:var(--ui);font-weight:700;letter-spacing:.5px;position:relative}
+  .doc-ic.pdf{background:linear-gradient(135deg,#C44545,#8E2B2B)}
+  .doc-ic.docx{background:linear-gradient(135deg,#3B4A6B,#1F2A44)}
+  .doc-ic.xls{background:linear-gradient(135deg,#2D7D5A,#1F5740)}
+  .doc-info-card{min-width:0}
+  .doc-nome{font-size:12.5px;font-weight:500;color:var(--marinho);line-height:1.2;font-family:var(--serif)}
+  .doc-meta-pq{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:3px;letter-spacing:.3px}
+
+  /* INFO LINE */
+  .info-row{display:grid;grid-template-columns:200px 1fr;gap:14px;padding:10px 0;border-bottom:1px solid var(--cinza-cl);font-size:13px}
+  .info-row:last-child{border:none}
+  .info-row .rot{color:var(--cinza);font-family:var(--ui);font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600}
+  .info-row .val{color:var(--marinho);font-family:var(--serif)}
+  .info-row .val strong{color:var(--juridico);font-style:italic}
+
+  /* WIZARD · PASSOS */
+  .wizard-passos{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:24px;margin-bottom:18px}
+  .passos-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;margin-bottom:8px}
+  .passo{display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;padding:0 12px}
+  .passo:not(:last-child)::after{content:"";position:absolute;right:0;top:22px;width:60%;height:2px;background:var(--cinza-cl);z-index:1}
+  .passo.feito::after,.passo.atual::after{background:var(--juridico)}
+  .passo-bola{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:18px;font-weight:600;background:var(--branco);border:2px solid var(--cinza-cl);color:var(--cinza);margin-bottom:10px;position:relative;z-index:2;transition:all .2s}
+  .passo.feito .passo-bola{background:var(--verde);border-color:var(--verde);color:white}
+  .passo.atual .passo-bola{background:var(--juridico);border-color:var(--juridico);color:white;box-shadow:0 0 0 4px rgba(91,63,160,.2)}
+  .passo-titulo{font-family:var(--ui);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);font-weight:700}
+  .passo.feito .passo-titulo,.passo.atual .passo-titulo{color:var(--marinho)}
+  .passo-sub{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:3px;line-height:1.4}
+
+  /* CAMPOS DE FORMULÁRIO · WIZARD */
+  .wizard-form{background:var(--branco);border:1px solid var(--cinza-cl);border-radius:2px;padding:32px;margin-bottom:18px}
+  .wizard-form-titulo{font-size:20px;font-weight:400;margin-bottom:6px;letter-spacing:-.2px}
+  .wizard-form-titulo em{color:var(--juridico);font-style:italic}
+  .wizard-form-sub{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-bottom:24px;letter-spacing:.3px;line-height:1.55}
+  .campo-w{margin-bottom:18px}
+  .campo-w label{display:block;font-family:var(--ui);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--marinho-med);margin-bottom:6px;font-weight:600}
+  .campo-w label .req{color:var(--vermelho);margin-left:2px}
+  .campo-w input,.campo-w select,.campo-w textarea{width:100%;padding:11px 14px;border:1px solid var(--cinza-cl);background:var(--branco);font-family:var(--serif);font-size:14px;color:var(--marinho);border-radius:2px;transition:all .15s}
+  .campo-w input:focus,.campo-w select:focus,.campo-w textarea:focus{outline:none;border-color:var(--juridico);box-shadow:0 0 0 3px rgba(91,63,160,.08)}
+  .campo-w .hint-w{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:6px;line-height:1.5;letter-spacing:.3px}
+  .campo-w .hint-w strong{color:var(--marinho)}
+  .grid-2-w{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-3-w{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+  /* AUTOCOMPLETE EX-EMPREGADO */
+  .autocomplete-card{padding:14px;border:1px solid var(--juridico);background:#EFE9FB;border-radius:2px;margin-top:8px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;cursor:pointer}
+  .autocomplete-card .av-ac{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#C44545,#8E2B2B);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-style:italic;font-size:15px;font-weight:600}
+  .autocomplete-card .info-ac{min-width:0}
+  .autocomplete-card .nome-ac{font-size:14px;font-weight:500;color:var(--marinho);font-family:var(--serif)}
+  .autocomplete-card .meta-ac{font-family:var(--ui);font-size:11px;color:var(--cinza);margin-top:3px}
+
+  /* PLEITOS · GRID DE CHECKBOXES VISUAIS */
+  .pleitos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .pleito-card{padding:14px;border:1px solid var(--cinza-cl);background:var(--branco);border-radius:2px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;cursor:pointer;transition:all .15s}
+  .pleito-card:hover{border-color:var(--juridico)}
+  .pleito-card.selecionado{border-color:var(--juridico);background:#EFE9FB;box-shadow:0 2px 6px rgba(91,63,160,.08)}
+  .pleito-check{width:22px;height:22px;border-radius:4px;border:2px solid var(--cinza-cl);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--branco)}
+  .pleito-card.selecionado .pleito-check{background:var(--juridico);border-color:var(--juridico);color:white}
+  .pleito-nome{font-size:13px;font-weight:500;color:var(--marinho);font-family:var(--serif);line-height:1.2}
+  .pleito-desc{font-family:var(--ui);font-size:10.5px;color:var(--cinza);margin-top:2px;letter-spacing:.3px}
+
+  /* SLIDER DE RISCO · 3 botões grandes */
+  .risco-opcoes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:6px}
+  .risco-opcao{padding:18px;border:2px solid var(--cinza-cl);background:var(--branco);border-radius:2px;text-align:center;cursor:pointer;transition:all .15s}
+  .risco-opcao:hover{border-color:var(--marinho)}
+  .risco-opcao.sel-provavel{border-color:var(--vermelho);background:var(--vermelho-cl);box-shadow:0 2px 6px rgba(196,69,69,.1)}
+  .risco-opcao.sel-possivel{border-color:var(--amarelo);background:var(--amarelo-cl)}
+  .risco-opcao.sel-remoto{border-color:var(--verde);background:var(--verde-cl)}
+  .risco-emoji{font-size:28px;margin-bottom:6px}
+  .risco-label-grande{font-family:var(--ui);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:var(--cinza)}
+  .risco-opcao.sel-provavel .risco-label-grande{color:var(--vermelho)}
+  .risco-opcao.sel-possivel .risco-label-grande{color:#876715}
+  .risco-opcao.sel-remoto .risco-label-grande{color:var(--verde)}
+  .risco-desc-pq{font-family:var(--ui);font-size:10px;color:var(--cinza);margin-top:6px;line-height:1.4}
+
+  /* SUGESTÃO IA · CAIXA ROXA */
+  .ia-sug{background:linear-gradient(135deg,var(--branco) 60%,#EFE9FB);border:1px solid var(--juridico);border-radius:2px;padding:18px;margin-top:14px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+  .ia-sug-ic{width:48px;height:48px;border-radius:50%;background:var(--juridico);color:white;display:flex;align-items:center;justify-content:center;font-size:22px}
+  .ia-sug-titulo{font-size:14px;font-weight:500;color:var(--marinho)}
+  .ia-sug-titulo em{color:var(--juridico);font-style:italic}
+  .ia-sug-desc{font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:3px;line-height:1.55}
+
+  /* PRÉVIA DO PROCESSO · STEP 4 */
+  .previa-proc{background:linear-gradient(135deg,var(--branco) 60%,#EFE9FB);border:2px solid var(--juridico);border-radius:4px;padding:24px;margin-bottom:18px}
+  .previa-cnj{font-family:'SF Mono','Monaco',monospace;font-size:14px;color:var(--juridico);letter-spacing:1px;font-weight:700;margin-bottom:6px}
+  .previa-titulo{font-size:22px;font-weight:400;letter-spacing:-.2px;margin-bottom:14px}
+  .previa-titulo em{color:var(--juridico);font-style:italic}
+
+  .previa-resumo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .previa-bloco{background:rgba(255,255,255,.6);border:1px solid var(--cinza-cl);border-radius:2px;padding:14px}
+  .previa-bloco h5{font-family:var(--ui);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--juridico);font-weight:700;margin-bottom:10px}
+  .previa-linha{display:flex;justify-content:space-between;padding:5px 0;font-family:var(--ui);font-size:12px;color:var(--cinza);border-bottom:1px dashed var(--cinza-cl)}
+  .previa-linha:last-child{border:none}
+  .previa-linha strong{color:var(--marinho);font-family:var(--serif);font-style:italic;font-weight:400}
+
+  /* RODAPÉ DO WIZARD · botões */
+  .wizard-rodape{position:sticky;bottom:0;background:var(--branco);border-top:1px solid var(--cinza-cl);padding:16px 36px;display:flex;justify-content:space-between;align-items:center;margin:24px -36px -60px;gap:14px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,.05);z-index:10}
+  .wizard-rodape-info{font-family:var(--ui);font-size:12px;color:var(--cinza)}
+  .wizard-rodape-info strong{color:var(--marinho)}
+
+  @media (max-width:1050px){
+    .kpis-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-2-1{grid-template-columns:1fr}
+    .header-bar{grid-template-columns:1fr;text-align:center}
+    .proc-card{grid-template-columns:auto 1fr;gap:10px}
+    .proc-valor,.proc-acoes{grid-column:2;text-align:left}
+    .tab-proc-linha{grid-template-columns:1fr;gap:8px}
+    .resumo-lista{grid-template-columns:repeat(2,1fr)}
+    .partes-grid{grid-template-columns:1fr}
+    .proc-header-top{grid-template-columns:1fr}
+    .calc-cenarios{grid-template-columns:1fr}
+    .calc-cen.realista{transform:none}
+    .docs-grid{grid-template-columns:1fr}
+    .info-row{grid-template-columns:1fr;gap:4px}
+    .tab-calc-linha{grid-template-columns:1fr;gap:6px}
+    .grid-2-w,.grid-3-w{grid-template-columns:1fr}
+    .pleitos-grid,.risco-opcoes{grid-template-columns:1fr}
+    .previa-resumo{grid-template-columns:1fr}
+    .passo:not(:last-child)::after{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- TELA 1: DASHBOARD DO ADVOGADO -->
+<div class="tela ativa" id="t-juri-dash">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">ESCRITÓRIO<strong>Vasconcellos &amp; Associados</strong></div>
+      <div class="sidebar-secao">Workspace Jurídico</div>
+      <div class="sidebar-item ativo"><span class="ic">⚖</span> Dashboard</div>
+      <div class="sidebar-item outro"><span class="ic">📋</span> Processos</div>
+      <div class="sidebar-item outro"><span class="ic">📅</span> Audiências</div>
+      <div class="sidebar-item outro"><span class="ic">📑</span> Petições &amp; Docs</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Cálculos</div>
+      <div class="sidebar-item outro"><span class="ic">🤝</span> Acordos</div>
+      <div class="sidebar-secao">Análise</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Provisões</div>
+      <div class="sidebar-item outro"><span class="ic">📈</span> Indicadores</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresas-clientes</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Equipe escritório</div>
+      <div class="sidebar-perfil">
+        <div class="av">HV</div>
+        <div>
+          <div class="nome">Dr. Henrique Vasconcellos</div>
+          <div class="cargo">⚖ Advogado Sênior · OAB/MG 78.452</div>
+          <div class="escritorio">Vasconcellos &amp; Associados</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a>Jurídico Trabalhista</a> &gt; <span style="color:var(--juridico)">Dashboard</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Jurídico <em>Trabalhista</em></h1>
+          <div class="meta">Dr. Henrique Vasconcellos · OAB/MG 78.452 · 3 empresas-clientes · ano 2026</div>
+          <div class="header-tags">
+            <span class="tag juridico">⚖ 18 processos ativos</span>
+            <span class="tag vermelho">🚨 1 audiência hoje</span>
+            <span class="tag amarelo">⏰ 3 prazos esta semana</span>
+            <span class="tag verde">2 acordos fechados em maio</span>
+            <span class="tag">R$ 1.86M em risco</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm">📋 Provisões contábeis</button>
+          <button class="btn btn-fantasma btn-sm">⤓ Relatório p/ Aurora</button>
+          <button class="btn btn-primario btn-sm">+ Cadastrar processo</button>
+        </div>
+      </div>
+
+      <!-- MULTI-EMPRESA · escritório atende 3 -->
+      <div class="multi-empresa-bar">
+        <div class="multi-empresa-label">🏢 Empresa-cliente:</div>
+        <div class="empresa-chip ativo">Todas <span class="num-proc">18</span></div>
+        <div class="empresa-chip">🏗 Construtora Aurora <span class="num-proc">12</span></div>
+        <div class="empresa-chip">🏭 Metalúrgica Horizonte <span class="num-proc">4</span></div>
+        <div class="empresa-chip">🏢 Pluma Tecnologia <span class="num-proc">2</span></div>
+      </div>
+
+      <div class="abas">
+        <div class="aba ativa"><span>⚖</span> Dashboard</div>
+        <div class="aba"><span>📋</span> Processos <span class="cnt">18</span></div>
+        <div class="aba"><span>📅</span> Audiências <span class="alerta">1</span></div>
+        <div class="aba"><span>📑</span> Petições</div>
+      </div>
+
+      <!-- KPIS -->
+      <div class="kpis-grid">
+        <div class="kpi destaque">
+          <div class="kpi-titulo">Processos ativos</div>
+          <div class="kpi-valor"><em>18</em></div>
+          <div class="kpi-meta">12 Aurora · 4 Horizonte · 2 Pluma</div>
+        </div>
+        <div class="kpi vermelho">
+          <div class="kpi-titulo">Valor total em risco</div>
+          <div class="kpi-valor" style="color:var(--vermelho)"><em>R$ 1.86M</em></div>
+          <div class="kpi-meta">R$ 842k provável · provisão obrigatória</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-titulo">Audiências próximas 30d</div>
+          <div class="kpi-valor"><em>7</em></div>
+          <div class="kpi-meta">1 hoje · 3 esta semana</div>
+        </div>
+        <div class="kpi verde">
+          <div class="kpi-titulo">Acordos · 2026 YTD</div>
+          <div class="kpi-valor"><em>5</em></div>
+          <div class="kpi-delta up">▲ economia R$ 312k vs sentenças</div>
+        </div>
+      </div>
+
+      <!-- ALERTA AUDIÊNCIA HOJE -->
+      <div class="alert alert-vermelho">
+        <span class="ic-grande">🚨</span>
+        <div>
+          <strong>AUDIÊNCIA HOJE · 14:30 · Fórum Trabalhista de BH</strong>
+          Processo nº <strong>0011234-56.2024.5.03.0021</strong> · José Roberto Pinheiro vs Construtora Aurora · 1ª VT de BH · <strong>Audiência inicial (conciliação)</strong> · valor da causa R$ 248k · você como patrono. Sair daqui 13:30.
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div>
+          <!-- PROCESSOS PRIORITÁRIOS · Top 5 -->
+          <div class="painel">
+            <h3>Processos <em>prioritários</em></h3>
+            <p class="sub-titulo">Top 5 por urgência e valor · clique para abrir</p>
+
+            <!-- 1. JOSÉ ROBERTO · HOJE -->
+            <div class="proc-card provavel urgente">
+              <div class="proc-ic">P</div>
+              <div class="proc-info">
+                <div class="proc-cnj">0011234-56.2024.5.03.0021 · 1ª VT BH</div>
+                <div class="proc-titulo">
+                  José Roberto Pinheiro vs <strong>Construtora Aurora</strong>
+                  <span class="tag vermelho" style="font-size:10px">🚨 AUDIÊNCIA HOJE 14:30</span>
+                </div>
+                <div class="proc-meta">
+                  Ex-pedreiro · 8 anos casa (2014-2022) · desligado sem justa causa · pleito: <strong>horas extras + adicional insalubridade (NR-15) + diferença FGTS</strong>
+                </div>
+                <div class="proc-tags-row">
+                  <span class="tag" style="font-size:10px">Horas extras</span>
+                  <span class="tag" style="font-size:10px">Insalubridade NR-15</span>
+                  <span class="tag" style="font-size:10px">FGTS</span>
+                  <span class="tag vermelho" style="font-size:10px">Risco PROVÁVEL</span>
+                </div>
+              </div>
+              <div class="proc-valor provavel">
+                <strong>R$ 248k</strong>
+                <span>valor causa</span>
+                <span style="color:var(--vermelho)">provisão: R$ 186k</span>
+              </div>
+              <div class="proc-acoes">
+                <button class="btn btn-primario btn-xs">📋 Abrir</button>
+                <button class="btn btn-fantasma btn-xs">📄 Peças</button>
+              </div>
+            </div>
+
+            <!-- 2. CARLOS MENDES · ACIDENTE -->
+            <div class="proc-card provavel">
+              <div class="proc-ic">P</div>
+              <div class="proc-info">
+                <div class="proc-cnj">0019876-43.2025.5.03.0048 · 4ª VT BH</div>
+                <div class="proc-titulo">
+                  Carlos Eduardo Mendes vs <strong>Construtora Aurora</strong>
+                  <span class="tag vermelho" style="font-size:10px">⚠ Acidente trabalho</span>
+                </div>
+                <div class="proc-meta">
+                  Ex-servente · acidente em queda de andaime (canteiro Pampulha · 03/2024) · <strong>NR-35 sem renovação</strong> · CAT emitida · INSS B91 · pleito: estabilidade + danos morais + materiais
+                </div>
+                <div class="proc-tags-row">
+                  <span class="tag" style="font-size:10px">Acidente NR-35</span>
+                  <span class="tag" style="font-size:10px">Danos morais</span>
+                  <span class="tag" style="font-size:10px">Estabilidade</span>
+                  <span class="tag vermelho" style="font-size:10px">Risco PROVÁVEL</span>
+                </div>
+              </div>
+              <div class="proc-valor provavel">
+                <strong>R$ 420k</strong>
+                <span>valor causa</span>
+                <span style="color:var(--vermelho)">provisão: R$ 336k</span>
+              </div>
+              <div class="proc-acoes">
+                <button class="btn btn-fantasma btn-xs">📋 Abrir</button>
+              </div>
+            </div>
+
+            <!-- 3. JOÃO SAMPAIO -->
+            <div class="proc-card possivel">
+              <div class="proc-ic">P</div>
+              <div class="proc-info">
+                <div class="proc-cnj">0024567-89.2026.5.03.0011 · 11ª VT BH</div>
+                <div class="proc-titulo">
+                  João Sampaio Ferreira vs <strong>Construtora Aurora</strong>
+                  <span class="tag amarelo" style="font-size:10px">Audiência 18/06</span>
+                </div>
+                <div class="proc-meta">
+                  Ex-servente · pediu demissão 15/05/2026 mas alega <strong>rescisão indireta</strong> (atrasos folha + horas extras não pagas) · 4 anos casa · ação ajuizada 22/05
+                </div>
+                <div class="proc-tags-row">
+                  <span class="tag" style="font-size:10px">Rescisão indireta</span>
+                  <span class="tag" style="font-size:10px">Horas extras</span>
+                  <span class="tag amarelo" style="font-size:10px">Risco POSSÍVEL</span>
+                </div>
+              </div>
+              <div class="proc-valor possivel">
+                <strong>R$ 84k</strong>
+                <span>valor causa</span>
+                <span style="color:#876715">provisão: R$ 42k</span>
+              </div>
+              <div class="proc-acoes">
+                <button class="btn btn-fantasma btn-xs">📋 Abrir</button>
+              </div>
+            </div>
+
+            <!-- 4. ANTÔNIO TEIXEIRA · NR-18 -->
+            <div class="proc-card possivel">
+              <div class="proc-ic">P</div>
+              <div class="proc-info">
+                <div class="proc-cnj">0008765-32.2025.5.03.0103 · 3ª VT Contagem</div>
+                <div class="proc-titulo">
+                  Antônio Teixeira vs <strong>Construtora Aurora</strong>
+                  <span class="tag amarelo" style="font-size:10px">Perícia agendada 02/06</span>
+                </div>
+                <div class="proc-meta">
+                  Ex-carpinteiro · pleito de <strong>adicional periculosidade + insalubridade cumulados</strong> · obra Sítio I (encerrada) · perícia técnica agendada
+                </div>
+                <div class="proc-tags-row">
+                  <span class="tag" style="font-size:10px">Periculosidade</span>
+                  <span class="tag" style="font-size:10px">Insalubridade</span>
+                  <span class="tag amarelo" style="font-size:10px">Risco POSSÍVEL</span>
+                </div>
+              </div>
+              <div class="proc-valor possivel">
+                <strong>R$ 142k</strong>
+                <span>valor causa</span>
+                <span style="color:#876715">provisão: R$ 71k</span>
+              </div>
+              <div class="proc-acoes">
+                <button class="btn btn-fantasma btn-xs">📋 Abrir</button>
+              </div>
+            </div>
+
+            <!-- 5. MARCOS REIS -->
+            <div class="proc-card remoto">
+              <div class="proc-ic">P</div>
+              <div class="proc-info">
+                <div class="proc-cnj">0029876-12.2026.5.03.0007 · 7ª VT BH</div>
+                <div class="proc-titulo">
+                  Marcos Reis Almeida vs <strong>Construtora Aurora</strong>
+                  <span class="tag verde" style="font-size:10px">contestação enviada</span>
+                </div>
+                <div class="proc-meta">
+                  Ex-auxiliar admin · saiu por acordo Art. 484-A em 22/05 · agora pleiteia <strong>nulidade do acordo</strong> alegando coação · sem provas robustas · acordo formalizado em cartório
+                </div>
+                <div class="proc-tags-row">
+                  <span class="tag" style="font-size:10px">Nulidade acordo</span>
+                  <span class="tag verde" style="font-size:10px">Risco REMOTO</span>
+                </div>
+              </div>
+              <div class="proc-valor remoto">
+                <strong>R$ 38k</strong>
+                <span>valor causa</span>
+                <span style="color:var(--verde)">provisão: R$ 3.8k</span>
+              </div>
+              <div class="proc-acoes">
+                <button class="btn btn-fantasma btn-xs">📋 Abrir</button>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding:12px;background:var(--cinza-fundo);border-radius:2px;font-family:var(--ui);font-size:12px;color:var(--cinza);text-align:center">
+              <strong style="color:var(--marinho)">+ 13 processos ativos</strong> · risco menor ou em fase inicial · <a style="color:var(--juridico);font-weight:600">Ver todos →</a>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- DISTRIBUIÇÃO POR RISCO -->
+          <div class="painel">
+            <h3 style="font-size:16px">Distribuição <em>por risco</em></h3>
+            <div class="sub-titulo">Classificação contábil CPC 25</div>
+
+            <div class="mini-pie">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <!-- 4 fatias: provável 45%, possível 28%, remoto 22%, em análise 5% -->
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#C44545" stroke-width="20" stroke-dasharray="170 377" stroke-dashoffset="0" transform="rotate(-90 70 70)"/>
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#D4A02C" stroke-width="20" stroke-dasharray="106 377" stroke-dashoffset="-170" transform="rotate(-90 70 70)"/>
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#2D7D5A" stroke-width="20" stroke-dasharray="83 377" stroke-dashoffset="-276" transform="rotate(-90 70 70)"/>
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#E8E4DC" stroke-width="20" stroke-dasharray="19 377" stroke-dashoffset="-359" transform="rotate(-90 70 70)"/>
+              </svg>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+                <div style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--marinho);line-height:1">18</div>
+                <div style="font-family:var(--ui);font-size:9px;color:var(--cinza);letter-spacing:1px;text-transform:uppercase;font-weight:600">total</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px;font-family:var(--ui);font-size:12px;margin-top:14px">
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--vermelho-cl);border-radius:2px;border-left:3px solid var(--vermelho)">
+                <span><strong style="color:var(--vermelho)">Provável</strong> · 8 processos</span>
+                <strong style="color:var(--vermelho);font-family:var(--serif);font-style:italic;font-size:14px">R$ 842k</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--amarelo-cl);border-radius:2px;border-left:3px solid var(--amarelo)">
+                <span><strong style="color:#876715">Possível</strong> · 5 processos</span>
+                <strong style="color:#876715;font-family:var(--serif);font-style:italic;font-size:14px">R$ 524k</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--verde-cl);border-radius:2px;border-left:3px solid var(--verde)">
+                <span><strong style="color:var(--verde)">Remoto</strong> · 4 processos</span>
+                <strong style="color:var(--verde);font-family:var(--serif);font-style:italic;font-size:14px">R$ 412k</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--cinza-fundo);border-radius:2px;border-left:3px solid var(--cinza)">
+                <span><strong style="color:var(--cinza)">Em análise</strong> · 1 processo</span>
+                <strong style="color:var(--cinza);font-family:var(--serif);font-style:italic;font-size:14px">R$ 82k</strong>
+              </div>
+            </div>
+
+            <div class="alert alert-roxo" style="margin-top:14px;margin-bottom:0">
+              <span class="ic-grande">📊</span>
+              <div>
+                <strong>Provisão obrigatória</strong>
+                <strong style="color:var(--juridico);font-family:var(--serif);font-style:italic;font-size:15px;font-weight:400">R$ 842k</strong> devem ir para "Provisões trabalhistas" no balanço (CPC 25 · valor dos riscos prováveis).
+              </div>
+            </div>
+          </div>
+
+          <!-- PRÓXIMAS AUDIÊNCIAS -->
+          <div class="painel">
+            <h3 style="font-size:16px">Próximas <em>audiências</em></h3>
+            <div class="sub-titulo">Calendário das próximas 4 semanas</div>
+
+            <div class="audiencia-card hoje">
+              <div class="audiencia-data">
+                <div class="dia">26</div>
+                <div class="mes">MAI</div>
+                <div class="hora">14:30</div>
+              </div>
+              <div class="audiencia-info-card">
+                <div class="audiencia-tipo">🚨 HOJE · Conciliação inicial</div>
+                <div class="audiencia-titulo">José Roberto Pinheiro</div>
+                <div class="audiencia-meta-pq">1ª VT BH · sala 04 · Aurora</div>
+              </div>
+            </div>
+
+            <div class="audiencia-card semana">
+              <div class="audiencia-data">
+                <div class="dia">02</div>
+                <div class="mes">JUN</div>
+                <div class="hora">09:00</div>
+              </div>
+              <div class="audiencia-info-card">
+                <div class="audiencia-tipo">📅 Perícia técnica</div>
+                <div class="audiencia-titulo">Antônio Teixeira</div>
+                <div class="audiencia-meta-pq">3ª VT Contagem · canteiro Sítio I</div>
+              </div>
+            </div>
+
+            <div class="audiencia-card semana">
+              <div class="audiencia-data">
+                <div class="dia">05</div>
+                <div class="mes">JUN</div>
+                <div class="hora">10:00</div>
+              </div>
+              <div class="audiencia-info-card">
+                <div class="audiencia-tipo">📅 Instrução</div>
+                <div class="audiencia-titulo">Carlos E. Mendes</div>
+                <div class="audiencia-meta-pq">4ª VT BH · testemunhas Aurora</div>
+              </div>
+            </div>
+
+            <div class="audiencia-card">
+              <div class="audiencia-data">
+                <div class="dia">18</div>
+                <div class="mes">JUN</div>
+                <div class="hora">15:00</div>
+              </div>
+              <div class="audiencia-info-card">
+                <div class="audiencia-tipo">📅 Conciliação inicial</div>
+                <div class="audiencia-titulo">João Sampaio</div>
+                <div class="audiencia-meta-pq">11ª VT BH · Aurora</div>
+              </div>
+            </div>
+
+            <div class="audiencia-card">
+              <div class="audiencia-data">
+                <div class="dia">25</div>
+                <div class="mes">JUN</div>
+                <div class="hora">14:00</div>
+              </div>
+              <div class="audiencia-info-card">
+                <div class="audiencia-tipo">📅 Instrução</div>
+                <div class="audiencia-titulo">Sérgio Brandão (Horizonte)</div>
+                <div class="audiencia-meta-pq">2ª VT Betim · testemunhas</div>
+              </div>
+            </div>
+
+            <div style="margin-top:10px;padding:10px;font-family:var(--ui);font-size:11px;color:var(--cinza);text-align:center;background:var(--cinza-fundo);border-radius:2px">
+              <strong style="color:var(--marinho)">+ 2 audiências</strong> em julho · <a style="color:var(--juridico);font-weight:600">Ver calendário →</a>
+            </div>
+          </div>
+
+          <!-- AÇÕES RÁPIDAS -->
+          <div class="painel" style="background:var(--juridico);color:var(--papel);border:none;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(232,99,58,.18) 0%,transparent 65%);pointer-events:none"></div>
+            <h3 style="font-size:16px;color:var(--papel);position:relative">📊 Relatório <em style="color:var(--laranja)">mensal</em></h3>
+            <div style="font-family:var(--ui);font-size:11px;opacity:.5;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;position:relative">Para a Aurora · maio/2026</div>
+            <p style="font-family:var(--ui);font-size:12.5px;line-height:1.55;opacity:.85;margin-top:14px;position:relative">Resumo executivo dos 12 processos da Aurora · 2 acordos fechados · R$ 312k economizados · pronto para envio.</p>
+            <button class="btn btn-primario btn-sm" style="width:100%;justify-content:center;margin-top:14px;position:relative">📤 Enviar para Roberto Aurora</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- TELA 2: LISTA DE PROCESSOS -->
+<div class="tela" id="t-juri-lista">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">ESCRITÓRIO<strong>Vasconcellos &amp; Associados</strong></div>
+      <div class="sidebar-secao">Workspace Jurídico</div>
+      <div class="sidebar-item" onclick="irPara('t-juri-dash')"><span class="ic">⚖</span> Dashboard</div>
+      <div class="sidebar-item ativo"><span class="ic">📋</span> Processos</div>
+      <div class="sidebar-item outro"><span class="ic">📅</span> Audiências</div>
+      <div class="sidebar-item outro"><span class="ic">📑</span> Petições &amp; Docs</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Cálculos</div>
+      <div class="sidebar-item outro"><span class="ic">🤝</span> Acordos</div>
+      <div class="sidebar-secao">Análise</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Provisões</div>
+      <div class="sidebar-item outro"><span class="ic">📈</span> Indicadores</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresas-clientes</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Equipe escritório</div>
+      <div class="sidebar-perfil">
+        <div class="av">HV</div>
+        <div>
+          <div class="nome">Dr. Henrique Vasconcellos</div>
+          <div class="cargo">⚖ Advogado Sênior · OAB/MG 78.452</div>
+          <div class="escritorio">Vasconcellos &amp; Associados</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-juri-dash')">Jurídico Trabalhista</a> &gt; <span style="color:var(--juridico)">Processos</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>Lista de <em>processos</em></h1>
+          <div class="meta">18 processos ativos · 3 empresas-clientes · ordenado por urgência · busca por CNJ, parte ou pleito</div>
+          <div class="header-tags">
+            <span class="tag juridico">⚖ 18 ativos</span>
+            <span class="tag verde">5 acordos · 2026 YTD</span>
+            <span class="tag">3 sentenças favoráveis</span>
+            <span class="tag amarelo">1 sentença desfavorável (em recurso)</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm">⤓ Exportar Excel</button>
+          <button class="btn btn-fantasma btn-sm">📋 Visualização em quadro</button>
+          <button class="btn btn-primario btn-sm" onclick="irPara('t-juri-wizard')">+ Cadastrar processo</button>
+        </div>
+      </div>
+
+      <!-- MULTI-EMPRESA -->
+      <div class="multi-empresa-bar">
+        <div class="multi-empresa-label">🏢 Empresa-cliente:</div>
+        <div class="empresa-chip ativo">Todas <span class="num-proc">18</span></div>
+        <div class="empresa-chip">🏗 Construtora Aurora <span class="num-proc">12</span></div>
+        <div class="empresa-chip">🏭 Metalúrgica Horizonte <span class="num-proc">4</span></div>
+        <div class="empresa-chip">🏢 Pluma Tecnologia <span class="num-proc">2</span></div>
+      </div>
+
+      <div class="abas">
+        <div class="aba" onclick="irPara('t-juri-dash')"><span>⚖</span> Dashboard</div>
+        <div class="aba ativa"><span>📋</span> Processos <span class="cnt">18</span></div>
+        <div class="aba"><span>📅</span> Audiências <span class="alerta">1</span></div>
+        <div class="aba"><span>📑</span> Petições</div>
+      </div>
+
+      <!-- RESUMO POR RISCO · 4 cards -->
+      <div class="resumo-lista">
+        <div class="resumo-bar provavel">
+          <div class="resumo-bar-label">Provável</div>
+          <div class="resumo-bar-num">8</div>
+          <div class="resumo-bar-valor">processos · <strong>R$ 842k</strong></div>
+        </div>
+        <div class="resumo-bar possivel">
+          <div class="resumo-bar-label">Possível</div>
+          <div class="resumo-bar-num">5</div>
+          <div class="resumo-bar-valor">processos · <strong>R$ 524k</strong></div>
+        </div>
+        <div class="resumo-bar remoto">
+          <div class="resumo-bar-label">Remoto</div>
+          <div class="resumo-bar-num">4</div>
+          <div class="resumo-bar-valor">processos · <strong>R$ 412k</strong></div>
+        </div>
+        <div class="resumo-bar analise">
+          <div class="resumo-bar-label">Em análise</div>
+          <div class="resumo-bar-num">1</div>
+          <div class="resumo-bar-valor">processo · <strong>R$ 82k</strong></div>
+        </div>
+      </div>
+
+      <!-- FILTROS DE BUSCA -->
+      <div class="filtros-juri">
+        <div class="busca-juri">
+          <span>⌕</span>
+          <input placeholder="Buscar por nº CNJ, nome da parte, vara, pleito..."/>
+        </div>
+        <select>
+          <option>Todos os tipos de ação</option>
+          <option>Reclamatória trabalhista</option>
+          <option>Acidente do trabalho</option>
+          <option>Ação de cumprimento</option>
+          <option>Execução trabalhista</option>
+        </select>
+        <select>
+          <option>Todas as fases</option>
+          <option>Conhecimento</option>
+          <option>Instrução</option>
+          <option>Sentenciado</option>
+          <option>Recurso ordinário</option>
+          <option>Execução</option>
+          <option>Acordo</option>
+        </select>
+        <select>
+          <option>Ordenar: urgência ↓</option>
+          <option>Valor ↓</option>
+          <option>Data ajuizamento ↓</option>
+          <option>Risco</option>
+          <option>Próxima audiência</option>
+        </select>
+      </div>
+
+      <!-- CHIPS · FILTROS RÁPIDOS -->
+      <div class="chips-juri">
+        <div class="chip-juri ativo">Todos <span class="num-c">18</span></div>
+        <div class="chip-juri">🚨 Urgentes <span class="num-c">4</span></div>
+        <div class="chip-juri">📅 Audiência em 30d <span class="num-c">7</span></div>
+        <div class="chip-juri">⚠ Horas extras <span class="num-c">9</span></div>
+        <div class="chip-juri">🪜 NRs / Acidente <span class="num-c">5</span></div>
+        <div class="chip-juri">💰 Insalubridade <span class="num-c">7</span></div>
+        <div class="chip-juri">🤝 Rescisão indireta <span class="num-c">3</span></div>
+      </div>
+
+      <!-- TABELA DE PROCESSOS -->
+      <div class="tab-proc">
+        <div class="tab-proc-linha head">
+          <div>Nº CNJ · Vara</div>
+          <div>Parte adversa · Pleito</div>
+          <div>Fase processual</div>
+          <div>Valor / Provisão</div>
+          <div style="text-align:center">Risco</div>
+          <div>Próximo evento</div>
+          <div></div>
+        </div>
+
+        <!-- 1. JOSÉ ROBERTO · HOJE -->
+        <div class="tab-proc-linha urgente" onclick="irPara('t-juri-ficha')">
+          <div class="tab-proc-cnj">
+            <strong>0011234-56.2024.5.03.0021</strong>
+            1ª VT BH · Aurora
+          </div>
+          <div>
+            <div class="tab-proc-parte">José Roberto Pinheiro</div>
+            <div class="tab-proc-empresa">Ex-pedreiro · <strong>HE + insalubridade NR-15 + FGTS</strong> · 8 anos casa</div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Conciliação</strong>
+            ajuizada 11/2024
+          </div>
+          <div class="tab-proc-valor alto">
+            R$ 248k
+            <span>provisão R$ 186k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco provavel">Provável</span>
+          </div>
+          <div class="tab-proc-proxima urgente">
+            <strong>🚨 HOJE 14:30</strong>
+            Conciliação inicial
+          </div>
+          <div><button class="btn btn-primario btn-xs">📋</button></div>
+        </div>
+
+        <!-- 2. CARLOS MENDES · ACIDENTE -->
+        <div class="tab-proc-linha urgente">
+          <div class="tab-proc-cnj">
+            <strong>0019876-43.2025.5.03.0048</strong>
+            4ª VT BH · Aurora
+          </div>
+          <div>
+            <div class="tab-proc-parte">Carlos Eduardo Mendes</div>
+            <div class="tab-proc-empresa">Ex-servente · <strong>acidente NR-35 + danos morais + estabilidade</strong></div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Instrução</strong>
+            ajuizada 06/2025
+          </div>
+          <div class="tab-proc-valor alto">
+            R$ 420k
+            <span>provisão R$ 336k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco provavel">Provável</span>
+          </div>
+          <div class="tab-proc-proxima urgente">
+            <strong>05/06 10h</strong>
+            Audiência instrução
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+
+        <!-- 3. JOÃO SAMPAIO -->
+        <div class="tab-proc-linha atencao">
+          <div class="tab-proc-cnj">
+            <strong>0024567-89.2026.5.03.0011</strong>
+            11ª VT BH · Aurora
+          </div>
+          <div>
+            <div class="tab-proc-parte">João Sampaio Ferreira</div>
+            <div class="tab-proc-empresa">Ex-servente · <strong>rescisão indireta + HE</strong> · saiu 15/05/2026</div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Conhecimento</strong>
+            ajuizada 22/05/2026
+          </div>
+          <div class="tab-proc-valor">
+            R$ 84k
+            <span>provisão R$ 42k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco possivel">Possível</span>
+          </div>
+          <div class="tab-proc-proxima">
+            <strong>18/06 15h</strong>
+            Conciliação inicial
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+
+        <!-- 4. ANTÔNIO TEIXEIRA -->
+        <div class="tab-proc-linha atencao">
+          <div class="tab-proc-cnj">
+            <strong>0008765-32.2025.5.03.0103</strong>
+            3ª VT Contagem · Aurora
+          </div>
+          <div>
+            <div class="tab-proc-parte">Antônio Teixeira</div>
+            <div class="tab-proc-empresa">Ex-carpinteiro · <strong>periculosidade + insalubridade cumulados</strong></div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Perícia</strong>
+            ajuizada 03/2025
+          </div>
+          <div class="tab-proc-valor">
+            R$ 142k
+            <span>provisão R$ 71k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco possivel">Possível</span>
+          </div>
+          <div class="tab-proc-proxima">
+            <strong>02/06 09h</strong>
+            Perícia técnica
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+
+        <!-- 5. MARCOS REIS -->
+        <div class="tab-proc-linha">
+          <div class="tab-proc-cnj">
+            <strong>0029876-12.2026.5.03.0007</strong>
+            7ª VT BH · Aurora
+          </div>
+          <div>
+            <div class="tab-proc-parte">Marcos Reis Almeida</div>
+            <div class="tab-proc-empresa">Ex-aux. admin · <strong>nulidade acordo 484-A</strong> · alega coação</div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Conhecimento</strong>
+            contestação enviada
+          </div>
+          <div class="tab-proc-valor">
+            R$ 38k
+            <span>provisão R$ 3.8k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco remoto">Remoto</span>
+          </div>
+          <div class="tab-proc-proxima">
+            <strong>15/07 14h</strong>
+            Conciliação
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+
+        <!-- 6. SÉRGIO BRANDÃO · Horizonte -->
+        <div class="tab-proc-linha">
+          <div class="tab-proc-cnj">
+            <strong>0014532-87.2024.5.03.0145</strong>
+            2ª VT Betim · Horizonte
+          </div>
+          <div>
+            <div class="tab-proc-parte">Sérgio Brandão Lopes</div>
+            <div class="tab-proc-empresa">Ex-soldador · <strong>insalubridade + adicional noturno</strong></div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Instrução</strong>
+            ajuizada 09/2024
+          </div>
+          <div class="tab-proc-valor">
+            R$ 156k
+            <span>provisão R$ 78k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco possivel">Possível</span>
+          </div>
+          <div class="tab-proc-proxima">
+            <strong>25/06 14h</strong>
+            Instrução
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+
+        <!-- 7. CONCEIÇÃO ALVES · Aurora -->
+        <div class="tab-proc-linha">
+          <div class="tab-proc-cnj">
+            <strong>0016789-54.2024.5.03.0021</strong>
+            1ª VT BH · Aurora
+          </div>
+          <div>
+            <div class="tab-proc-parte">Conceição Alves dos Santos</div>
+            <div class="tab-proc-empresa">Ex-cozinheira · <strong>equiparação salarial + horas extras</strong></div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Sentenciado</strong>
+            recurso ordinário
+          </div>
+          <div class="tab-proc-valor">
+            R$ 78k
+            <span>provisão R$ 62k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco provavel">Provável</span>
+          </div>
+          <div class="tab-proc-proxima">
+            <strong>—</strong>
+            aguardando TRT
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+
+        <!-- 8. PAULO ROBERTO · Aurora -->
+        <div class="tab-proc-linha">
+          <div class="tab-proc-cnj">
+            <strong>0031245-67.2025.5.03.0048</strong>
+            4ª VT BH · Aurora
+          </div>
+          <div>
+            <div class="tab-proc-parte">Paulo Roberto Sarmento</div>
+            <div class="tab-proc-empresa">Ex-pedreiro · <strong>diferenças FGTS + verbas rescisórias</strong></div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Conhecimento</strong>
+            ajuizada 10/2025
+          </div>
+          <div class="tab-proc-valor">
+            R$ 62k
+            <span>provisão R$ 6.2k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco remoto">Remoto</span>
+          </div>
+          <div class="tab-proc-proxima">
+            <strong>03/07 16h</strong>
+            Conciliação
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+
+        <!-- 9. DOUGLAS · Aurora · acidente -->
+        <div class="tab-proc-linha">
+          <div class="tab-proc-cnj">
+            <strong>0022345-78.2025.5.03.0103</strong>
+            3ª VT Contagem · Aurora
+          </div>
+          <div>
+            <div class="tab-proc-parte">Douglas Vieira Tavares</div>
+            <div class="tab-proc-empresa">Ex-encarregado · <strong>acidente NR-18 + danos materiais</strong></div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Perícia</strong>
+            ajuizada 08/2025
+          </div>
+          <div class="tab-proc-valor alto">
+            R$ 286k
+            <span>provisão R$ 142k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco possivel">Possível</span>
+          </div>
+          <div class="tab-proc-proxima">
+            <strong>11/07 09h</strong>
+            Perícia técnica
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+
+        <!-- 10. SIMONE · Pluma -->
+        <div class="tab-proc-linha">
+          <div class="tab-proc-cnj">
+            <strong>0027890-12.2026.5.03.0007</strong>
+            7ª VT BH · Pluma
+          </div>
+          <div>
+            <div class="tab-proc-parte">Simone Castro Ribeiro</div>
+            <div class="tab-proc-empresa">Ex-desenvolvedora · <strong>HE + assédio moral</strong></div>
+          </div>
+          <div class="tab-proc-fase">
+            <strong>Conhecimento</strong>
+            ajuizada 02/2026
+          </div>
+          <div class="tab-proc-valor">
+            R$ 96k
+            <span>provisão R$ 28k</span>
+          </div>
+          <div class="tab-proc-risco">
+            <span class="pill-risco analise">Análise</span>
+          </div>
+          <div class="tab-proc-proxima">
+            <strong>22/07 11h</strong>
+            Conciliação
+          </div>
+          <div><button class="btn btn-fantasma btn-xs">📋</button></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:18px;font-family:var(--ui);font-size:12px;color:var(--cinza);margin-top:14px">
+        Mostrando 10 de 18 processos · <a style="color:var(--juridico);font-weight:600">Carregar próximos 8 →</a>
+      </div>
+
+      <!-- ALERTA DE PROVISÃO -->
+      <div class="alert alert-roxo">
+        <span class="ic-grande">📊</span>
+        <div>
+          <strong>Provisões contábeis · próximo fechamento</strong>
+          Soma das provisões prováveis: <strong style="color:var(--juridico);font-family:var(--serif);font-style:italic;font-size:15px;font-weight:400">R$ 842.000</strong> · valor que deve ser registrado em "Provisões Trabalhistas" no balancete de junho (CPC 25). Relatório de provisões pronto para envio aos contadores da Aurora, Horizonte e Pluma.
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- TELA 3: FICHA DO PROCESSO · JOSÉ ROBERTO -->
+<div class="tela" id="t-juri-ficha">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">ESCRITÓRIO<strong>Vasconcellos &amp; Associados</strong></div>
+      <div class="sidebar-secao">Workspace Jurídico</div>
+      <div class="sidebar-item" onclick="irPara('t-juri-dash')"><span class="ic">⚖</span> Dashboard</div>
+      <div class="sidebar-item ativo"><span class="ic">📋</span> Processos</div>
+      <div class="sidebar-item outro"><span class="ic">📅</span> Audiências</div>
+      <div class="sidebar-item outro"><span class="ic">📑</span> Petições &amp; Docs</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Cálculos</div>
+      <div class="sidebar-item outro"><span class="ic">🤝</span> Acordos</div>
+      <div class="sidebar-secao">Análise</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Provisões</div>
+      <div class="sidebar-item outro"><span class="ic">📈</span> Indicadores</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresas-clientes</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Equipe escritório</div>
+      <div class="sidebar-perfil">
+        <div class="av">HV</div>
+        <div>
+          <div class="nome">Dr. Henrique Vasconcellos</div>
+          <div class="cargo">⚖ Advogado Sênior · OAB/MG 78.452</div>
+          <div class="escritorio">Vasconcellos &amp; Associados</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-juri-dash')">Jurídico</a> &gt; <a onclick="irPara('t-juri-lista')">Processos</a> &gt; <span style="color:var(--juridico)">José Roberto Pinheiro</span></div>
+
+      <!-- HEADER DO PROCESSO -->
+      <div class="proc-header provavel">
+        <div class="proc-header-top">
+          <div>
+            <div class="proc-cnj-grande">⚖ 0011234-56.2024.5.03.0021</div>
+            <h1 class="proc-titulo-grande">José Roberto Pinheiro vs <em>Construtora Aurora</em></h1>
+            <div class="proc-subtitulo">
+              <strong>1ª Vara do Trabalho de Belo Horizonte</strong> · Juiz titular Dr. Pedro Henrique Coelho · ajuizada 14/11/2024 · em fase de <strong>conciliação inicial</strong>
+            </div>
+            <div class="proc-tags-grandes">
+              <span class="tag vermelho">🚨 Audiência HOJE 14:30</span>
+              <span class="tag vermelho">Risco PROVÁVEL</span>
+              <span class="tag">Horas extras</span>
+              <span class="tag">Insalubridade NR-15</span>
+              <span class="tag">Diferença FGTS</span>
+              <span class="tag juridico">12 documentos</span>
+              <span class="tag">15 andamentos</span>
+            </div>
+          </div>
+          <div class="proc-acoes-grandes">
+            <button class="btn btn-primario btn-sm" style="background:var(--vermelho);justify-content:center">🚨 Preparar audiência</button>
+            <button class="btn btn-fantasma btn-sm" style="justify-content:center">📄 Baixar autos completo</button>
+            <button class="btn btn-fantasma btn-sm" style="justify-content:center">🤝 Propor acordo</button>
+            <button class="btn btn-fantasma btn-sm" style="justify-content:center">📤 Enviar para Roberto</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABAS DA FICHA -->
+      <div class="abas-ficha">
+        <div class="aba-ficha ativa"><span>📋</span> Visão geral</div>
+        <div class="aba-ficha"><span>📅</span> Timeline <span class="cnt" style="background:var(--juridico);color:white">15</span></div>
+        <div class="aba-ficha"><span>💰</span> Cálculos</div>
+        <div class="aba-ficha"><span>📑</span> Documentos <span class="cnt" style="background:var(--cinza-fundo)">12</span></div>
+        <div class="aba-ficha"><span>👥</span> Partes &amp; Procuradores</div>
+        <div class="aba-ficha"><span>💬</span> Anotações privadas</div>
+      </div>
+
+      <!-- PARTES · 2 CARDS -->
+      <div class="partes-grid">
+        <!-- RECLAMANTE -->
+        <div class="parte-card reclamante">
+          <div class="parte-papel-label">⚠ RECLAMANTE · ex-empregado</div>
+          <div class="parte-pessoa-row">
+            <div class="parte-foto" style="background:linear-gradient(135deg,#C44545,#8E2B2B)">JR</div>
+            <div>
+              <div class="parte-nome-grande">José Roberto Pinheiro</div>
+              <div class="parte-cargo-info">Ex-pedreiro · matrícula histórica 0089 (excluído 03/2022)</div>
+            </div>
+          </div>
+          <div class="parte-dados">
+            <div class="rotulo">CPF</div>
+            <div class="valor-c">123.456.789-00</div>
+            <div class="rotulo">Admissão</div>
+            <div class="valor-c">15/02/2014</div>
+            <div class="rotulo">Desligamento</div>
+            <div class="valor-c">10/03/2022 · sem justa causa</div>
+            <div class="rotulo">Tempo casa</div>
+            <div class="valor-c">8 anos · 25 dias</div>
+            <div class="rotulo">Último salário</div>
+            <div class="valor-c">R$ 2.840 + insalubridade</div>
+            <div class="rotulo">Procurador</div>
+            <div class="valor-c">Dr. Marcus Vilela · OAB/MG 45.221</div>
+          </div>
+          <button class="botao-ficha-empregado">📁 Abrir ficha histórica do empregado</button>
+        </div>
+
+        <!-- RECLAMADA -->
+        <div class="parte-card reclamada">
+          <div class="parte-papel-label">⚖ RECLAMADA · empresa</div>
+          <div class="parte-pessoa-row">
+            <div class="parte-foto" style="background:linear-gradient(135deg,#7E5BCC,#5B3FA0);font-size:14px">CA</div>
+            <div>
+              <div class="parte-nome-grande">Construtora Aurora Ltda</div>
+              <div class="parte-cargo-info">Empresa-cliente Premium · 128 empregados</div>
+            </div>
+          </div>
+          <div class="parte-dados">
+            <div class="rotulo">CNPJ</div>
+            <div class="valor-c">12.345.678/0001-90</div>
+            <div class="rotulo">CNAE</div>
+            <div class="valor-c">41.20-4-00 Construção</div>
+            <div class="rotulo">Endereço</div>
+            <div class="valor-c">Av. Olegário Maciel, 2520 · BH/MG</div>
+            <div class="rotulo">Representante</div>
+            <div class="valor-c">Roberto Aurora · Dir. RH</div>
+            <div class="rotulo">Patrono</div>
+            <div class="valor-c">Dr. Henrique Vasconcellos · você</div>
+            <div class="rotulo">Apoio escritório</div>
+            <div class="valor-c">Dra. Patrícia Reis (paralegal)</div>
+          </div>
+          <button class="botao-ficha-empregado" style="background:var(--marinho)">🏢 Abrir ficha da empresa-cliente</button>
+        </div>
+      </div>
+
+      <!-- DETALHES DO PROCESSO · INFO LINHA -->
+      <div class="painel">
+        <h3>Dados do <em>processo</em></h3>
+        <p class="sub-titulo">Informações cadastrais e processuais</p>
+
+        <div class="info-row">
+          <span class="rot">Tipo de ação</span>
+          <span class="val">Reclamatória Trabalhista · rito ordinário</span>
+        </div>
+        <div class="info-row">
+          <span class="rot">Vara &amp; Juiz</span>
+          <span class="val">1ª Vara do Trabalho de Belo Horizonte · <strong>Dr. Pedro Henrique Coelho</strong></span>
+        </div>
+        <div class="info-row">
+          <span class="rot">Data ajuizamento</span>
+          <span class="val">14/11/2024 · há 1 ano e 6 meses</span>
+        </div>
+        <div class="info-row">
+          <span class="rot">Fase atual</span>
+          <span class="val"><strong>Conhecimento</strong> · aguardando audiência inicial (hoje)</span>
+        </div>
+        <div class="info-row">
+          <span class="rot">Valor da causa</span>
+          <span class="val"><strong>R$ 248.000,00</strong></span>
+        </div>
+        <div class="info-row">
+          <span class="rot">Pleitos</span>
+          <span class="val">Horas extras 50% (não pagas 2016-2022) · Adicional Insalubridade 20% NR-15 · Diferenças FGTS · Honorários sucumbenciais</span>
+        </div>
+        <div class="info-row">
+          <span class="rot">Status legal</span>
+          <span class="val">Em curso · contestação enviada em 22/01/2025 · réplica do reclamante em 14/02/2025</span>
+        </div>
+        <div class="info-row">
+          <span class="rot">Provisão registrada</span>
+          <span class="val"><strong>R$ 186.000</strong> (75% do valor causa · CPC 25 · risco provável)</span>
+        </div>
+      </div>
+
+      <!-- CÁLCULO DE RISCO · CENÁRIOS -->
+      <div class="calc-risco">
+        <div class="calc-head-row">
+          <div>
+            <div class="calc-titulo">💰 Cálculo de <em>risco financeiro</em></div>
+            <div class="calc-sub-c">Análise quantitativa · 3 cenários · valores atualizados pela Selic</div>
+          </div>
+          <button class="btn btn-fantasma btn-sm">🤖 Recalcular com IA</button>
+        </div>
+
+        <div class="calc-cenarios">
+          <div class="calc-cen melhor">
+            <div class="calc-cen-label">🟢 Melhor caso · 25%</div>
+            <div class="calc-cen-valor">R$ 48k</div>
+            <div class="calc-cen-desc">Acordo em conciliação · só insalubridade · 50% de desconto</div>
+          </div>
+          <div class="calc-cen realista">
+            <div class="calc-cen-label">🟡 Cenário realista · 60%</div>
+            <div class="calc-cen-valor">R$ 186k</div>
+            <div class="calc-cen-desc">Procedência parcial · 75% do pleito · sem juros moratórios</div>
+          </div>
+          <div class="calc-cen pior">
+            <div class="calc-cen-label">🔴 Pior caso · 15%</div>
+            <div class="calc-cen-valor">R$ 296k</div>
+            <div class="calc-cen-desc">Procedência total + juros + honorários sucumbenciais</div>
+          </div>
+        </div>
+
+        <!-- DETALHAMENTO DAS PARCELAS -->
+        <div style="font-family:var(--ui);font-size:11px;letter-spacing:1px;color:var(--cinza);font-weight:700;text-transform:uppercase;margin-bottom:8px">📊 Detalhamento · cenário realista</div>
+
+        <div class="tab-calc">
+          <div class="tab-calc-linha head">
+            <div>Parcela</div>
+            <div>Período</div>
+            <div>Cálculo</div>
+            <div>Valor</div>
+          </div>
+          <div class="tab-calc-linha">
+            <div class="tab-calc-parcela">Horas extras 50%<span class="ref">não pagas (CLT art. 7º XVI)</span></div>
+            <div>02/2016 a 03/2022</div>
+            <div>2.847h × R$ 21,55</div>
+            <div class="tab-calc-valor">R$ 61.353</div>
+          </div>
+          <div class="tab-calc-linha">
+            <div class="tab-calc-parcela">Reflexos HE em DSR<span class="ref">Súmula 172 TST</span></div>
+            <div>2016-2022</div>
+            <div>1/6 do total HE</div>
+            <div class="tab-calc-valor">R$ 10.225</div>
+          </div>
+          <div class="tab-calc-linha">
+            <div class="tab-calc-parcela">Insalubridade 20%<span class="ref">NR-15 anexo 14 · poeira</span></div>
+            <div>02/2014 a 03/2022</div>
+            <div>96 meses × R$ 568</div>
+            <div class="tab-calc-valor">R$ 54.528</div>
+          </div>
+          <div class="tab-calc-linha">
+            <div class="tab-calc-parcela">Reflexos insalubridade<span class="ref">13º + férias + FGTS</span></div>
+            <div>2014-2022</div>
+            <div>30% sobre valor</div>
+            <div class="tab-calc-valor">R$ 16.358</div>
+          </div>
+          <div class="tab-calc-linha">
+            <div class="tab-calc-parcela">Diferenças FGTS<span class="ref">não recolhidas + multa 40%</span></div>
+            <div>04/2020 a 03/2022</div>
+            <div>24 meses</div>
+            <div class="tab-calc-valor">R$ 12.840</div>
+          </div>
+          <div class="tab-calc-linha">
+            <div class="tab-calc-parcela">Honorários advocatícios<span class="ref">CLT art. 791-A · 15%</span></div>
+            <div>—</div>
+            <div>15% sobre condenação</div>
+            <div class="tab-calc-valor">R$ 23.296</div>
+          </div>
+          <div class="tab-calc-linha">
+            <div class="tab-calc-parcela">Juros + atualização<span class="ref">Selic + IPCA · Lei 14.905/24</span></div>
+            <div>14/11/2024 até hoje</div>
+            <div>~10% acumulado</div>
+            <div class="tab-calc-valor">R$ 7.400</div>
+          </div>
+          <div class="tab-calc-linha total">
+            <div class="tab-calc-parcela">TOTAL ESTIMADO · cenário realista</div>
+            <div>—</div>
+            <div>—</div>
+            <div class="tab-calc-valor" style="color:var(--laranja);font-size:16px">R$ 186.000</div>
+          </div>
+        </div>
+
+        <div class="alert alert-roxo" style="margin-top:14px;margin-bottom:0">
+          <span class="ic-grande">💡</span>
+          <div>
+            <strong>Recomendação · acordo em conciliação hoje</strong>
+            Propor acordo de <strong style="color:var(--juridico);font-family:var(--serif);font-style:italic;font-size:14px;font-weight:400">R$ 80.000 a R$ 110.000</strong> tem ~70% de chance de aceite (baseado no histórico de 14 acordos similares). Economiza até <strong style="color:var(--verde)">R$ 106k</strong> vs cenário realista e <strong style="color:var(--verde)">R$ 216k</strong> vs pior caso. Sugiro abrir com R$ 80k.
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div>
+          <!-- TIMELINE DE ANDAMENTOS · ÚLTIMOS 8 -->
+          <div class="painel">
+            <h3>Timeline de <em>andamentos</em></h3>
+            <p class="sub-titulo">Últimos 8 eventos · 15 totais</p>
+
+            <div class="timeline-proc">
+              <div class="tl-linha">
+                <div class="tl-data-col">26/05<span>HOJE</span></div>
+                <div class="tl-conteudo urgente">
+                  <div class="tl-tipo-label">🚨 AUDIÊNCIA · em 4 horas</div>
+                  <div class="tl-titulo-evento">Audiência inicial de conciliação · 14:30</div>
+                  <div class="tl-desc">Sala 04 · 1ª VT BH · presença obrigatória do reclamante e preposto da Aurora. Você representa a empresa.</div>
+                </div>
+              </div>
+
+              <div class="tl-linha">
+                <div class="tl-data-col">22/05<span>SEX</span></div>
+                <div class="tl-conteudo peticao">
+                  <div class="tl-tipo-label">📑 PETIÇÃO · você protocolou</div>
+                  <div class="tl-titulo-evento">Manifestação sobre proposta de acordo</div>
+                  <div class="tl-desc">Petição de 4 páginas indicando disposição para negociar acordo até R$ 110k. Protocolada via PJe às 18:42.</div>
+                  <span class="tl-doc-anexo">📎 manif_proposta_acordo.pdf</span>
+                </div>
+              </div>
+
+              <div class="tl-linha">
+                <div class="tl-data-col">18/05<span>SEG</span></div>
+                <div class="tl-conteudo evento">
+                  <div class="tl-tipo-label">📋 DESPACHO</div>
+                  <div class="tl-titulo-evento">Audiência de conciliação designada</div>
+                  <div class="tl-desc">Juiz Dr. Pedro Henrique designou audiência inicial para 26/05/2026 às 14:30.</div>
+                </div>
+              </div>
+
+              <div class="tl-linha">
+                <div class="tl-data-col">14/02/25<span>QUI</span></div>
+                <div class="tl-conteudo peticao">
+                  <div class="tl-tipo-label">📑 PETIÇÃO · do reclamante</div>
+                  <div class="tl-titulo-evento">Réplica do reclamante</div>
+                  <div class="tl-desc">Procurador Dr. Marcus Vilela apresentou réplica de 18 páginas refutando a contestação. Manteve pedidos integralmente.</div>
+                  <span class="tl-doc-anexo">📎 replica_reclamante.pdf</span>
+                </div>
+              </div>
+
+              <div class="tl-linha">
+                <div class="tl-data-col">22/01/25<span>QUA</span></div>
+                <div class="tl-conteudo peticao">
+                  <div class="tl-tipo-label">📑 PETIÇÃO · você protocolou</div>
+                  <div class="tl-titulo-evento">Contestação enviada · 42 páginas</div>
+                  <div class="tl-desc">Defesa preliminar arguindo prescrição quinquenal + impugnação de horas extras alegadas + apresentação de espelhos de ponto + comprovantes de pagamento de insalubridade no período correto.</div>
+                  <span class="tl-doc-anexo">📎 contestacao_aurora.pdf</span>
+                  <span class="tl-doc-anexo">📎 espelhos_ponto_2016_2022.pdf</span>
+                </div>
+              </div>
+
+              <div class="tl-linha">
+                <div class="tl-data-col">15/12/24<span>DOM</span></div>
+                <div class="tl-conteudo evento">
+                  <div class="tl-tipo-label">📩 CITAÇÃO RECEBIDA</div>
+                  <div class="tl-titulo-evento">Citação válida em 15/12/2024</div>
+                  <div class="tl-desc">Prazo de 30 dias para contestação · vencimento 14/01/2025.</div>
+                </div>
+              </div>
+
+              <div class="tl-linha">
+                <div class="tl-data-col">14/11/24<span>QUI</span></div>
+                <div class="tl-conteudo evento">
+                  <div class="tl-tipo-label">⚖ DISTRIBUIÇÃO</div>
+                  <div class="tl-titulo-evento">Ação distribuída · 1ª VT BH</div>
+                  <div class="tl-desc">Reclamatória ajuizada pelo Dr. Marcus Vilela em nome do José Roberto Pinheiro. Valor da causa R$ 248k.</div>
+                  <span class="tl-doc-anexo">📎 peticao_inicial.pdf</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px">📋 Ver todos os 15 andamentos →</button>
+          </div>
+        </div>
+
+        <div>
+          <!-- DOCUMENTOS ANEXOS -->
+          <div class="painel">
+            <h3 style="font-size:16px"><em>Documentos</em> do processo</h3>
+            <p class="sub-titulo">12 anexos · 8 enviados ao PJe</p>
+
+            <div class="docs-grid" style="grid-template-columns:1fr">
+              <div class="doc-card">
+                <div class="doc-ic pdf">PDF</div>
+                <div class="doc-info-card">
+                  <div class="doc-nome">Petição inicial</div>
+                  <div class="doc-meta-pq">14/11/2024 · 22 páginas · 1.4 MB</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⤓</button>
+              </div>
+              <div class="doc-card">
+                <div class="doc-ic pdf">PDF</div>
+                <div class="doc-info-card">
+                  <div class="doc-nome">Contestação Aurora</div>
+                  <div class="doc-meta-pq">22/01/2025 · 42 páginas · 3.8 MB</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⤓</button>
+              </div>
+              <div class="doc-card">
+                <div class="doc-ic xls">XLS</div>
+                <div class="doc-info-card">
+                  <div class="doc-nome">Espelhos de ponto 2016-2022</div>
+                  <div class="doc-meta-pq">22/01/2025 · 6 abas · 4.2 MB</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⤓</button>
+              </div>
+              <div class="doc-card">
+                <div class="doc-ic pdf">PDF</div>
+                <div class="doc-info-card">
+                  <div class="doc-nome">Holerites do período</div>
+                  <div class="doc-meta-pq">22/01/2025 · 96 meses · 8.1 MB</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⤓</button>
+              </div>
+              <div class="doc-card">
+                <div class="doc-ic pdf">PDF</div>
+                <div class="doc-info-card">
+                  <div class="doc-nome">Laudo NR-15 · canteiro Pampulha</div>
+                  <div class="doc-meta-pq">22/01/2025 · técnico SESMT</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⤓</button>
+              </div>
+              <div class="doc-card">
+                <div class="doc-ic pdf">PDF</div>
+                <div class="doc-info-card">
+                  <div class="doc-nome">Réplica do reclamante</div>
+                  <div class="doc-meta-pq">14/02/2025 · 18 páginas</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⤓</button>
+              </div>
+              <div class="doc-card">
+                <div class="doc-ic docx">DOC</div>
+                <div class="doc-info-card">
+                  <div class="doc-nome">Minuta de acordo · proposta</div>
+                  <div class="doc-meta-pq">22/05/2026 · rascunho · 4 páginas</div>
+                </div>
+                <button class="btn btn-fantasma btn-xs">⤓</button>
+              </div>
+            </div>
+
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px">+ Anexar documento</button>
+          </div>
+
+          <!-- ANOTAÇÕES PRIVADAS -->
+          <div class="painel" style="background:linear-gradient(135deg,var(--branco) 60%,#FAF1DA);border-color:var(--amarelo)">
+            <h3 style="font-size:16px;color:#876715">📝 Anotações <em>privadas</em></h3>
+            <p class="sub-titulo">Não visível à empresa-cliente</p>
+            <div style="font-family:var(--ui);font-size:12.5px;color:var(--marinho);line-height:1.6;background:rgba(255,255,255,.6);padding:14px;border-radius:2px">
+              <strong style="color:#876715">23/05 às 19h</strong> · Conversei com Roberto Aurora · ele autorizou acordo até R$ 110k mas prefere ficar entre R$ 80-90k. CFO Eduardo quer fechar antes do balanço Q3. <br><br>
+              <strong style="color:#876715">22/05 às 14h</strong> · José Roberto procurou nosso WhatsApp pelo escritório · tentou conversa direta. Bloqueei e instruí a falar com Dr. Marcus Vilela. <br><br>
+              <strong style="color:#876715">17/01/25</strong> · Espelhos de ponto têm 11 dias sem batida em 2018 · risco de presunção de horas extras. Atenção na audiência!
+            </div>
+            <button class="btn btn-fantasma btn-sm" style="width:100%;justify-content:center;margin-top:14px">✎ Adicionar anotação</button>
+          </div>
+
+          <!-- PREPARAÇÃO PARA AUDIÊNCIA -->
+          <div class="painel" style="background:var(--vermelho);color:var(--papel);border:none;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30%;right:-15%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 65%);pointer-events:none"></div>
+            <h3 style="font-size:16px;color:var(--papel);position:relative">🚨 Audiência <em style="color:var(--amarelo)">em 4 horas</em></h3>
+            <div style="font-family:var(--ui);font-size:11px;opacity:.5;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;position:relative">checklist de preparação</div>
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;font-family:var(--ui);font-size:12px;position:relative">
+              <div style="padding:10px;background:rgba(255,255,255,.08);border-radius:2px;display:flex;align-items:center;gap:10px">
+                <span style="color:var(--amarelo)">✓</span> Preposto Aurora confirmado · Roberto Aurora
+              </div>
+              <div style="padding:10px;background:rgba(255,255,255,.08);border-radius:2px;display:flex;align-items:center;gap:10px">
+                <span style="color:var(--amarelo)">✓</span> Procuração atualizada · vigente até 12/2026
+              </div>
+              <div style="padding:10px;background:rgba(255,255,255,.08);border-radius:2px;display:flex;align-items:center;gap:10px">
+                <span style="color:var(--amarelo)">✓</span> Minuta de acordo pronta · R$ 80-110k
+              </div>
+              <div style="padding:10px;background:rgba(255,255,255,.08);border-radius:2px;display:flex;align-items:center;gap:10px">
+                <span style="opacity:.4">○</span> Imprimir cópia espelhos ponto (5 cópias)
+              </div>
+              <div style="padding:10px;background:rgba(255,255,255,.08);border-radius:2px;display:flex;align-items:center;gap:10px">
+                <span style="opacity:.4">○</span> Sair daqui 13:30 (trânsito Funcionários→Centro)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- TELA 4: WIZARD DE CADASTRO DE PROCESSO -->
+<div class="tela" id="t-juri-wizard">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="oi">Oi</span><span class="nora">Nora</span></div>
+      <div class="sidebar-empresa">ESCRITÓRIO<strong>Vasconcellos &amp; Associados</strong></div>
+      <div class="sidebar-secao">Workspace Jurídico</div>
+      <div class="sidebar-item" onclick="irPara('t-juri-dash')"><span class="ic">⚖</span> Dashboard</div>
+      <div class="sidebar-item ativo"><span class="ic">📋</span> Processos</div>
+      <div class="sidebar-item outro"><span class="ic">📅</span> Audiências</div>
+      <div class="sidebar-item outro"><span class="ic">📑</span> Petições &amp; Docs</div>
+      <div class="sidebar-item outro"><span class="ic">💰</span> Cálculos</div>
+      <div class="sidebar-item outro"><span class="ic">🤝</span> Acordos</div>
+      <div class="sidebar-secao">Análise</div>
+      <div class="sidebar-item outro"><span class="ic">📊</span> Provisões</div>
+      <div class="sidebar-item outro"><span class="ic">📈</span> Indicadores</div>
+      <div class="sidebar-secao">Configurações</div>
+      <div class="sidebar-item outro"><span class="ic">🏢</span> Empresas-clientes</div>
+      <div class="sidebar-item outro"><span class="ic">👥</span> Equipe escritório</div>
+      <div class="sidebar-perfil">
+        <div class="av">HV</div>
+        <div>
+          <div class="nome">Dr. Henrique Vasconcellos</div>
+          <div class="cargo">⚖ Advogado Sênior · OAB/MG 78.452</div>
+          <div class="escritorio">Vasconcellos &amp; Associados</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main">
+      <div class="breadcrumb"><a onclick="irPara('t-juri-dash')">Jurídico</a> &gt; <a onclick="irPara('t-juri-lista')">Processos</a> &gt; <span style="color:var(--juridico)">Cadastrar processo</span></div>
+
+      <div class="header-bar">
+        <div>
+          <h1>+ Cadastrar <em>processo</em></h1>
+          <div class="meta">Citação recebida hoje 23/05 · novo processo da Aurora · José Augusto Mendes (ex-pedreiro)</div>
+          <div class="header-tags">
+            <span class="tag juridico">Wizard · Passo 3 de 4</span>
+            <span class="tag verde">Rascunho salvo automaticamente</span>
+            <span class="tag">75% preenchido</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-juri-lista')">✕ Cancelar</button>
+          <button class="btn btn-fantasma btn-sm">💾 Salvar rascunho</button>
+        </div>
+      </div>
+
+      <!-- BARRA DOS PASSOS -->
+      <div class="wizard-passos">
+        <div class="passos-bar">
+          <div class="passo feito">
+            <div class="passo-bola">✓</div>
+            <div class="passo-titulo">1. Identificação</div>
+            <div class="passo-sub">CNJ, vara, juiz, ajuizamento</div>
+          </div>
+          <div class="passo feito">
+            <div class="passo-bola">✓</div>
+            <div class="passo-titulo">2. Partes &amp; Pleitos</div>
+            <div class="passo-sub">reclamante + ex-empregado</div>
+          </div>
+          <div class="passo atual">
+            <div class="passo-bola">3</div>
+            <div class="passo-titulo">3. Análise de risco</div>
+            <div class="passo-sub">classificação + cálculo financeiro</div>
+          </div>
+          <div class="passo">
+            <div class="passo-bola">4</div>
+            <div class="passo-titulo">4. Documentos &amp; revisão</div>
+            <div class="passo-sub">anexar peças + confirmação</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORMULÁRIO · PASSO 3 -->
+      <div class="wizard-form">
+        <div class="wizard-form-titulo">Passo 3 · Análise de <em>risco financeiro</em></div>
+        <div class="wizard-form-sub">Classifique o risco conforme CPC 25 e descreva os principais pleitos. A IA da Oi Nora ajuda a calcular o valor estimado em risco baseado em <strong>14 processos similares</strong> da Aurora.</div>
+
+        <!-- CLASSIFICAÇÃO DE RISCO -->
+        <div class="campo-w">
+          <label>Classificação do risco · CPC 25 <span class="req">*</span></label>
+          <div class="risco-opcoes">
+            <div class="risco-opcao">
+              <div class="risco-emoji">🟢</div>
+              <div class="risco-label-grande">Remoto</div>
+              <div class="risco-desc-pq">Improvável condenação · provisão mínima</div>
+            </div>
+            <div class="risco-opcao sel-possivel">
+              <div class="risco-emoji">🟡</div>
+              <div class="risco-label-grande">Possível</div>
+              <div class="risco-desc-pq">Pode haver condenação · provisão 50%</div>
+            </div>
+            <div class="risco-opcao">
+              <div class="risco-emoji">🔴</div>
+              <div class="risco-label-grande">Provável</div>
+              <div class="risco-desc-pq">Alta chance condenação · provisão 75-100%</div>
+            </div>
+          </div>
+          <div class="hint-w">📊 Baseado nos pleitos selecionados, a IA sugeriu <strong>POSSÍVEL</strong> · 14 processos similares Aurora: 5 prováveis, 6 possíveis, 3 remotos.</div>
+        </div>
+
+        <!-- PLEITOS -->
+        <div class="campo-w">
+          <label>Pleitos do reclamante <span class="req">*</span> · marque todos que se aplicam</label>
+          <div class="pleitos-grid">
+            <div class="pleito-card selecionado">
+              <div class="pleito-check">✓</div>
+              <div>
+                <div class="pleito-nome">Horas extras 50% e reflexos</div>
+                <div class="pleito-desc">CLT art. 7º XVI · DSR + 13º + férias</div>
+              </div>
+            </div>
+            <div class="pleito-card selecionado">
+              <div class="pleito-check">✓</div>
+              <div>
+                <div class="pleito-nome">Adicional insalubridade NR-15</div>
+                <div class="pleito-desc">20% sobre salário-mínimo · construção</div>
+              </div>
+            </div>
+            <div class="pleito-card">
+              <div class="pleito-check"></div>
+              <div>
+                <div class="pleito-nome">Adicional periculosidade</div>
+                <div class="pleito-desc">30% · NR-16 · combustíveis/eletricidade</div>
+              </div>
+            </div>
+            <div class="pleito-card selecionado">
+              <div class="pleito-check">✓</div>
+              <div>
+                <div class="pleito-nome">Diferenças FGTS</div>
+                <div class="pleito-desc">8% mensal + multa 40% rescisória</div>
+              </div>
+            </div>
+            <div class="pleito-card">
+              <div class="pleito-check"></div>
+              <div>
+                <div class="pleito-nome">Verbas rescisórias</div>
+                <div class="pleito-desc">Aviso prévio + saldo salário + férias</div>
+              </div>
+            </div>
+            <div class="pleito-card">
+              <div class="pleito-check"></div>
+              <div>
+                <div class="pleito-nome">Equiparação salarial</div>
+                <div class="pleito-desc">CLT art. 461 · função idêntica</div>
+              </div>
+            </div>
+            <div class="pleito-card">
+              <div class="pleito-check"></div>
+              <div>
+                <div class="pleito-nome">Danos morais / materiais</div>
+                <div class="pleito-desc">Assédio · acidente · CC art. 186</div>
+              </div>
+            </div>
+            <div class="pleito-card">
+              <div class="pleito-check"></div>
+              <div>
+                <div class="pleito-nome">Estabilidade pré-aposentadoria</div>
+                <div class="pleito-desc">CCT · 12 meses antes aposentadoria</div>
+              </div>
+            </div>
+          </div>
+          <div class="hint-w">3 pleitos selecionados · valor estimado para esses pleitos: <strong>R$ 142.000 - R$ 178.000</strong></div>
+        </div>
+
+        <!-- VALOR DA CAUSA -->
+        <div class="grid-2-w">
+          <div class="campo-w">
+            <label>Valor da causa <span class="req">*</span></label>
+            <input value="R$ 168.500,00" placeholder="R$ 0,00"/>
+            <div class="hint-w">💡 Valor declarado na petição inicial pelo reclamante</div>
+          </div>
+
+          <div class="campo-w">
+            <label>Provisão sugerida (CPC 25)</label>
+            <input value="R$ 84.250,00" placeholder="R$ 0,00" style="background:#EFE9FB;color:var(--juridico);font-weight:600"/>
+            <div class="hint-w">📊 IA sugere <strong>50% do valor</strong> (POSSÍVEL · média histórica Aurora)</div>
+          </div>
+        </div>
+
+        <!-- DESCRIÇÃO DO CASO -->
+        <div class="campo-w">
+          <label>Resumo do caso · contexto</label>
+          <textarea rows="4" style="resize:vertical">Ex-pedreiro José Augusto Mendes ajuizou ação alegando trabalho com sobrejornada sistemática (média 2h extras/dia) entre 2017-2024 não anotadas no ponto. Pleiteia também adicional insalubridade NR-15 pela exposição a poeira de cimento (mesma situação do José Roberto - processo 0011234). Saída em 04/2024 sem justa causa após 7 anos. Documentos apresentados: holerites parciais e duas testemunhas (ex-colegas).</textarea>
+          <div class="hint-w">💡 Sua descrição não é compartilhada com a empresa-cliente · apenas para uso interno do escritório</div>
+        </div>
+
+        <!-- CÁLCULO RÁPIDO IA -->
+        <div class="ia-sug">
+          <div class="ia-sug-ic">🤖</div>
+          <div>
+            <div class="ia-sug-titulo">Sugestão da <em>Nora · IA</em></div>
+            <div class="ia-sug-desc">
+              Este caso é <strong>83% similar</strong> ao processo do José Roberto Pinheiro (mesmo cargo, mesmo período de trabalho, mesmos pleitos). Recomendo:
+              <br>• Manter classificação <strong>POSSÍVEL</strong> (não PROVÁVEL · não há comprovação documental ainda)
+              <br>• Provisão sugerida: <strong>R$ 84k</strong> (50% do valor causa)
+              <br>• Estratégia: <strong>tentar acordo cedo</strong> · economia estimada de R$ 60-90k vs sentença
+              <br>• Solicitar à Aurora os <strong>espelhos de ponto 2017-2024</strong> via Tela de Empregados
+            </div>
+          </div>
+          <button class="btn btn-fantasma btn-sm">✓ Aplicar sugestões</button>
+        </div>
+
+        <!-- ESTRATÉGIA INICIAL -->
+        <div class="campo-w" style="margin-top:18px">
+          <label>Estratégia inicial · próximos passos</label>
+          <div class="grid-3-w" style="gap:10px">
+            <div class="pleito-card selecionado" style="padding:12px">
+              <div class="pleito-check">✓</div>
+              <div>
+                <div class="pleito-nome" style="font-size:12px">Solicitar espelhos ponto à Aurora</div>
+                <div class="pleito-desc">via integração</div>
+              </div>
+            </div>
+            <div class="pleito-card selecionado" style="padding:12px">
+              <div class="pleito-check">✓</div>
+              <div>
+                <div class="pleito-nome" style="font-size:12px">Buscar acordo na audiência</div>
+                <div class="pleito-desc">faixa R$ 60-80k</div>
+              </div>
+            </div>
+            <div class="pleito-card" style="padding:12px">
+              <div class="pleito-check"></div>
+              <div>
+                <div class="pleito-nome" style="font-size:12px">Indicar perícia técnica</div>
+                <div class="pleito-desc">contraprovar insalubridade</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PRÉVIA RESUMIDA DO PROCESSO -->
+      <div class="previa-proc">
+        <div class="previa-cnj">⚖ 0033456-78.2026.5.03.0021 · 1ª VT BH</div>
+        <div class="previa-titulo">José Augusto Mendes vs <em>Construtora Aurora</em></div>
+
+        <div class="previa-resumo">
+          <div class="previa-bloco">
+            <h5>📋 Resumo cadastral</h5>
+            <div class="previa-linha"><span>Vara</span><strong>1ª VT BH</strong></div>
+            <div class="previa-linha"><span>Juiz</span><strong>Dr. Pedro Henrique Coelho</strong></div>
+            <div class="previa-linha"><span>Ajuizamento</span><strong>20/05/2026</strong></div>
+            <div class="previa-linha"><span>Citação</span><strong>23/05/2026 (hoje)</strong></div>
+            <div class="previa-linha"><span>Empresa</span><strong>Construtora Aurora</strong></div>
+            <div class="previa-linha"><span>Reclamante</span><strong>José Augusto Mendes</strong></div>
+          </div>
+
+          <div class="previa-bloco">
+            <h5>💰 Resumo financeiro</h5>
+            <div class="previa-linha"><span>Valor da causa</span><strong>R$ 168.500</strong></div>
+            <div class="previa-linha"><span>Classificação</span><strong style="color:#876715">🟡 Possível</strong></div>
+            <div class="previa-linha"><span>Provisão CPC 25</span><strong style="color:var(--juridico)">R$ 84.250</strong></div>
+            <div class="previa-linha"><span>Pleitos</span><strong>3 selecionados</strong></div>
+            <div class="previa-linha"><span>Faixa de acordo</span><strong>R$ 60-80k</strong></div>
+            <div class="previa-linha"><span>Economia estimada</span><strong style="color:var(--verde)">~ R$ 75k</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVISO DA AUTOCOMPLETE DE EX-EMPREGADO -->
+      <div class="alert alert-roxo">
+        <span class="ic-grande">🔗</span>
+        <div>
+          <strong>Integração automática · ficha do ex-empregado encontrada</strong>
+          Na etapa anterior, identifiquei <strong>José Augusto Mendes</strong> no banco da Aurora: MAT histórica 0067, admitido 03/2017, desligado 04/2024 sem justa causa. Documentos do RH ficarão automaticamente disponíveis nesta ficha (holerites, espelhos de ponto, contrato).
+        </div>
+      </div>
+
+      <!-- RODAPÉ -->
+      <div class="wizard-rodape">
+        <div class="wizard-rodape-info">
+          <strong>Passo 3 de 4</strong> · Próximo: anexar documentos e revisar
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-fantasma btn-sm" onclick="irPara('t-juri-lista')">✕ Cancelar</button>
+          <button class="btn btn-fantasma btn-sm">← Voltar (Partes &amp; Pleitos)</button>
+          <button class="btn btn-fantasma btn-sm">💾 Salvar rascunho</button>
+          <button class="btn btn-primario btn-sm" style="background:var(--juridico)">Próximo (Documentos) →</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- PROTO BAR -->
+<div class="proto-bar">
+  <span class="proto-label">Jurídico · Tela:</span>
+  <select onchange="irPara(this.value)" id="seletor-tela">
+    <option value="t-juri-dash">⚖ Dashboard do Advogado</option>
+    <option value="t-juri-lista">📋 Lista de Processos</option>
+    <option value="t-juri-ficha">📄 Ficha do Processo (José Roberto)</option>
+    <option value="t-juri-wizard">+ Cadastrar Processo (wizard 4 passos)</option>
+  </select>
+</div>
+
+<script>
+function irPara(idTela){
+  const alvo = document.getElementById(idTela);
+  if(!alvo){
+    alert('Tela "' + idTela + '" ainda em construção. Aguarde as próximas partes.');
+    return;
+  }
+  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
+  alvo.classList.add('ativa');
+  window.scrollTo({top:0,behavior:'instant'});
+  const sel = document.getElementById('seletor-tela');
+  if(sel) sel.value = idTela;
+}
+</script>
+</body>
+</html>
