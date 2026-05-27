@@ -44,6 +44,7 @@ const NAV_GROUPS: Array<{
   {
     titulo: "Administração",
     itens: [
+      { href: "/usuarios", label: "Usuários", sigla: "U", roles: ["owner", "admin"] },
       { href: "/auditoria", label: "Auditoria", sigla: "A", roles: ["owner"] },
       { href: "/configuracoes", label: "Configurações", sigla: "C" },
     ],

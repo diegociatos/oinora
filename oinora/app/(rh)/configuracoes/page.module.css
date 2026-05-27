@@ -1,0 +1,131 @@
+.hubGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+.hubCard {
+  display: block;
+  background: var(--branco);
+  border: 1px solid var(--cinza-cl);
+  border-radius: var(--radius-sharp);
+  padding: var(--space-6);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.hubCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--marinho-med);
+}
+.hubCard h3 {
+  font-family: var(--serif);
+  font-size: var(--fs-xl);
+  font-weight: 400;
+  color: var(--marinho);
+  margin-bottom: var(--space-2);
+}
+.hubCard h3 em {
+  color: var(--laranja);
+  font-style: italic;
+}
+.hubCard p {
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--cinza);
+  line-height: 1.5;
+}
+.contador {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--fs-xl);
+  color: var(--laranja);
+}
+
+.crudGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-6);
+}
+@media (max-width: 980px) {
+  .crudGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--branco);
+  border: 1px solid var(--cinza-cl);
+  border-radius: var(--radius-sharp);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+}
+.tabela thead th {
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--cinza);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--cinza-cl);
+  background: var(--papel);
+}
+.tabela tbody td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--cinza-cl);
+  color: var(--marinho);
+  vertical-align: middle;
+}
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+.tabela tbody tr:hover {
+  background: var(--papel);
+}
+.tabelaActions {
+  text-align: right;
+  white-space: nowrap;
+}
+.tabelaActions a,
+.tabelaActions button {
+  margin-left: var(--space-2);
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  color: var(--cinza);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+}
+.tabelaActions a:hover,
+.tabelaActions button:hover {
+  color: var(--laranja);
+  text-decoration: underline;
+}
+.tabelaActions button.deletar:hover {
+  color: var(--vermelho);
+}
+
+.vazio {
+  padding: var(--space-10);
+  text-align: center;
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--cinza);
+}
+
+.btnPrincipal {
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--laranja);
+  color: var(--branco);
+  border-radius: var(--radius-sharp);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}

@@ -1,0 +1,109 @@
+.filtros {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+.filtros input,
+.filtros select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--cinza-cl);
+  background: var(--branco);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--marinho);
+  border-radius: var(--radius-sharp);
+}
+.filtros input:focus,
+.filtros select:focus {
+  outline: none;
+  border-color: var(--laranja);
+}
+.filtros input {
+  min-width: 240px;
+  flex: 1;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.evento {
+  background: var(--branco);
+  border: 1px solid var(--cinza-cl);
+  border-radius: var(--radius-sharp);
+  padding: var(--space-4) var(--space-5);
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: var(--space-4);
+}
+.eventoData {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--cinza);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+.eventoAcao {
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--marinho-esc);
+  margin-bottom: var(--space-1);
+  font-weight: 500;
+}
+.eventoAcao .verbo {
+  color: var(--laranja);
+  font-style: italic;
+  font-family: var(--serif);
+  font-size: var(--fs-md);
+}
+.eventoUsuario {
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  color: var(--cinza);
+  letter-spacing: 0.5px;
+}
+.eventoDiff {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: var(--papel);
+  border: 1px dashed var(--cinza-cl);
+  border-radius: var(--radius-sharp);
+  font-family: var(--mono);
+  font-size: 11px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  color: var(--cinza);
+  max-height: 200px;
+}
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: var(--cinza-fundo);
+  color: var(--marinho-med);
+}
+.tag.insert {
+  background: #EAF5EE;
+  color: var(--verde);
+}
+.tag.update {
+  background: #FAF1DA;
+  color: #876715;
+}
+.tag.delete {
+  background: #FBEAEA;
+  color: var(--vermelho);
+}
+.vazio {
+  padding: var(--space-10);
+  text-align: center;
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--cinza);
+}

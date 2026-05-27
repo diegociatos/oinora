@@ -1,0 +1,163 @@
+/* Formulário reutilizável para CRUD dentro de (rh) */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-6);
+}
+.formGrid.tres {
+  grid-template-columns: repeat(3, 1fr);
+}
+.formGrid .full {
+  grid-column: 1 / -1;
+}
+.painel {
+  background: var(--branco);
+  border: 1px solid var(--cinza-cl);
+  border-radius: var(--radius-sharp);
+  padding: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+.painelTitulo {
+  font-family: var(--serif);
+  font-size: var(--fs-xl);
+  font-weight: 400;
+  color: var(--marinho);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--cinza-cl);
+}
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.campo label {
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--marinho-med);
+  font-weight: 600;
+}
+.campo label .obrig {
+  color: var(--vermelho);
+}
+.campo input,
+.campo select,
+.campo textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--cinza-cl);
+  background: var(--branco);
+  font-family: var(--serif);
+  font-size: var(--fs-md);
+  color: var(--marinho);
+  border-radius: var(--radius-sharp);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 3px rgba(232, 99, 58, 0.1);
+}
+.campo input[type="date"],
+.campo input[type="number"] {
+  font-family: var(--ui);
+}
+.campoErro {
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  color: var(--vermelho);
+}
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+}
+.btn {
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-sharp);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btnPrimario {
+  background: var(--laranja);
+  color: var(--branco);
+}
+.btnPrimario:hover:not(:disabled) {
+  background: var(--laranja-esc);
+}
+.btnFantasma {
+  background: var(--branco);
+  color: var(--marinho);
+  border-color: var(--cinza-cl);
+}
+.btnFantasma:hover:not(:disabled) {
+  border-color: var(--marinho);
+}
+.btnPerigo {
+  background: var(--branco);
+  color: var(--vermelho);
+  border-color: var(--vermelho);
+}
+.btnPerigo:hover:not(:disabled) {
+  background: var(--vermelho);
+  color: var(--branco);
+}
+.alertaErro {
+  padding: var(--space-3) var(--space-4);
+  background: #FBEAEA;
+  border: 1px solid var(--vermelho);
+  border-radius: var(--radius-sharp);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: #8A2727;
+  margin-bottom: var(--space-4);
+}
+.alertaSucesso {
+  padding: var(--space-3) var(--space-4);
+  background: #EAF5EE;
+  border: 1px solid var(--verde);
+  border-radius: var(--radius-sharp);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: #1E5A3F;
+  margin-bottom: var(--space-4);
+}
+.headerPagina {
+  margin-bottom: var(--space-6);
+}
+.headerPagina h2 {
+  font-family: var(--serif);
+  font-size: var(--fs-2xl);
+  font-weight: 400;
+  color: var(--marinho);
+  margin-bottom: var(--space-1);
+}
+.headerPagina h2 em {
+  color: var(--laranja);
+  font-style: italic;
+}
+.headerPagina p {
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--cinza);
+}
+
+@media (max-width: 800px) {
+  .formGrid,
+  .formGrid.tres {
+    grid-template-columns: 1fr;
+  }
+}

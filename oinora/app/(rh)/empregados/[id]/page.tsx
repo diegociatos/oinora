@@ -195,9 +195,26 @@ export default async function FichaEmpregadoPage({
       </header>
 
       <div className={layout.content}>
-        <Link href="/empregados" className={styles.voltar}>
-          ← Voltar para Empregados
-        </Link>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-4)" }}>
+          <Link href="/empregados" className={styles.voltar} style={{ marginBottom: 0 }}>
+            ← Voltar para Empregados
+          </Link>
+          <Link
+            href={`/empregados/${empregado.id}/editar`}
+            style={{
+              padding: "8px 16px",
+              background: "var(--branco)",
+              color: "var(--marinho)",
+              border: "1px solid var(--cinza-cl)",
+              borderRadius: "var(--radius-sharp)",
+              fontFamily: "var(--ui)",
+              fontSize: "var(--fs-sm)",
+              fontWeight: 500,
+            }}
+          >
+            ✎ Editar empregado
+          </Link>
+        </div>
 
         <section className={styles.hero}>
           <div className={styles.avatar} aria-hidden="true">

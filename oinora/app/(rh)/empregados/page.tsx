@@ -83,6 +83,22 @@ export default async function EmpregadosPage({
               Todos os empregados cadastrados no tenant — RLS isola por empresa.
             </p>
           </div>
+          <Link
+            href="/empregados/novo"
+            style={{
+              padding: "10px 20px",
+              background: "var(--laranja)",
+              color: "var(--branco)",
+              borderRadius: "var(--radius-sharp)",
+              fontFamily: "var(--ui)",
+              fontSize: "var(--fs-sm)",
+              fontWeight: 500,
+              transition: "background 0.15s ease",
+              display: "inline-block",
+            }}
+          >
+            + Novo empregado
+          </Link>
         </div>
 
         <form className={styles.filtros}>
