@@ -54,7 +54,7 @@ export default async function FichaEmpregadoPage({
        centro_custo:centros_custo(codigo, nome),
        local_trabalho:locais_trabalho(nome),
        jornada:jornadas(nome, horas_semana),
-       gestor:empregados!empregados_gestor_id_fkey(nome_completo, matricula)`,
+       gestor:gestor_id(nome_completo, matricula)`,
     )
     .eq("id", id)
     .maybeSingle();
