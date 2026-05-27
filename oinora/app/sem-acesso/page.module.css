@@ -1,0 +1,64 @@
+.tela {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--marinho), var(--marinho-esc));
+  padding: var(--space-6);
+}
+.box {
+  max-width: 540px;
+  width: 100%;
+  background: var(--papel);
+  padding: var(--space-10) var(--space-10);
+  border-radius: var(--radius-sharp);
+  text-align: center;
+  border: 1px solid var(--cinza-cl);
+  box-shadow: var(--shadow-lg);
+}
+.logo {
+  display: inline-flex;
+  font-family: var(--serif);
+  font-size: var(--fs-2xl);
+  margin-bottom: var(--space-8);
+}
+.box h1 {
+  font-family: var(--serif);
+  font-size: var(--fs-2xl);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
+  margin-bottom: var(--space-4);
+  color: var(--marinho);
+}
+.box h1 em {
+  color: var(--laranja);
+  font-style: italic;
+}
+.box p {
+  font-family: var(--ui);
+  font-size: var(--fs-base);
+  color: var(--cinza);
+  line-height: 1.6;
+  margin-bottom: var(--space-3);
+}
+.box p strong {
+  color: var(--marinho);
+  font-weight: 600;
+}
+.btn {
+  margin-top: var(--space-6);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  padding: var(--space-3) var(--space-6);
+  background: var(--marinho);
+  color: var(--papel);
+  border: none;
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn:hover {
+  background: var(--marinho-esc);
+}

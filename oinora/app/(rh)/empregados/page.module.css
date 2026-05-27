@@ -1,0 +1,162 @@
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+.headerTitulo {
+  font-family: var(--serif);
+  font-size: var(--fs-2xl);
+  font-weight: 400;
+  color: var(--marinho);
+}
+.headerTitulo em {
+  color: var(--laranja);
+  font-style: italic;
+}
+.headerSub {
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--cinza);
+  margin-top: var(--space-1);
+}
+
+.filtros {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+.filtros input,
+.filtros select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--cinza-cl);
+  background: var(--branco);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--marinho);
+  border-radius: var(--radius-sharp);
+}
+.filtros input:focus,
+.filtros select:focus {
+  outline: none;
+  border-color: var(--laranja);
+}
+.filtros input {
+  min-width: 280px;
+  flex: 1;
+  max-width: 480px;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--branco);
+  border: 1px solid var(--cinza-cl);
+  border-radius: var(--radius-sharp);
+  overflow: hidden;
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+}
+.tabela thead th {
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--cinza);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--cinza-cl);
+  background: var(--papel);
+  white-space: nowrap;
+}
+.tabela tbody td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--cinza-cl);
+  color: var(--marinho);
+  vertical-align: middle;
+}
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+.tabela tbody tr:hover {
+  background: var(--papel);
+}
+.matricula {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--cinza);
+  font-size: var(--fs-sm);
+}
+.nomeCompleto {
+  font-weight: 500;
+  color: var(--marinho-esc);
+}
+.nomeCompleto a {
+  color: inherit;
+}
+.nomeCompleto a:hover {
+  color: var(--laranja);
+}
+.cargoNome {
+  color: var(--marinho);
+}
+.cargoSub {
+  font-size: 11px;
+  color: var(--cinza);
+  margin-top: 2px;
+}
+.tag {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-radius: var(--radius-sharp);
+  border: 1px solid;
+}
+.tag.ativo {
+  background: #EAF5EE;
+  color: var(--verde);
+  border-color: rgba(45, 125, 90, 0.3);
+}
+.tag.afastado,
+.tag.aviso_previo {
+  background: #FAF1DA;
+  color: #876715;
+  border-color: rgba(212, 160, 44, 0.3);
+}
+.tag.ferias {
+  background: #EEF1F6;
+  color: var(--marinho);
+  border-color: rgba(31, 42, 68, 0.3);
+}
+.tag.licenca_maternidade,
+.tag.licenca_medica {
+  background: #EFE9FB;
+  color: var(--juridico);
+  border-color: rgba(91, 63, 160, 0.3);
+}
+.tag.desligado {
+  background: #FBEAEA;
+  color: var(--vermelho);
+  border-color: rgba(196, 69, 69, 0.3);
+}
+.vazio {
+  padding: var(--space-10);
+  text-align: center;
+  color: var(--cinza);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+}
+.contador {
+  margin-top: var(--space-3);
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  color: var(--cinza);
+  text-align: right;
+}
