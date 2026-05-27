@@ -1,16 +1,19 @@
 # =================================================
 # Oi Nora · configuração de deploy Netlify
 # =================================================
-# O Next.js fica no subdiretório oinora/ — informamos isso ao Netlify via "base".
-# Plugin @netlify/plugin-nextjs é detectado automaticamente.
+# O app Next.js está no subdiretório oinora/.
+# Não especificamos "publish" — o plugin @netlify/plugin-nextjs cuida disso.
 
 [build]
   base    = "oinora"
   command = "npm run build"
-  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Plugin obrigatório para SSR/Server Components/App Router funcionarem.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 # Headers de segurança aplicados a todas as respostas
 [[headers]]
