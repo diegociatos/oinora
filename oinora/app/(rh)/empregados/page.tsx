@@ -48,7 +48,7 @@ export default async function EmpregadosPage({
   let query = supabase
     .from("empregados")
     .select(
-      "id, matricula, nome_completo, cpf, status, data_admissao, salario_centavos, cargo:cargos(nome, nivel), departamento:departamentos(nome, sigla)",
+      "id, matricula, nome_completo, cpf, status, data_admissao, salario_centavos, cargo:cargos!empregados_cargo_id_fkey(nome, nivel), departamento:departamentos!empregados_departamento_id_fkey(nome, sigla)",
     )
     .order("nome_completo", { ascending: true });
 

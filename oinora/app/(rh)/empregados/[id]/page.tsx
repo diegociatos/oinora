@@ -49,12 +49,12 @@ export default async function FichaEmpregadoPage({
        email_pessoal, telefone_principal, endereco, contato_emergencia,
        data_admissao, tipo_contrato, salario_centavos, status,
        nine_box_desempenho, nine_box_potencial,
-       cargo:cargos(nome, nivel, cbo, codigo),
-       departamento:departamentos(nome, sigla),
+       cargo:cargos!empregados_cargo_id_fkey(nome, nivel, cbo, codigo),
+       departamento:departamentos!empregados_departamento_id_fkey(nome, sigla),
        centro_custo:centros_custo(codigo, nome),
        local_trabalho:locais_trabalho(nome),
        jornada:jornadas(nome, horas_semana),
-       gestor:gestor_id(nome_completo, matricula)`,
+       gestor:empregados!empregados_gestor_id_fkey(nome_completo, matricula)`,
     )
     .eq("id", id)
     .maybeSingle();
