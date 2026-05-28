@@ -33,6 +33,17 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  manifest: "/manifest.json",
+  themeColor: "#1F2A44",
+  appleWebApp: {
+    capable: true,
+    title: "Oi Nora",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: "/logo-oinora.png",
+    apple: "/logo-oinora.png",
+  },
 };
 
 export default function RootLayout({

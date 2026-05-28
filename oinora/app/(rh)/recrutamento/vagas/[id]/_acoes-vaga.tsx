@@ -1,7 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
 import { publicarVaga, pausarVaga } from "@/server/actions/recrutamento";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useActionToast } from "@/components/ui/use-action-toast";
 
 export function AcoesVaga({
   vagaId,
@@ -10,50 +11,43 @@ export function AcoesVaga({
   vagaId: string;
   status: string;
 }) {
-  const [pending, start] = useTransition();
-
+  const showResult = useActionToast();
   if (status === "preenchida" || status === "cancelada") return null;
 
+  if (status === "publicada") {
+    return (
+      <ConfirmDialog
+        titulo="Pausar esta vaga?"
+        descricao="Vagas pausadas somem do portal de candidatos. Candidaturas em andamento não são afetadas."
+        textoConfirmar="Pausar"
+        variant="neutro"
+        trigger={
+          <button type="button" style={btnSec()}>Pausar</button>
+        }
+        onConfirmar={async () => {
+          const r = await pausarVaga(vagaId);
+          showResult(r, "Vaga pausada");
+        }}
+      />
+    );
+  }
+
   return (
-    <div style={{ display: "flex", gap: 8 }}>
-      {status === "publicada" ? (
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => {
-            if (confirm("Pausar esta vaga? Ela some do portal de candidatos.")) {
-              start(async () => {
-                const r = await pausarVaga(vagaId);
-                if (r.status === "error") alert(r.message);
-              });
-            }
-          }}
-          style={btnSecStyle()}
-        >
-          {pending ? "…" : "Pausar"}
-        </button>
-      ) : (
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => {
-            if (confirm("Publicar no portal de candidatos?")) {
-              start(async () => {
-                const r = await publicarVaga(vagaId);
-                if (r.status === "error") alert(r.message);
-              });
-            }
-          }}
-          style={btnPriStyle()}
-        >
-          {pending ? "…" : "↑ Publicar"}
-        </button>
-      )}
-    </div>
+    <ConfirmDialog
+      titulo="Publicar no portal de candidatos?"
+      descricao="A vaga ficará visível publicamente em /portal. Candidatos poderão se inscrever imediatamente."
+      textoConfirmar="↑ Publicar"
+      variant="neutro"
+      trigger={<button type="button" style={btnPri()}>↑ Publicar</button>}
+      onConfirmar={async () => {
+        const r = await publicarVaga(vagaId);
+        showResult(r, "Vaga publicada");
+      }}
+    />
   );
 }
 
-function btnPriStyle(): React.CSSProperties {
+function btnPri(): React.CSSProperties {
   return {
     padding: "8px 16px",
     background: "var(--laranja)",
@@ -66,7 +60,7 @@ function btnPriStyle(): React.CSSProperties {
     cursor: "pointer",
   };
 }
-function btnSecStyle(): React.CSSProperties {
+function btnSec(): React.CSSProperties {
   return {
     padding: "8px 16px",
     background: "var(--branco)",

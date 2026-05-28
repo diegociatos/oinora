@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { moverCandidato } from "@/server/actions/recrutamento";
 import { STAGE_LABEL, STAGE_ORDER } from "@/lib/utils/stages";
+import { useActionToast } from "@/components/ui/use-action-toast";
 import styles from "../../page.module.css";
 
 type Candidatura = {
@@ -46,6 +47,7 @@ export function Kanban({ candidaturas }: { candidaturas: Candidatura[] }) {
 
 function Card({ cand }: { cand: Candidatura }) {
   const [pending, start] = useTransition();
+  const showResult = useActionToast();
   const stageAtual = cand.stage;
   const proxStageIdx =
     (STAGE_ORDER as readonly string[]).indexOf(stageAtual) + 1;
@@ -84,7 +86,7 @@ function Card({ cand }: { cand: Candidatura }) {
           onClick={() => {
             start(async () => {
               const r = await moverCandidato(cand.id, proxStage);
-              if (r.status === "error") alert(r.message);
+              showResult(r, `Candidato movido para ${STAGE_LABEL[proxStage]}`);
             });
           }}
           style={{
