@@ -8,6 +8,7 @@ import {
   formatarData,
   formatarMoeda,
 } from "@/lib/utils/format";
+import { Paginacao } from "@/components/ui/Paginacao";
 import layout from "../layout.module.css";
 import styles from "./page.module.css";
 
@@ -37,30 +38,39 @@ const STATUS_FILTROS = [
 export default async function EmpregadosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; departamento?: string; page?: string }>;
 }) {
   await requireSession();
   const params = await searchParams;
   const q = (params.q ?? "").trim();
   const status = (params.status ?? "").trim();
+  const departamento = (params.departamento ?? "").trim();
+  const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
+  const PAGE_SIZE_LOCAL = 25;
 
   const supabase = await createClient();
   let query = supabase
     .from("empregados")
     .select(
       "id, matricula, nome_completo, cpf, status, data_admissao, salario_centavos, cargo:cargos!empregados_cargo_id_fkey(nome, nivel), departamento:departamentos!empregados_departamento_id_fkey(nome, sigla)",
+      { count: "exact" },
     )
-    .order("nome_completo", { ascending: true });
+    .order("nome_completo", { ascending: true })
+    .range((page - 1) * PAGE_SIZE_LOCAL, page * PAGE_SIZE_LOCAL - 1);
 
-  if (q) {
-    query = query.ilike("nome_completo", `%${q}%`);
-  }
-  if (status) {
-    query = query.eq("status", status);
-  }
+  if (q) query = query.ilike("nome_completo", `%${q}%`);
+  if (status) query = query.eq("status", status);
+  if (departamento) query = query.eq("departamento_id", departamento);
 
-  const { data, error } = await query;
+  // Carregar departamentos pra dropdown filtro
+  const { data: deptos } = await supabase
+    .from("departamentos")
+    .select("id, nome, sigla")
+    .order("nome");
+
+  const { data, error, count } = await query;
   const empregados = (data ?? []) as unknown as Empregado[];
+  const total = count ?? 0;
 
   return (
     <>
@@ -139,6 +149,18 @@ export default async function EmpregadosPage({
               </option>
             ))}
           </select>
+          <select
+            name="departamento"
+            defaultValue={departamento}
+            aria-label="Filtrar por departamento"
+          >
+            <option value="">Todos os departamentos</option>
+            {(deptos ?? []).map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.sigla ? `${d.sigla} · ${d.nome}` : d.nome}
+              </option>
+            ))}
+          </select>
           <button
             type="submit"
             style={{
@@ -213,10 +235,17 @@ export default async function EmpregadosPage({
                 </tbody>
               </table>
             </div>
-            <div className={styles.contador}>
-              Mostrando {empregados.length}{" "}
-              {empregados.length === 1 ? "empregado" : "empregados"}
-            </div>
+            <Paginacao
+              total={total}
+              paginaAtual={page}
+              basePath="/empregados"
+              baseSearchParams={new URLSearchParams({
+                ...(q ? { q } : {}),
+                ...(status ? { status } : {}),
+                ...(departamento ? { departamento } : {}),
+              })}
+              pageSize={PAGE_SIZE_LOCAL}
+            />
           </>
         )}
       </div>
