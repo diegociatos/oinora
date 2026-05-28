@@ -46,18 +46,16 @@ export default async function ConfiguracoesPage() {
       count: cCentros ?? 0,
     },
     {
-      href: "#",
+      href: "/configuracoes/locais",
       titulo: "Locais de trabalho",
-      desc: `${cLocais ?? 0} cadastrados. CRUD via SQL por enquanto — UI no MVP 2.`,
+      desc: "Sedes, canteiros e obras com geofence para ponto eletrônico.",
       count: cLocais ?? 0,
-      disabled: true,
     },
     {
-      href: "#",
+      href: "/configuracoes/jornadas",
       titulo: "Jornadas",
-      desc: `${cJornadas ?? 0} cadastradas. CRUD via SQL por enquanto — UI no MVP 2.`,
+      desc: "Padrões de horários com horas semanais e janelas por dia.",
       count: cJornadas ?? 0,
-      disabled: true,
     },
   ];
 
@@ -75,8 +73,6 @@ export default async function ConfiguracoesPage() {
               key={item.titulo}
               href={item.href}
               className={styles.hubCard}
-              aria-disabled={item.disabled}
-              style={item.disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
             >
               <h3>
                 <em>{item.titulo}</em>

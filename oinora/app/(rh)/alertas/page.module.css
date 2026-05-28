@@ -1,0 +1,101 @@
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.alerta {
+  background: var(--branco);
+  border: 1px solid var(--cinza-cl);
+  border-left-width: 4px;
+  border-radius: var(--radius-sharp);
+  padding: var(--space-4) var(--space-5);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-4);
+  align-items: center;
+}
+.alerta.critico {
+  border-left-color: var(--vermelho);
+  background: #FFF5F5;
+}
+.alerta.aviso {
+  border-left-color: var(--amarelo);
+  background: #FFFCEF;
+}
+.titulo {
+  font-family: var(--serif);
+  font-size: var(--fs-md);
+  color: var(--marinho);
+}
+.titulo em {
+  color: var(--laranja);
+  font-style: italic;
+}
+.detalhes {
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  color: var(--cinza);
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+.acao {
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--laranja);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.acao:hover {
+  text-decoration: underline;
+}
+.vazio {
+  padding: var(--space-12);
+  text-align: center;
+  color: var(--cinza);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+}
+.vazio em {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--verde);
+  font-size: var(--fs-lg);
+  display: block;
+  margin-bottom: var(--space-2);
+}
+.resumo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.resumoCard {
+  background: var(--branco);
+  border: 1px solid var(--cinza-cl);
+  border-radius: var(--radius-sharp);
+  padding: var(--space-5);
+  text-align: center;
+}
+.resumoNum {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--fs-4xl);
+  line-height: 1;
+}
+.resumoNum.critico {
+  color: var(--vermelho);
+}
+.resumoNum.aviso {
+  color: var(--amarelo);
+}
+.resumoLabel {
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--cinza);
+  font-weight: 600;
+  margin-top: var(--space-2);
+}

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { requireSession } from "@/lib/auth/session";
+import { contarAlertas } from "@/lib/db/alertas";
 import styles from "./layout.module.css";
 
 const NAV_GROUPS: Array<{
@@ -11,12 +12,14 @@ const NAV_GROUPS: Array<{
     sigla: string;
     roles?: string[];
     soon?: boolean;
+    badgeKind?: "alertas";
   }>;
 }> = [
   {
     titulo: "Pessoas",
     itens: [
       { href: "/empregados", label: "Empregados", sigla: "E" },
+      { href: "/alertas", label: "Alertas", sigla: "A", badgeKind: "alertas" as const },
       { href: "/onboarding", label: "Onboarding", sigla: "O", soon: true },
       { href: "/treinamentos", label: "Treinamentos", sigla: "T", soon: true },
     ],
@@ -77,6 +80,7 @@ function roleLabel(role: string) {
 
 export default async function RHLayout({ children }: { children: ReactNode }) {
   const session = await requireSession();
+  const alertasInfo = await contarAlertas();
 
   return (
     <div className={styles.shell}>
@@ -111,6 +115,20 @@ export default async function RHLayout({ children }: { children: ReactNode }) {
                     {item.label}
                     {item.soon ? (
                       <span className={styles.navItemBadge}>soon</span>
+                    ) : null}
+                    {"badgeKind" in item &&
+                    item.badgeKind === "alertas" &&
+                    alertasInfo.total > 0 ? (
+                      <span
+                        className={styles.navItemBadge}
+                        style={
+                          alertasInfo.criticos > 0
+                            ? { background: "var(--vermelho)" }
+                            : undefined
+                        }
+                      >
+                        {alertasInfo.total}
+                      </span>
                     ) : null}
                   </Link>
                 ))}

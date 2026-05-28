@@ -12,6 +12,8 @@ import {
 } from "@/lib/utils/format";
 import layout from "../../layout.module.css";
 import styles from "./page.module.css";
+import { DependentesContainer } from "./_dependentes-ui";
+import { DocumentosContainer } from "./_documentos-ui";
 
 type TabId =
   | "resumo"
@@ -162,7 +164,7 @@ export default async function FichaEmpregadoPage({
     activeTab === "documentos"
       ? supabase
           .from("empregado_documentos")
-          .select("id, tipo, nome_arquivo, validade, criado_em")
+          .select("id, tipo, nome_arquivo, validade, criado_em, storage_path")
           .eq("empregado_id", id)
           .order("criado_em", { ascending: false })
       : Promise.resolve({ data: null }),
@@ -812,60 +814,11 @@ export default async function FichaEmpregadoPage({
             <div className={styles.painel}>
               <h3 className={styles.painelTitulo}>
                 Dependentes
-                <span className={styles.contador}>
-                  · {dependentes?.length ?? 0}{" "}
-                  {dependentes?.length === 1 ? "registro" : "registros"}
-                </span>
               </h3>
-              {!dependentes || dependentes.length === 0 ? (
-                <div className={styles.empty}>
-                  <strong>Sem dependentes cadastrados</strong>
-                  Use Server Action “Adicionar dependente” (em breve) para
-                  registrar filhos, cônjuge ou outros beneficiários do plano.
-                </div>
-              ) : (
-                <table className={styles.tabela}>
-                  <thead>
-                    <tr>
-                      <th>Nome</th>
-                      <th>CPF</th>
-                      <th>Nascimento · idade</th>
-                      <th>Parentesco</th>
-                      <th>IR</th>
-                      <th>Sal. família</th>
-                      <th>Plano saúde</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dependentes.map((d) => (
-                      <tr key={d.id}>
-                        <td>{d.nome_completo}</td>
-                        <td>{formatarCpf(d.cpf)}</td>
-                        <td>
-                          {formatarData(d.data_nascimento)} ·{" "}
-                          {calcularIdade(d.data_nascimento)} anos
-                        </td>
-                        <td>{d.parentesco}</td>
-                        <td>
-                          <span
-                            className={`${styles.bolinha} ${d.ir_dependente ? styles.on : ""}`}
-                          />
-                        </td>
-                        <td>
-                          <span
-                            className={`${styles.bolinha} ${d.salario_familia ? styles.on : ""}`}
-                          />
-                        </td>
-                        <td>
-                          <span
-                            className={`${styles.bolinha} ${d.plano_saude ? styles.on : ""}`}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+              <DependentesContainer
+                empregadoId={empregado.id}
+                dependentes={(dependentes ?? []) as Parameters<typeof DependentesContainer>[0]["dependentes"]}
+              />
             </div>
           </div>
         ) : null}
@@ -873,46 +826,11 @@ export default async function FichaEmpregadoPage({
         {activeTab === "documentos" ? (
           <div className={styles.gridUnica}>
             <div className={styles.painel}>
-              <h3 className={styles.painelTitulo}>
-                Documentos
-                <span className={styles.contador}>
-                  · {documentos?.length ?? 0}{" "}
-                  {documentos?.length === 1 ? "arquivo" : "arquivos"}
-                </span>
-              </h3>
-              {!documentos || documentos.length === 0 ? (
-                <div className={styles.empty}>
-                  <strong>Sem documentos anexados</strong>
-                  Upload via Supabase Storage entra na próxima iteração.
-                  Documentos esperados: RG, CPF, CTPS, comprovante de endereço,
-                  ASO admissional, certificados de NRs.
-                </div>
-              ) : (
-                <table className={styles.tabela}>
-                  <thead>
-                    <tr>
-                      <th>Tipo</th>
-                      <th>Arquivo</th>
-                      <th>Validade</th>
-                      <th>Enviado em</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {documentos.map((d) => (
-                      <tr key={d.id}>
-                        <td style={{ textTransform: "uppercase", fontSize: 11, letterSpacing: 1, fontWeight: 700 }}>
-                          {d.tipo}
-                        </td>
-                        <td style={{ fontFamily: "var(--serif)" }}>
-                          {d.nome_arquivo}
-                        </td>
-                        <td>{formatarData(d.validade)}</td>
-                        <td>{formatarData(d.criado_em)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+              <h3 className={styles.painelTitulo}>Documentos</h3>
+              <DocumentosContainer
+                empregadoId={empregado.id}
+                documentos={(documentos ?? []) as Parameters<typeof DocumentosContainer>[0]["documentos"]}
+              />
             </div>
           </div>
         ) : null}

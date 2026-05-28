@@ -242,3 +242,164 @@ export async function deletarCentroCusto(id: string): Promise<FormState> {
   revalidatePath("/configuracoes/centros-custo");
   return { status: "success", message: "Centro de custo removido." };
 }
+
+// =================================================
+// LOCAIS DE TRABALHO
+// =================================================
+const localSchema = z.object({
+  nome: z.string().trim().min(2, "Nome muito curto"),
+  raio_metros: z
+    .string()
+    .transform((v) => v.trim())
+    .transform((v) => (v === "" ? 100 : parseInt(v, 10)))
+    .refine((v) => !Number.isNaN(v) && v > 0, "Raio inválido"),
+  ativo: z.string().transform((v) => v === "on" || v === "true"),
+  endereco_logradouro: optionalString,
+  endereco_numero: optionalString,
+  endereco_bairro: optionalString,
+  endereco_cidade: optionalString,
+  endereco_uf: optionalString,
+  endereco_cep: optionalString,
+});
+
+export async function salvarLocal(
+  id: string | null,
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const session = await requireSession();
+  if (!ensureAdmin(session.role)) {
+    return { status: "error", message: "Sem permissão." };
+  }
+  const raw: Record<string, string> = {};
+  for (const [k, v] of formData.entries()) {
+    if (typeof v === "string") raw[k] = v;
+  }
+  if (!("ativo" in raw)) raw.ativo = "";
+  const r = localSchema.safeParse(raw);
+  if (!r.success) {
+    const fieldErrors: Record<string, string> = {};
+    for (const i of r.error.issues) {
+      const p = i.path.join(".");
+      if (p && !fieldErrors[p]) fieldErrors[p] = i.message;
+    }
+    return {
+      status: "error",
+      message: "Confira os campos.",
+      fieldErrors,
+    };
+  }
+  const data = r.data;
+  const endereco = {
+    logradouro: data.endereco_logradouro,
+    numero: data.endereco_numero,
+    bairro: data.endereco_bairro,
+    cidade: data.endereco_cidade,
+    uf: data.endereco_uf,
+    cep: data.endereco_cep,
+  };
+  const payload = {
+    nome: data.nome,
+    raio_metros: data.raio_metros,
+    ativo: data.ativo,
+    endereco,
+  };
+
+  const supabase = await createClient();
+  if (id) {
+    const { error } = await supabase
+      .from("locais_trabalho")
+      .update(payload)
+      .eq("id", id);
+    if (error) return { status: "error", message: error.message };
+  } else {
+    const { error } = await supabase
+      .from("locais_trabalho")
+      .insert({ ...payload, tenant_id: session.tenantId });
+    if (error) return { status: "error", message: error.message };
+  }
+  revalidatePath("/configuracoes/locais");
+  redirect("/configuracoes/locais");
+}
+
+export async function deletarLocal(id: string): Promise<FormState> {
+  const session = await requireSession();
+  if (session.role !== "owner") {
+    return { status: "error", message: "Apenas owner pode deletar." };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.from("locais_trabalho").delete().eq("id", id);
+  if (error) {
+    return {
+      status: "error",
+      message:
+        error.code === "23503"
+          ? "Local em uso por empregados — remova vínculos antes."
+          : error.message,
+    };
+  }
+  revalidatePath("/configuracoes/locais");
+  return { status: "success", message: "Local removido." };
+}
+
+// =================================================
+// JORNADAS
+// =================================================
+const jornadaSchema = z.object({
+  nome: z.string().trim().min(2, "Nome muito curto"),
+  horas_semana: z
+    .string()
+    .transform((v) => v.trim())
+    .transform((v) => (v === "" ? null : parseFloat(v)))
+    .refine((v) => v !== null && !Number.isNaN(v) && v > 0, "Horas obrigatórias"),
+});
+
+export async function salvarJornada(
+  id: string | null,
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const session = await requireSession();
+  if (!ensureAdmin(session.role)) {
+    return { status: "error", message: "Sem permissão." };
+  }
+  const parsed = parse(jornadaSchema, formData);
+  if (!parsed.ok) {
+    return { status: "error", message: "Confira os campos.", fieldErrors: parsed.fieldErrors };
+  }
+  const supabase = await createClient();
+  if (id) {
+    const { error } = await supabase
+      .from("jornadas")
+      .update(parsed.data)
+      .eq("id", id);
+    if (error) return { status: "error", message: error.message };
+  } else {
+    const { error } = await supabase
+      .from("jornadas")
+      .insert({ ...parsed.data, tenant_id: session.tenantId });
+    if (error) return { status: "error", message: error.message };
+  }
+  revalidatePath("/configuracoes/jornadas");
+  redirect("/configuracoes/jornadas");
+}
+
+export async function deletarJornada(id: string): Promise<FormState> {
+  const session = await requireSession();
+  if (session.role !== "owner") {
+    return { status: "error", message: "Apenas owner pode deletar." };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.from("jornadas").delete().eq("id", id);
+  if (error) {
+    return {
+      status: "error",
+      message:
+        error.code === "23503"
+          ? "Jornada em uso por empregados — remova vínculos antes."
+          : error.message,
+    };
+  }
+  revalidatePath("/configuracoes/jornadas");
+  return { status: "success", message: "Jornada removida." };
+}
