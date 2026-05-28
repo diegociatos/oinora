@@ -8,6 +8,9 @@ import {
   initialDocumentoState,
 } from "@/server/actions/documentos";
 import type { FormState } from "@/server/actions/empregados";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/components/ui/Toast";
+import { useActionToast } from "@/components/ui/use-action-toast";
 import shared from "../../_form.module.css";
 
 type Doc = {
@@ -199,8 +202,9 @@ function LinhaDocumento({
   doc: Doc;
   empregadoId: string;
 }) {
-  const [pendingDelete, startDelete] = useTransition();
   const [pendingView, startView] = useTransition();
+  const { error: showError } = useToast();
+  const showResult = useActionToast();
 
   const vencida = doc.validade && new Date(doc.validade) < new Date();
 
@@ -230,7 +234,7 @@ function LinhaDocumento({
           onClick={() => {
             startView(async () => {
               const r = await gerarSignedUrl(doc.storage_path);
-              if (r.error) alert(r.error);
+              if (r.error) showError("Não foi possível abrir", r.error);
               else if (r.url) window.open(r.url, "_blank");
             });
           }}
@@ -238,21 +242,17 @@ function LinhaDocumento({
         >
           {pendingView ? "…" : "abrir"}
         </button>
-        <button
-          type="button"
-          disabled={pendingDelete}
-          onClick={() => {
-            if (confirm(`Remover "${doc.nome_arquivo}"?`)) {
-              startDelete(async () => {
-                const r = await removerDocumento(empregadoId, doc.id);
-                if (r.status === "error") alert(r.message);
-              });
-            }
+        <ConfirmDialog
+          titulo={`Remover "${doc.nome_arquivo}"?`}
+          descricao="Arquivo será excluído do Storage."
+          textoConfirmar="Remover"
+          variant="perigo"
+          trigger={<button type="button" style={btn()}>remover</button>}
+          onConfirmar={async () => {
+            const r = await removerDocumento(empregadoId, doc.id);
+            showResult(r, "Documento removido");
           }}
-          style={btn()}
-        >
-          {pendingDelete ? "…" : "remover"}
-        </button>
+        />
       </td>
     </tr>
   );

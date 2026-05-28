@@ -83,6 +83,24 @@ export default async function EmpregadosPage({
               Todos os empregados cadastrados no tenant — RLS isola por empresa.
             </p>
           </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <a
+              href="/api/exportar/empregados"
+              download
+              style={{
+                padding: "10px 16px",
+                background: "var(--branco)",
+                color: "var(--marinho)",
+                border: "1px solid var(--cinza-cl)",
+                borderRadius: "var(--radius-sharp)",
+                fontFamily: "var(--ui)",
+                fontSize: "var(--fs-sm)",
+                fontWeight: 500,
+                textDecoration: "none",
+              }}
+            >
+              📥 Exportar CSV
+            </a>
           <Link
             href="/empregados/novo"
             style={{
@@ -99,6 +117,7 @@ export default async function EmpregadosPage({
           >
             + Novo empregado
           </Link>
+          </div>
         </div>
 
         <form className={styles.filtros}>

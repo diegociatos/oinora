@@ -8,6 +8,9 @@ import {
   initialProcDocState,
 } from "@/server/actions/processo-documentos";
 import type { FormState } from "@/server/actions/empregados";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/components/ui/Toast";
+import { useActionToast } from "@/components/ui/use-action-toast";
 import shared from "../../_form.module.css";
 
 type Doc = {
@@ -108,7 +111,8 @@ export function DocumentosProcesso({
 
 function DocLinha({ doc, processoId }: { doc: Doc; processoId: string }) {
   const [pView, startView] = useTransition();
-  const [pDel, startDel] = useTransition();
+  const { error: showError } = useToast();
+  const showResult = useActionToast();
   return (
     <li
       style={{
@@ -138,7 +142,7 @@ function DocLinha({ doc, processoId }: { doc: Doc; processoId: string }) {
           onClick={() => {
             startView(async () => {
               const r = await signedUrlDocProcesso(doc.storage_path);
-              if (r.error) alert(r.error);
+              if (r.error) showError("Não foi possível abrir", r.error);
               else if (r.url) window.open(r.url, "_blank");
             });
           }}
@@ -146,21 +150,17 @@ function DocLinha({ doc, processoId }: { doc: Doc; processoId: string }) {
         >
           {pView ? "…" : "abrir"}
         </button>
-        <button
-          type="button"
-          disabled={pDel}
-          onClick={() => {
-            if (confirm(`Remover "${doc.nome_arquivo}"?`)) {
-              startDel(async () => {
-                const r = await removerDocProcesso(processoId, doc.id);
-                if (r.status === "error") alert(r.message);
-              });
-            }
+        <ConfirmDialog
+          titulo={`Remover "${doc.nome_arquivo}"?`}
+          descricao="Arquivo será excluído do Storage do processo."
+          textoConfirmar="Remover"
+          variant="perigo"
+          trigger={<button type="button" style={btnLink()}>remover</button>}
+          onConfirmar={async () => {
+            const r = await removerDocProcesso(processoId, doc.id);
+            showResult(r, "Documento removido");
           }}
-          style={btnLink()}
-        >
-          {pDel ? "…" : "remover"}
-        </button>
+        />
       </div>
     </li>
   );

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import type { FormState } from "./empregados";
 
 export const initialRecrutamentoState: FormState = { status: "idle" };
@@ -273,6 +273,31 @@ export async function criarCandidaturaPortal(
       .single();
     if (cErr) return { status: "error", message: cErr.message };
     candidatoId = novo.id;
+  }
+
+  // Upload CV (opcional) via admin (RLS de cvs bucket pode ser restrito)
+  const cv = formData.get("cv") as File | null;
+  if (cv && cv.size > 0 && cv.size <= 5 * 1024 * 1024) {
+    const mimeOk = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ].includes(cv.type);
+    if (mimeOk) {
+      const admin = createAdminClient();
+      const filename = cv.name
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-zA-Z0-9._-]/g, "_")
+        .slice(0, 100);
+      const path = `${candidatoId}/${Date.now()}_${filename}`;
+      const { error: upErr } = await admin.storage
+        .from("cvs")
+        .upload(path, cv, { contentType: cv.type, upsert: false });
+      if (!upErr) {
+        await supabase.from("candidatos").update({ cv_url: path }).eq("id", candidatoId);
+      }
+    }
   }
 
   // Cria candidatura

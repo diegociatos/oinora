@@ -1,12 +1,14 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useState } from "react";
 import {
   salvarDependente,
   removerDependente,
   initialDependenteState,
 } from "@/server/actions/dependentes";
 import type { FormState } from "@/server/actions/empregados";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useActionToast } from "@/components/ui/use-action-toast";
 import shared from "../../_form.module.css";
 
 type Dep = {
@@ -177,31 +179,34 @@ export function BotaoRemoverDependente({
   dependenteId: string;
   nome: string;
 }) {
-  const [pending, start] = useTransition();
+  const showResult = useActionToast();
   return (
-    <button
-      type="button"
-      disabled={pending}
-      onClick={() => {
-        if (confirm(`Remover dependente "${nome}"?`)) {
-          start(async () => {
-            const r = await removerDependente(empregadoId, dependenteId);
-            if (r.status === "error") alert(r.message);
-          });
-        }
+    <ConfirmDialog
+      titulo={`Remover dependente "${nome}"?`}
+      descricao="Ação irreversível. O dependente será removido da folha e cálculo de IR."
+      textoConfirmar="Remover"
+      variant="perigo"
+      trigger={
+        <button
+          type="button"
+          style={{
+            background: "none",
+            border: "none",
+            color: "var(--cinza)",
+            cursor: "pointer",
+            fontFamily: "var(--ui)",
+            fontSize: "var(--fs-xs)",
+            marginLeft: 8,
+          }}
+        >
+          remover
+        </button>
+      }
+      onConfirmar={async () => {
+        const r = await removerDependente(empregadoId, dependenteId);
+        showResult(r, "Dependente removido");
       }}
-      style={{
-        background: "none",
-        border: "none",
-        color: "var(--cinza)",
-        cursor: "pointer",
-        fontFamily: "var(--ui)",
-        fontSize: "var(--fs-xs)",
-        marginLeft: 8,
-      }}
-    >
-      {pending ? "…" : "remover"}
-    </button>
+    />
   );
 }
 

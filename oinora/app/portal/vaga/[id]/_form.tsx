@@ -34,7 +34,7 @@ export function FormCandidatura({ vagaId }: { vagaId: string }) {
   }
 
   return (
-    <form action={action} noValidate>
+    <form action={action} encType="multipart/form-data" noValidate>
       <input type="hidden" name="vaga_id" value={vagaId} />
       {state.status === "error" ? (
         <div
@@ -59,6 +59,32 @@ export function FormCandidatura({ vagaId }: { vagaId: string }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <Field name="telefone" label="Telefone (com DDD)" />
           <Field name="cpf" label="CPF" />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <label
+            style={{
+              fontFamily: "var(--ui)",
+              fontSize: 10,
+              letterSpacing: 1.5,
+              textTransform: "uppercase",
+              color: "var(--marinho-med)",
+              fontWeight: 600,
+            }}
+          >
+            Currículo (PDF ou DOCX · máx 5 MB · opcional)
+          </label>
+          <input
+            type="file"
+            name="cv"
+            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            style={{
+              padding: "10px 12px",
+              border: "1px solid var(--cinza-cl)",
+              borderRadius: "var(--radius-sharp)",
+              fontFamily: "var(--ui)",
+              fontSize: 13,
+            }}
+          />
         </div>
         <label
           style={{
