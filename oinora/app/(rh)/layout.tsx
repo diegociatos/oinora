@@ -56,6 +56,12 @@ const NAV_GROUPS: Array<{
     ],
   },
   {
+    titulo: "Minha área",
+    itens: [
+      { href: "/meus-dados", label: "Meus dados", sigla: "M" },
+    ],
+  },
+  {
     titulo: "Oi Nora",
     itens: [
       { href: "/console", label: "Console", sigla: "★", roles: ["super_admin"] },

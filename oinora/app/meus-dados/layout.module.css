@@ -1,0 +1,100 @@
+.shell {
+  min-height: 100vh;
+  background: var(--papel);
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  background: var(--marinho);
+  color: var(--papel);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+.logo {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--serif);
+  font-size: 24px;
+  text-decoration: none;
+}
+.logo .oi {
+  color: var(--laranja);
+  font-style: italic;
+}
+.logo .nora {
+  color: var(--papel);
+  margin-left: 4px;
+}
+.nav {
+  display: flex;
+  gap: 20px;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 500;
+}
+.nav a {
+  color: rgba(250, 247, 242, 0.75);
+  padding: 6px 12px;
+  border-radius: 2px;
+  text-decoration: none;
+}
+.nav a:hover {
+  color: var(--papel);
+  background: rgba(255, 255, 255, 0.06);
+}
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--ui);
+  font-size: 13px;
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--laranja), var(--laranja-esc));
+  color: var(--branco);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 600;
+}
+.signout {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(250, 247, 242, 0.7);
+  padding: 6px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 12px;
+}
+.signout:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--papel);
+}
+.content {
+  flex: 1;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+@media (max-width: 700px) {
+  .nav {
+    display: none;
+  }
+  .content {
+    padding: 20px 16px;
+  }
+}
