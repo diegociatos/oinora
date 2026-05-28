@@ -92,7 +92,12 @@ export default async function CompetenciaPage({
                 return (
                   <tr key={h.id} style={{ borderBottom: "1px dashed var(--cinza-cl)" }}>
                     <td style={{ padding: "10px 12px", color: "var(--marinho)", fontWeight: 500 }}>
-                      {e?.nome_completo} · {e?.matricula}
+                      <Link
+                        href={`/folha/${comp.id}/holerite/${h.id}`}
+                        style={{ color: "var(--marinho)" }}
+                      >
+                        {e?.nome_completo} · {e?.matricula}
+                      </Link>
                     </td>
                     <td style={tdRight()}>{formatarMoeda(h.salario_base_centavos)}</td>
                     <td style={tdRight()}>{formatarMoeda(h.total_proventos_centavos)}</td>

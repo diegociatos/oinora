@@ -26,13 +26,18 @@ export default async function OnboardingPage() {
         <div className={layout.topbarActions}>{onbs?.length ?? 0} em curso</div>
       </header>
       <div className={layout.content}>
-        <div className={shared.headerPagina}>
-          <h2>
-            Integração de <em>novos empregados</em>
-          </h2>
-          <p>
-            Checklists D+0 a D+30. Mentores + RH acompanham progresso.
-          </p>
+        <div className={shared.headerPagina} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div>
+            <h2>
+              Integração de <em>novos empregados</em>
+            </h2>
+            <p>
+              Checklists D+0 a D+30. Mentores + RH acompanham progresso.
+            </p>
+          </div>
+          <Link href="/onboarding/novo" style={{ padding: "10px 20px", background: "var(--laranja)", color: "var(--branco)", borderRadius: "var(--radius-sharp)", fontFamily: "var(--ui)", fontSize: 13, fontWeight: 500 }}>
+            + Novo onboarding
+          </Link>
         </div>
 
         <div

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireSession } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { formatarData, formatarMoeda } from "@/lib/utils/format";
@@ -124,7 +125,9 @@ export default async function CandidatosPage({
             {(candidatos ?? []).map((c) => (
               <tr key={c.id} style={{ borderBottom: "1px solid var(--cinza-cl)" }}>
                 <td style={{ padding: "12px 16px", fontWeight: 500, color: "var(--marinho-esc)" }}>
-                  {c.nome_completo}
+                  <Link href={`/candidatos/${c.id}`} style={{ color: "var(--marinho-esc)" }}>
+                    {c.nome_completo}
+                  </Link>
                 </td>
                 <td style={{ padding: "12px 16px" }}>{c.email}</td>
                 <td style={{ padding: "12px 16px" }}>

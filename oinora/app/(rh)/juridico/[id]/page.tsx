@@ -6,6 +6,7 @@ import { formatarMoeda, formatarData, formatarDataLonga, formatarCpf } from "@/l
 import layout from "../../layout.module.css";
 import shared from "../../_form.module.css";
 import { FormNovoAndamento, FormNovaAudiencia } from "./_acoes-processo";
+import { DocumentosProcesso } from "./_docs-ui";
 
 export const metadata = { title: "Processo" };
 
@@ -40,10 +41,11 @@ export default async function ProcessoPage({
 
   if (!p) notFound();
 
-  const [{ data: andamentos }, { data: audiencias }, { data: parcelas }] = await Promise.all([
+  const [{ data: andamentos }, { data: audiencias }, { data: parcelas }, { data: docsProcesso }] = await Promise.all([
     supabase.from("processo_andamentos").select("id, data_evento, tipo, titulo, descricao").eq("processo_id", id).order("data_evento", { ascending: false }),
     supabase.from("processo_audiencias").select("id, data_hora, tipo, vara, sala, preposto_nome, resultado").eq("processo_id", id).order("data_hora", { ascending: false }),
     supabase.from("processo_calculo_parcelas").select("id, cenario, parcela, fundamento_legal, periodo, base_calculo, valor_centavos, ordem").eq("processo_id", id).eq("cenario", "realista").order("ordem"),
+    supabase.from("processo_documentos").select("id, tipo, nome_arquivo, storage_path, tamanho_bytes, criado_em").eq("processo_id", id).order("criado_em", { ascending: false }),
   ]);
 
   const esc = Array.isArray(p.escritorio) ? p.escritorio[0] : p.escritorio;
@@ -228,6 +230,14 @@ export default async function ProcessoPage({
                   </div>
                 ))
               )}
+            </div>
+
+            <div className={shared.painel}>
+              <h3 className={shared.painelTitulo}>Documentos do processo</h3>
+              <DocumentosProcesso
+                processoId={p.id}
+                documentos={(docsProcesso ?? []) as Parameters<typeof DocumentosProcesso>[0]["documentos"]}
+              />
             </div>
           </aside>
         </div>
