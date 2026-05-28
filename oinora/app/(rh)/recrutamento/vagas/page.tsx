@@ -62,20 +62,18 @@ export default async function VagasPage({
             </p>
           </div>
           <Link
-            href="#"
+            href="/recrutamento/vagas/novo"
             style={{
               padding: "10px 20px",
-              background: "var(--cinza-fundo)",
-              color: "var(--cinza)",
+              background: "var(--laranja)",
+              color: "var(--branco)",
               borderRadius: "var(--radius-sharp)",
               fontFamily: "var(--ui)",
               fontSize: "var(--fs-sm)",
               fontWeight: 500,
-              border: "1px dashed var(--cinza-cl)",
             }}
-            aria-disabled
           >
-            + Nova vaga (em breve)
+            + Nova vaga
           </Link>
         </div>
 

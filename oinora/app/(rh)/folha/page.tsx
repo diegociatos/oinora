@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatarData, formatarMoeda } from "@/lib/utils/format";
 import layout from "../layout.module.css";
 import shared from "../_form.module.css";
+import { GerarCompetencia } from "./_acoes";
 
 export const metadata = { title: "Folha de pagamento" };
 
@@ -44,14 +45,17 @@ export default async function FolhaPage() {
         </div>
       </header>
       <div className={layout.content}>
-        <div className={shared.headerPagina}>
-          <h2>
-            Competências <em>mensais</em>
-          </h2>
-          <p>
-            Cálculo automático INSS/IRRF/FGTS (tabelas 2026), 4-eyes
-            (cálculo+conferência), envio eSocial S-1200 ao final.
-          </p>
+        <div className={shared.headerPagina} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div>
+            <h2>
+              Competências <em>mensais</em>
+            </h2>
+            <p>
+              Cálculo automático INSS/IRRF/FGTS (tabelas 2026), 4-eyes
+              (cálculo+conferência), envio eSocial S-1200 ao final.
+            </p>
+          </div>
+          <GerarCompetencia />
         </div>
 
         <table style={{ width: "100%", background: "var(--branco)", border: "1px solid var(--cinza-cl)", borderRadius: "var(--radius-sharp)", borderCollapse: "separate", borderSpacing: 0, fontFamily: "var(--ui)", fontSize: 13 }}>

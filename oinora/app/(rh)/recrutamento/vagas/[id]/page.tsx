@@ -8,6 +8,7 @@ import layout from "../../../layout.module.css";
 import shared from "../../../_form.module.css";
 import styles from "../../page.module.css";
 import { Kanban } from "./_kanban";
+import { AcoesVaga } from "./_acoes-vaga";
 
 export const metadata = { title: "Vaga" };
 
@@ -66,12 +67,15 @@ export default async function VagaPage({
       </header>
 
       <div className={layout.content}>
-        <Link
-          href="/recrutamento/vagas"
-          style={{ color: "var(--cinza)", fontFamily: "var(--ui)", fontSize: 13, marginBottom: 16, display: "inline-block" }}
-        >
-          ← Voltar para Vagas
-        </Link>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <Link
+            href="/recrutamento/vagas"
+            style={{ color: "var(--cinza)", fontFamily: "var(--ui)", fontSize: 13 }}
+          >
+            ← Voltar para Vagas
+          </Link>
+          <AcoesVaga vagaId={vaga.id} status={vaga.status} />
+        </div>
 
         <section className={styles.heroVaga}>
           <div className={styles.heroVagaTop}>

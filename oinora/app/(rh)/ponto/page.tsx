@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatarMoeda } from "@/lib/utils/format";
 import layout from "../layout.module.css";
 import shared from "../_form.module.css";
+import { FormBatida } from "./_form-batida";
 
 export const metadata = { title: "Ponto eletrônico" };
 
@@ -27,6 +28,22 @@ export default async function PontoPage() {
     .order("horario", { ascending: false })
     .limit(20);
 
+  // Opções pra registrar batida
+  const [{ data: empregadosList }, { data: locaisList }] = await Promise.all([
+    supabase
+      .from("empregados")
+      .select("id, nome_completo, matricula")
+      .eq("status", "ativo")
+      .order("nome_completo"),
+    supabase
+      .from("locais_trabalho")
+      .select("id, nome")
+      .eq("ativo", true)
+      .order("nome"),
+  ]);
+  const empregadosLista = empregadosList ?? [];
+  const locaisLista = locaisList ?? [];
+
   return (
     <>
       <header className={layout.topbar}>
@@ -46,6 +63,17 @@ export default async function PontoPage() {
             Web + mobile PWA. Geofence por local de trabalho. Biometria/foto
             quando configurada com DataValid/Serpro.
           </p>
+        </div>
+
+        <div className={shared.painel}>
+          <h3 className={shared.painelTitulo}>Registrar batida</h3>
+          <FormBatida
+            empregados={empregadosLista.map((e) => ({
+              id: e.id,
+              label: `${e.nome_completo} · mat. ${e.matricula}`,
+            }))}
+            locais={locaisLista.map((l) => ({ id: l.id, label: l.nome }))}
+          />
         </div>
 
         <div className={shared.painel}>

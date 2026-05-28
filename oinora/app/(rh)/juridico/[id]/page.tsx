@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatarMoeda, formatarData, formatarDataLonga, formatarCpf } from "@/lib/utils/format";
 import layout from "../../layout.module.css";
 import shared from "../../_form.module.css";
+import { FormNovoAndamento, FormNovaAudiencia } from "./_acoes-processo";
 
 export const metadata = { title: "Processo" };
 
@@ -139,7 +140,12 @@ export default async function ProcessoPage({
 
             {/* Andamentos */}
             <div className={shared.painel}>
-              <h3 className={shared.painelTitulo}>Andamentos ({andamentos?.length ?? 0})</h3>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <h3 className={shared.painelTitulo} style={{ marginBottom: 0, paddingBottom: 0, border: "none" }}>
+                  Andamentos ({andamentos?.length ?? 0})
+                </h3>
+                <FormNovoAndamento processoId={p.id} />
+              </div>
               {(andamentos ?? []).map((a) => (
                 <div key={a.id} style={{ padding: "12px 0", borderBottom: "1px dashed var(--cinza-cl)", display: "flex", gap: 16 }}>
                   <div style={{ fontFamily: "var(--serif)", fontStyle: "italic", color: "var(--cinza)", whiteSpace: "nowrap", minWidth: 100, fontSize: 13 }}>
@@ -196,7 +202,12 @@ export default async function ProcessoPage({
             </div>
 
             <div className={shared.painel}>
-              <h3 className={shared.painelTitulo}>Audiências</h3>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <h3 className={shared.painelTitulo} style={{ marginBottom: 0, paddingBottom: 0, border: "none" }}>
+                  Audiências
+                </h3>
+              </div>
+              <FormNovaAudiencia processoId={p.id} />
               {(audiencias ?? []).length === 0 ? (
                 <p style={{ fontFamily: "var(--ui)", color: "var(--cinza)", fontSize: 13 }}>—</p>
               ) : (

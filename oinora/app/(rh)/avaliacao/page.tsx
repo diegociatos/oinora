@@ -3,6 +3,7 @@ import { requireSession } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import layout from "../layout.module.css";
 import shared from "../_form.module.css";
+import { CalibrarBotao } from "./_calibrar";
 
 export const metadata = { title: "Avaliação 9-Box" };
 
@@ -170,22 +171,27 @@ export default async function AvaliacaoPage() {
             <p style={{ fontFamily: "var(--ui)", fontSize: 13, color: "var(--cinza)", marginBottom: 12 }}>
               Empregados ativos sem avaliação 9-Box no ciclo atual.
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
               {semCalibracao.map((e) => (
-                <span
+                <div
                   key={e.id}
                   style={{
-                    fontFamily: "var(--ui)",
-                    fontSize: 12,
-                    padding: "4px 10px",
-                    background: "var(--cinza-fundo)",
+                    padding: 12,
+                    background: "var(--branco)",
                     border: "1px solid var(--cinza-cl)",
-                    borderRadius: "var(--radius-pill)",
-                    color: "var(--marinho)",
+                    borderRadius: "var(--radius-sharp)",
                   }}
                 >
-                  {e.nome_completo}
-                </span>
+                  <div style={{ fontFamily: "var(--serif)", fontSize: 14, color: "var(--marinho)" }}>
+                    {e.nome_completo}
+                  </div>
+                  <CalibrarBotao
+                    empregadoId={e.id}
+                    nome={e.nome_completo}
+                    desempenhoAtual={null}
+                    potencialAtual={null}
+                  />
+                </div>
               ))}
             </div>
           </div>

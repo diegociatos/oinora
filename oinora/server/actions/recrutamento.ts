@@ -1,9 +1,176 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { z } from "zod";
 import { requireSession } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { FormState } from "./empregados";
+
+export const initialRecrutamentoState: FormState = { status: "idle" };
+
+// ============================================================
+// CRIAR VAGA (wizard)
+// ============================================================
+const vagaSchema = z.object({
+  codigo: z.string().trim().min(2, "Código obrigatório"),
+  titulo: z.string().trim().min(3, "Título muito curto"),
+  cargo_id: z.string().uuid("Cargo obrigatório"),
+  departamento_id: z.string().uuid("Departamento obrigatório"),
+  gestor_solicitante_id: z
+    .string()
+    .transform((v) => v.trim())
+    .transform((v) => (v === "" ? null : v))
+    .nullable(),
+  local_trabalho_id: z
+    .string()
+    .transform((v) => v.trim())
+    .transform((v) => (v === "" ? null : v))
+    .nullable(),
+  modelo_trabalho: z.string().trim().optional().nullable(),
+  jornada: z.string().trim().optional().nullable(),
+  descricao_completa: z.string().trim().min(20, "Descreva a vaga (mín. 20 chars)"),
+  responsabilidades: z.string().trim().optional().nullable(),
+  requisitos_obrigatorios_text: z.string().trim().optional().nullable(),
+  requisitos_desejaveis_text: z.string().trim().optional().nullable(),
+  beneficios_text: z.string().trim().optional().nullable(),
+  salario_min_centavos: z
+    .string()
+    .transform((v) => v.replace(/\D/g, ""))
+    .transform((v) => (v === "" ? null : parseInt(v, 10)))
+    .nullable(),
+  salario_max_centavos: z
+    .string()
+    .transform((v) => v.replace(/\D/g, ""))
+    .transform((v) => (v === "" ? null : parseInt(v, 10)))
+    .nullable(),
+  afirmativa: z.string().transform((v) => v === "on" || v === "true"),
+  publico_alvo: z.string().trim().optional().nullable(),
+  justificativa_afirmativa: z.string().trim().optional().nullable(),
+  publicar: z.string().transform((v) => v === "on" || v === "true"),
+});
+
+export async function criarVaga(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const session = await requireSession();
+  if (!["owner", "admin", "recrutador_oinora", "hr_ops"].includes(session.role)) {
+    return { status: "error", message: "Sem permissão." };
+  }
+  const raw: Record<string, string> = {};
+  for (const [k, v] of formData.entries()) {
+    if (typeof v === "string") raw[k] = v;
+  }
+  for (const ck of ["afirmativa", "publicar"]) {
+    if (!(ck in raw)) raw[ck] = "";
+  }
+  const parsed = vagaSchema.safeParse(raw);
+  if (!parsed.success) {
+    const fieldErrors: Record<string, string> = {};
+    for (const i of parsed.error.issues) {
+      const p = i.path.join(".");
+      if (p && !fieldErrors[p]) fieldErrors[p] = i.message;
+    }
+    return {
+      status: "error",
+      message: "Verifique os campos destacados.",
+      fieldErrors,
+    };
+  }
+  const d = parsed.data;
+  const supabase = await createClient();
+  const { data: vaga, error } = await supabase
+    .from("vagas")
+    .insert({
+      tenant_id: session.tenantId,
+      codigo: d.codigo,
+      titulo: d.titulo,
+      cargo_id: d.cargo_id,
+      departamento_id: d.departamento_id,
+      gestor_solicitante_id: d.gestor_solicitante_id,
+      local_trabalho_id: d.local_trabalho_id,
+      modelo_trabalho: d.modelo_trabalho || null,
+      jornada: d.jornada || null,
+      descricao_completa: d.descricao_completa,
+      responsabilidades: d.responsabilidades || null,
+      requisitos_obrigatorios: d.requisitos_obrigatorios_text
+        ? d.requisitos_obrigatorios_text.split("\n").map((s) => s.trim()).filter(Boolean)
+        : null,
+      requisitos_desejaveis: d.requisitos_desejaveis_text
+        ? d.requisitos_desejaveis_text.split("\n").map((s) => s.trim()).filter(Boolean)
+        : null,
+      beneficios: d.beneficios_text
+        ? d.beneficios_text.split("\n").map((s) => s.trim()).filter(Boolean)
+        : null,
+      salario_min_centavos: d.salario_min_centavos,
+      salario_max_centavos: d.salario_max_centavos,
+      afirmativa: d.afirmativa,
+      publico_alvo: d.afirmativa ? (d.publico_alvo || null) : null,
+      justificativa_afirmativa: d.afirmativa ? (d.justificativa_afirmativa || null) : null,
+      status: d.publicar ? "publicada" : "rascunho",
+      data_publicacao: d.publicar ? new Date().toISOString().slice(0, 10) : null,
+      recrutador_oinora_id: session.userId,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.code === "23505" ? "Código de vaga já existe." : error.message,
+    };
+  }
+  revalidatePath("/recrutamento/vagas");
+  revalidatePath("/portal");
+  redirect(`/recrutamento/vagas/${vaga.id}`);
+}
+
+export async function pausarVaga(vagaId: string): Promise<FormState> {
+  const session = await requireSession();
+  if (!["owner", "admin", "recrutador_oinora"].includes(session.role)) {
+    return { status: "error", message: "Sem permissão." };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("vagas")
+    .update({ status: "pausada" })
+    .eq("id", vagaId);
+  if (error) return { status: "error", message: error.message };
+  revalidatePath(`/recrutamento/vagas/${vagaId}`);
+  revalidatePath("/portal");
+  return { status: "success", message: "Vaga pausada." };
+}
+
+export async function agendarEntrevista(
+  candidaturaId: string,
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const session = await requireSession();
+  if (!["owner", "admin", "recrutador_oinora", "hr_ops", "gestor"].includes(session.role)) {
+    return { status: "error", message: "Sem permissão." };
+  }
+  const dataHora = String(formData.get("data_hora") ?? "");
+  const modalidade = String(formData.get("modalidade") ?? "video");
+  const linkVideo = String(formData.get("link_video") ?? "").trim() || null;
+
+  if (!dataHora) {
+    return { status: "error", message: "Data e hora obrigatórias." };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.from("entrevistas").insert({
+    candidatura_id: candidaturaId,
+    tenant_id: session.tenantId,
+    entrevistador_id: session.userId,
+    data_hora: new Date(dataHora).toISOString(),
+    modalidade,
+    link_video: linkVideo,
+  });
+  if (error) return { status: "error", message: error.message };
+  revalidatePath(`/recrutamento/vagas`);
+  return { status: "success", message: "Entrevista agendada." };
+}
 
 export async function moverCandidato(
   candidaturaId: string,

@@ -67,14 +67,19 @@ export default async function JuridicoPage() {
         </div>
       </header>
       <div className={layout.content}>
-        <div className={shared.headerPagina}>
-          <h2>
-            Processos <em>trabalhistas</em>
-          </h2>
-          <p>
-            Cálculo de risco e sugestão de acordo via Claude Opus 4.7 ficam
-            ativos quando ANTHROPIC_API_KEY for configurada.
-          </p>
+        <div className={shared.headerPagina} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div>
+            <h2>
+              Processos <em>trabalhistas</em>
+            </h2>
+            <p>
+              Cálculo de risco e sugestão de acordo via Claude Opus 4.7 ficam
+              ativos quando ANTHROPIC_API_KEY for configurada.
+            </p>
+          </div>
+          <Link href="/juridico/novo" style={{ padding: "10px 20px", background: "var(--juridico)", color: "var(--branco)", borderRadius: "var(--radius-sharp)", fontFamily: "var(--ui)", fontSize: 13, fontWeight: 500 }}>
+            + Novo processo
+          </Link>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>

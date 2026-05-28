@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatarMoeda } from "@/lib/utils/format";
 import layout from "../../layout.module.css";
 import shared from "../../_form.module.css";
+import { AcoesCompetencia } from "../_acoes";
 
 export const metadata = { title: "Competência" };
 
@@ -48,9 +49,12 @@ export default async function CompetenciaPage({
         <div className={layout.topbarActions}>{comp.status}</div>
       </header>
       <div className={layout.content}>
-        <Link href="/folha" style={{ color: "var(--cinza)", fontFamily: "var(--ui)", fontSize: 13, marginBottom: 16, display: "inline-block" }}>
-          ← Voltar
-        </Link>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <Link href="/folha" style={{ color: "var(--cinza)", fontFamily: "var(--ui)", fontSize: 13 }}>
+            ← Voltar
+          </Link>
+          <AcoesCompetencia competenciaId={comp.id} status={comp.status} />
+        </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
           {[
