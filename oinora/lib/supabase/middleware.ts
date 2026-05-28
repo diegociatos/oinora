@@ -44,7 +44,8 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/login") ||
     path.startsWith("/signup") ||
     path.startsWith("/recuperar-senha") ||
-    path.startsWith("/auth/");
+    path.startsWith("/auth/") ||
+    path.startsWith("/portal"); // Portal de candidatos é público
 
   // Não-autenticado tentando acessar área protegida → /login
   if (!user && !isAuthRoute) {

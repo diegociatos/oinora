@@ -20,28 +20,30 @@ const NAV_GROUPS: Array<{
     itens: [
       { href: "/empregados", label: "Empregados", sigla: "E" },
       { href: "/alertas", label: "Alertas", sigla: "A", badgeKind: "alertas" as const },
-      { href: "/onboarding", label: "Onboarding", sigla: "O", soon: true },
-      { href: "/treinamentos", label: "Treinamentos", sigla: "T", soon: true },
+      { href: "/onboarding", label: "Onboarding", sigla: "O" },
+      { href: "/treinamentos", label: "Treinamentos", sigla: "T" },
+      { href: "/headcount", label: "Headcount", sigla: "H", roles: ["owner", "admin"] },
+      { href: "/avaliacao", label: "Avaliação 9-Box", sigla: "9", roles: ["owner", "admin", "hr_ops", "gestor"] },
     ],
   },
   {
     titulo: "Operação",
     itens: [
-      { href: "/folha", label: "Folha", sigla: "F", soon: true },
-      { href: "/ponto", label: "Ponto", sigla: "P", soon: true },
+      { href: "/folha", label: "Folha", sigla: "F" },
+      { href: "/ponto", label: "Ponto", sigla: "P" },
     ],
   },
   {
     titulo: "Recrutamento",
     itens: [
-      { href: "/recrutamento", label: "Vagas", sigla: "V", soon: true },
-      { href: "/candidatos", label: "Candidatos", sigla: "C", soon: true },
+      { href: "/recrutamento/vagas", label: "Vagas", sigla: "V" },
+      { href: "/candidatos", label: "Candidatos", sigla: "C" },
     ],
   },
   {
     titulo: "Jurídico",
     itens: [
-      { href: "/juridico", label: "Processos", sigla: "J", soon: true },
+      { href: "/juridico", label: "Processos", sigla: "J", roles: ["owner", "admin", "advogado_externo", "advogado_interno"] },
     ],
   },
   {
@@ -49,7 +51,14 @@ const NAV_GROUPS: Array<{
     itens: [
       { href: "/usuarios", label: "Usuários", sigla: "U", roles: ["owner", "admin"] },
       { href: "/auditoria", label: "Auditoria", sigla: "A", roles: ["owner"] },
+      { href: "/modulos-planos", label: "Módulos & Planos", sigla: "M" },
       { href: "/configuracoes", label: "Configurações", sigla: "C" },
+    ],
+  },
+  {
+    titulo: "Oi Nora",
+    itens: [
+      { href: "/console", label: "Console", sigla: "★", roles: ["super_admin"] },
     ],
   },
 ];

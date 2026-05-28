@@ -1,0 +1,136 @@
+.portalShell {
+  min-height: 100vh;
+  background: var(--papel);
+  display: flex;
+  flex-direction: column;
+}
+.portalTopbar {
+  background: var(--branco);
+  border-bottom: 1px solid var(--cinza-cl);
+  padding: var(--space-4) var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+.portalLogo {
+  font-family: var(--serif);
+  font-size: var(--fs-2xl);
+  display: inline-flex;
+  align-items: baseline;
+  text-decoration: none;
+}
+.portalLogo .oi {
+  color: var(--laranja);
+  font-style: italic;
+}
+.portalLogo .nora {
+  margin-left: var(--space-1);
+  color: var(--marinho);
+}
+.portalNav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--cinza);
+}
+.portalContent {
+  flex: 1;
+  padding: var(--space-10) var(--space-8);
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+.portalHero {
+  text-align: center;
+  padding: var(--space-10) 0;
+}
+.portalHero h1 {
+  font-family: var(--serif);
+  font-size: var(--fs-4xl);
+  font-weight: 400;
+  color: var(--marinho);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+}
+.portalHero h1 em {
+  color: var(--laranja);
+  font-style: italic;
+}
+.portalHero p {
+  font-family: var(--ui);
+  font-size: var(--fs-md);
+  color: var(--cinza);
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+.portalCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-10);
+}
+.portalVagaCard {
+  background: var(--branco);
+  border: 1px solid var(--cinza-cl);
+  border-radius: var(--radius-sharp);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  color: var(--marinho);
+}
+.portalVagaCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--laranja);
+  box-shadow: var(--shadow-md);
+}
+.portalVagaCardCodigo {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--cinza);
+  font-size: var(--fs-sm);
+}
+.portalVagaCardTitulo {
+  font-family: var(--serif);
+  font-size: var(--fs-xl);
+  font-weight: 400;
+  color: var(--marinho);
+  line-height: 1.2;
+}
+.portalVagaCardTitulo em {
+  color: var(--laranja);
+  font-style: italic;
+}
+.portalAfirmativa {
+  background: var(--laranja-cl);
+  color: var(--laranja-esc);
+  border: 1px solid var(--laranja);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  width: max-content;
+}
+.portalMeta {
+  font-family: var(--ui);
+  font-size: var(--fs-xs);
+  color: var(--cinza);
+}
+.portalFooter {
+  text-align: center;
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--cinza-cl);
+  font-family: var(--ui);
+  font-size: var(--fs-sm);
+  color: var(--cinza);
+}
