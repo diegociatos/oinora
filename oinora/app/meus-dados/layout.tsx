@@ -37,6 +37,7 @@ export default async function MeusDadosLayout({
           <Link href="/meus-dados">Início</Link>
           <Link href="/meus-dados/holerites">Holerites</Link>
           <Link href="/meus-dados/cursos">Cursos</Link>
+          <Link href="/meus-dados/lgpd">LGPD</Link>
           <Link href="/meus-dados/ponto">Ponto</Link>
           <Link href="/meus-dados/ficha">Minha ficha</Link>
         </nav>

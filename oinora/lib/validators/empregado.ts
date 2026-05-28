@@ -1,9 +1,11 @@
 import { z } from "zod";
+import { validarCpf } from "./br";
 
 const cpfSchema = z
   .string()
   .transform((v) => v.replace(/\D/g, ""))
-  .refine((v) => v.length === 11, "CPF precisa ter 11 dígitos");
+  .refine((v) => v.length === 11, "CPF precisa ter 11 dígitos")
+  .refine((v) => validarCpf(v), "CPF inválido (dígito verificador não bate)");
 
 const optionalString = z
   .string()
